@@ -10,15 +10,15 @@
 	ci = commit
 	co = checkout
 	contrib = shortlog --summary --numbered
-    br = branch
+	br = branch
 	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	lg = log -p
-    ll = log --pretty=oneline --graph --abbrev-commit
-    lm = log --pretty=format:'* %s (%h)'
+	ll = log --pretty=oneline --graph --abbrev-commit
+	lm = log --pretty=format:'* %s (%h)'
 [push]
 	default = simple
 [diff]
 [merge]
 	tool = opendiff
 [help]
-    autocorrect = 1
+	autocorrect = 1

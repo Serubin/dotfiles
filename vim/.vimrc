@@ -1,18 +1,18 @@
 syntax on
 
 set nocompatible
-set number                      "Line numbers are good
+set number						"Line numbers are good
 highlight LineNr ctermfg=grey	"Colored line numbers are better"
 set title						"Titles are cool
-set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
+set hidden					 	"Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>			"Paste without being smart
 set backspace=indent,eol,start  "Allow backspace in insert mode
-set history=1000                "Store lots of :cmdline history
-set showcmd                     "Show incomplete cmds down the bottom
-set showmode                    "Show current mode down the bottom
-set visualbell                  "No sounds
+set history=1000				"Store lots of :cmdline history
+set showcmd						"Show incomplete cmds down the bottom
+set showmode					"Show current mode down the bottom
+set visualbell					"No sounds
 set noerrorbells				"Removes error bells
-set autoread                    "Reload files changed outside vim
+set autoread					"Reload files changed outside vim
 set ruler						"Shows file ruler
 set autoindent					"Auto indentation
 set smartindent					"Smart indentation
@@ -29,9 +29,9 @@ set undolevels=1000				"Undo history
 let g:netrw_liststyle=3 		"List styles for file explorer
 
 " Key mappings
-nnoremap <leader><space> :noh<cr>   " Clear search highlighting with ,<space>
-nnoremap <tab> :bnext<cr>           " Tab to next buffer
-nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
+nnoremap <leader><space> :noh<cr>	" Clear search highlighting with ,<space>
+nnoremap <tab> :bnext<cr>			" Tab to next buffer
+nnoremap <s-tab> :bprevious<cr>		" Shift-tab to previous buffer
 
 " Load plugins
 
