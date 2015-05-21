@@ -1,0 +1,21 @@
+
+
+# cd
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+
+# ls aliases
+alias la="ls -A"
+alias ll="ls -lhAr"
+
+# shortcuts
+alias _="sudo"
+alias g="git"
+alias v="vim"
+alias rr="rm -rf"
+
+# ip aliases
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
