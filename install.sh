@@ -27,6 +27,14 @@ fi
 if [ -d "$HOME/.gitconfig_global" ]; then
 	mv $HOME/.gitconfig_global $DOTFILES_DIR/bak/.gitconfig_global
 fi
+
+if [ -d "$HOME/.gitconfig_global" ]; then
+	mv $HOME/.vim $DOTFILES_DIR/bak/.vim
+fi
+
+if [ -d "$HOME/.gitconfig_global" ]; then
+	mv $HOME/.vimrc $DOTFILES_DIR/bak/.vimrc
+fi
 # Bunch of symlinks
 
 ln -sfv "$DOTFILES_DIR/runcom/.bash_profile" ~
