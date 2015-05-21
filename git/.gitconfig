@@ -20,3 +20,5 @@
 [diff]
 [merge]
 	tool = opendiff
+[help]
+    autocorrect = 1
