@@ -16,6 +16,8 @@ call vundle#begin("$HOME/.vim/bundle")
 " let Vundle manage Vundle (required)
 Bundle "gmarik/vundle"
 
+" Keeping vim rather simple
+
 " Generic
 
 Bundle "itchyny/lightline.vim"
@@ -25,6 +27,10 @@ Bundle "itchyny/lightline.vim"
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+
+" JavaScript
+
+Bundle "pangloss/vim-javascript"
 
 call vundle#end()
 
