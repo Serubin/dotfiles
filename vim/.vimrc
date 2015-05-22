@@ -34,9 +34,8 @@ nnoremap <tab> :bnext<cr>			" Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>		" Shift-tab to previous buffer
 
 " Load plugins
-
-if filereadable(expand("$VIM/vundle.vim"))
-  source $VIM/vundle.vim
+if filereadable(expand("~/.vim/vundle.vim"))
+  source ~/.vim/vundle.vim
 endif
 
 if has('persistent_undo')
