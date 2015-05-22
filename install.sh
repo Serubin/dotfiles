@@ -44,3 +44,5 @@ ln -sfv "$DOTFILES_DIR/git/.gitconfig" ~
 ln -sfv "$DOTFILES_DIR/vim/.vimrc" ~
 
 source install/vim.sh
+
+source ~/.bash_profile
