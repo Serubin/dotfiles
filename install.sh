@@ -46,6 +46,7 @@ ln -sfv "$DOTFILES_DIR/runcom/.inputrc" ~
 ln -sfv "$DOTFILES_DIR/git/.gitconfig" ~
 ln -sfv "$DOTFILES_DIR/git/.gitignore_global" ~ # needs creation
 ln -sfv "$DOTFILES_DIR/vim/.vimrc" ~
+mkdir -p ~/vim/
 ln -sfv "$DOTFILES_DIR/vim/vundle.vim" ~/.vim/
 
 source install/vim.sh
