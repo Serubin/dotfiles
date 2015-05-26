@@ -11,6 +11,10 @@ export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Moving previous configurations to dotfiles/bak/"
 mkdir $DOTFILES_DIR/bak
 
+if [ -d "$HOME/.bash_profile" ]; then
+	mv $HOME/.bash_profile $DOTFILES_DIR/bak/.bash_profile
+fi
+
 if [ -d "$HOME/.bashrc" ]; then
 	mv $HOME/.bashrc $DOTFILES_DIR/bak/.bashrc
 fi
@@ -27,11 +31,11 @@ if [ -d "$HOME/.gitconfig_global" ]; then
 	mv $HOME/.gitconfig_global $DOTFILES_DIR/bak/.gitconfig_global
 fi
 
-if [ -d "$HOME/.gitconfig_global" ]; then
+if [ -d "$HOME/.vim" ]; then
 	mv $HOME/.vim $DOTFILES_DIR/bak/.vim
 fi
 
-if [ -d "$HOME/.gitconfig_global" ]; then
+if [ -d "$HOME/.vimrc" ]; then
 	mv $HOME/.vimrc $DOTFILES_DIR/bak/.vimrc
 fi
 
@@ -40,7 +44,7 @@ echo "Creating symlinks"
 ln -sfv "$DOTFILES_DIR/runcom/.bash_profile" ~
 ln -sfv "$DOTFILES_DIR/runcom/.inputrc" ~
 ln -sfv "$DOTFILES_DIR/git/.gitconfig" ~
-#ln -sfv "$DOTFILES_DIR/git/.gitignore_global" ~ # needs creation
+ln -sfv "$DOTFILES_DIR/git/.gitignore_global" ~ # needs creation
 ln -sfv "$DOTFILES_DIR/vim/.vimrc" ~
 ln -sfv "$DOTFILES_DIR/vim/vundle.vim" ~/.vim/
 
