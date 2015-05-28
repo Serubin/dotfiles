@@ -12,31 +12,31 @@ echo "Moving previous configurations to dotfiles/bak/"
 mkdir $DOTFILES_DIR/bak
 
 if [ -e "$HOME/.bash_profile" ]; then
-	mv $HOME/.bash_profile $DOTFILES_DIR/bak/.bash_profile
+	mv $HOME/.bash_profile $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.bashrc" ]; then
-	mv $HOME/.bashrc $DOTFILES_DIR/bak/.bashrc
+	mv $HOME/.bashrc $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.inputrc" ]; then
-	mv $HOME/.inputrc $DOTFILES_DIR/bak/.inputrc
+	mv $HOME/.inputrc $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.gitconfig" ]; then
-	mv $HOME/.gitconfig $DOTFILES_DIR/bak/.gitconfig
+	mv $HOME/.gitconfig $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.gitconfig_global" ]; then
-	mv $HOME/.gitconfig_global $DOTFILES_DIR/bak/.gitconfig_global
+	mv $HOME/.gitconfig_global $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.vim" ]; then
-	mv $HOME/.vim $DOTFILES_DIR/bak/.vim
+	mv $HOME/.vim $HOME/.dotfiles-bak/
 fi
 
 if [ -e "$HOME/.vimrc" ]; then
-	mv $HOME/.vimrc $DOTFILES_DIR/bak/.vimrc
+	mv $HOME/.vimrc $HOME/.dotfiles-bak/
 fi
 
 echo "Creating symlinks"
@@ -50,7 +50,7 @@ mkdir -p ~/.vim/
 ln -sfv "$DOTFILES_DIR/vim/vundle.vim" ~/.vim/
 
 if [ ! -e "$HOME/.custom" ]; then
-	mv $DOTFILES_DIR/bash/.custom  ~
+	cp $DOTFILES_DIR/bash/.custom  ~
 fi
 source install/vim.sh
 
