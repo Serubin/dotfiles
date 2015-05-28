@@ -4,6 +4,7 @@
 [github]
 	user = Serubin
 [core]
+	excludesfile = ~/.gitignore_global
 	editor = vim
 [alias]
 	ap = add -p

@@ -11,31 +11,31 @@ export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Moving previous configurations to dotfiles/bak/"
 mkdir $DOTFILES_DIR/bak
 
-if [ -d "$HOME/.bash_profile" ]; then
+if [ -e "$HOME/.bash_profile" ]; then
 	mv $HOME/.bash_profile $DOTFILES_DIR/bak/.bash_profile
 fi
 
-if [ -d "$HOME/.bashrc" ]; then
+if [ -e "$HOME/.bashrc" ]; then
 	mv $HOME/.bashrc $DOTFILES_DIR/bak/.bashrc
 fi
 
-if [ -d "$HOME/.inputrc" ]; then
+if [ -e "$HOME/.inputrc" ]; then
 	mv $HOME/.inputrc $DOTFILES_DIR/bak/.inputrc
 fi
 
-if [ -d "$HOME/.gitconfig" ]; then
+if [ -e "$HOME/.gitconfig" ]; then
 	mv $HOME/.gitconfig $DOTFILES_DIR/bak/.gitconfig
 fi
 
-if [ -d "$HOME/.gitconfig_global" ]; then
+if [ -e "$HOME/.gitconfig_global" ]; then
 	mv $HOME/.gitconfig_global $DOTFILES_DIR/bak/.gitconfig_global
 fi
 
-if [ -d "$HOME/.vim" ]; then
+if [ -e "$HOME/.vim" ]; then
 	mv $HOME/.vim $DOTFILES_DIR/bak/.vim
 fi
 
-if [ -d "$HOME/.vimrc" ]; then
+if [ -e "$HOME/.vimrc" ]; then
 	mv $HOME/.vimrc $DOTFILES_DIR/bak/.vimrc
 fi
 
@@ -49,6 +49,9 @@ ln -sfv "$DOTFILES_DIR/vim/.vimrc" ~
 mkdir -p ~/.vim/
 ln -sfv "$DOTFILES_DIR/vim/vundle.vim" ~/.vim/
 
+if [ ! -e "$HOME/.custom" ]; then
+	mv $DOTFILES_DIR/bash/.custom  ~
+fi
 source install/vim.sh
 
 source ~/.bash_profile
