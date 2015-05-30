@@ -1,4 +1,6 @@
-
+#!/bin/sh
+# Aliases
+#
 
 # cd
 alias ..="cd .."
