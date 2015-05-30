@@ -14,3 +14,6 @@ vim +PluginInstall +qall
 cd "$BUNDLE_DIR/YouCompleteMe" && ./install.sh
 
 cd -
+
+# Removing variables
+unset BUNDLE_DIR
