@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# sublime install for osx
+
+# install sublime
+brew cask install caskroom/versions/sublime-text3
+
+ln -s "${HOME}/Applications/Sublime\ Text.app" "/Applications/Sublime Text.app"
+
+sublime_loc="${HOME}/Library/Application Support/Sublime Text 3/"
+
+mkdir "$sublime_loc"
+mkdir "${sublime_loc}Installed Packages"
+
+wget https://packagecontrol.io/Package%20Control.sublime-package -O "${sublime_loc}Installed Packages/Package Control.sublime-package"
+
+cp -r "install/sublime/config/" "${sublime_loc}/Packages"
+
+

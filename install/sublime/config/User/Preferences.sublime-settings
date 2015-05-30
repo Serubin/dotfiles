@@ -1,0 +1,8 @@
+{
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"theme": "Spacegray.sublime-theme",
+	"color_scheme": "Packages/User/Spacegrey-Monkai.tmTheme"
+}
