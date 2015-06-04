@@ -18,14 +18,13 @@ brew update
 brew upgrade
 
 apps=(
-	cmake
+    cmake
     git
     gnu-sed --default-names
     grep --default-names
     htop-osx
     perl
     python
-    vim
     wget
 )
 
