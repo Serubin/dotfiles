@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo " -- Installing Sublime"
+
 echo "Backing up previous vim config"
 
 if [ -r "$HOME/.vim" ]; then
