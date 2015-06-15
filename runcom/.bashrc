@@ -10,3 +10,5 @@ done
 if [ -r ~/.custom ]; then
 	source ~/.custom;
 fi
+
+clear
