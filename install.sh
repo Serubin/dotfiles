@@ -34,21 +34,11 @@ if [ -r "$HOME/.inputrc" ]; then
 	mv $HOME/.inputrc $HOME/.dotfiles-bak/
 fi
 
-if [ -r "$HOME/.gitconfig" ]; then
-	mv $HOME/.gitconfig $HOME/.dotfiles-bak/
-fi
-
-if [ -r "$HOME/.gitconfig_global" ]; then
-	mv $HOME/.gitconfig_global $HOME/.dotfiles-bak/
-fi
-
 echo "Creating symlinks"
 # Bunch of symlinks
 ln -sfv "$DOTFILES_DIR/runcom/.bashrc" ~
 ln -sfv "$DOTFILES_DIR/runcom/.bash_profile" ~
 ln -sfv "$DOTFILES_DIR/runcom/.inputrc" ~
-ln -sfv "$DOTFILES_DIR/git/.gitconfig" ~
-ln -sfv "$DOTFILES_DIR/git/.gitignore_global" ~ # needs creation
 
 if [ ! -r "$HOME/.custom" ]; then
 	cp $DOTFILES_DIR/bash/.custom  ~
@@ -56,7 +46,9 @@ fi
 
 source install/vim.sh
 
-source install/sublime/sublime.osx
+source install/sublime/sublime.sh
+
+source install/git/git.sh
 
 source ~/.bashrc
 
