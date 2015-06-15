@@ -5,3 +5,12 @@ sudo add-apt-repository -y ppa:webupd8team/sublime-text-3
 
 sudo apt-get update
 sudo apt-get -y install sublime-text-installer
+
+sublime_loc="${HOME}/.config/sublime-text-3"
+
+mkdir "${sublime_loc}"
+mkdir "${sublime_loc}Installed Packages"
+
+wget https://packagecontrol.io/Package%20Control.sublime-package -O "${sublime_loc}Installed Packages/Package Control.sublime-package"
+
+cp -r "install/sublime/config/" "${sublime_loc}/Packages"
