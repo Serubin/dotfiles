@@ -19,11 +19,11 @@ if [ $DISTRO == "Debian" | $DISTRO="Ubuntu" ]; then
 	source $DOTFILES_DIR/install/vim/vim.debian
 elif [ $DISTRO == "Darwin" ]; then
 	source $DOTFILES_DIR/install/vim/vim.osx
-
+fi
 # config install
-ln -sfv "$DOTFILES_DIR/vim/.vimrc" ~
+ln -sfv "$DOTFILES_DIR/install/vim/config/.vimrc" ~
 mkdir -p ~/.vim/
-ln -sfv "$DOTFILES_DIR/vim/vundle.vim" ~/.vim/
+ln -sfv "$DOTFILES_DIR/install/vim/config/vundle.vim" ~/.vim/
 
 BUNDLE_DIR=~/.vim/bundle
 
