@@ -44,7 +44,7 @@ if [ ! -r "$HOME/.custom" ]; then
 	cp $DOTFILES_DIR/bash/.custom  ~
 fi
 
-source install/vim.sh
+source install/vim/vim.sh
 
 source install/sublime/sublime.sh
 
