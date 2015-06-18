@@ -4,6 +4,7 @@ DOTFILES_DIR="$HOME/.dotfiles"
 
 # source all bash base files
 for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
+	if
 	[ -r "$DOTFILE" ] && source "$DOTFILE"
 done
 

@@ -13,4 +13,4 @@ mkdir "${sublime_loc}Installed Packages"
 
 wget https://packagecontrol.io/Package%20Control.sublime-package -O "${sublime_loc}Installed Packages/Package Control.sublime-package"
 
-cp -r "install/sublime/config/" "${sublime_loc}/Packages"
+cp -r "$DOTFILES_DIR/install/sublime/config/" "${sublime_loc}/Packages"

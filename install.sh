@@ -36,19 +36,19 @@ fi
 
 echo "Creating symlinks"
 # Bunch of symlinks
-ln -sfv "runcom/.bashrc" ~
-ln -sfv "runcom/.bash_profile" ~
-ln -sfv "runcom/.inputrc" ~
+ln -sfv "$DOTFILES_DIR/runcom/.bashrc" ~
+ln -sfv "$DOTFILES_DIR/runcom/.bash_profile" ~
+ln -sfv "$DOTFILES_DIR/runcom/.inputrc" ~
 
 if [ ! -r "$HOME/.custom" ]; then
-	cp bash/.custom  ~
+	cp $DOTFILES_DIR/bash/.custom  ~
 fi
 
-source install/vim/vim.sh
+source $DOTFILES_DIR/install/vim/vim.sh
 
-source install/sublime/sublime.sh
+source $DOTFILES_DIR/install/sublime/sublime.sh
 
-source install/git/git.sh
+source $DOTFILES_DIR/install/git/git.sh
 
 source ~/.bashrc
 
