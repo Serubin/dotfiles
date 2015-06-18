@@ -8,6 +8,7 @@
 	editor = vim
 [alias]
 	ap = add -p
+	s = status
 	ci = commit
 	co = checkout
 	contrib = shortlog --summary --numbered
