@@ -4,6 +4,9 @@ echo "Starting Serubin's dotfile install..."
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# saves dotfile location
+echo "export DOTFILES_DIR=${DOTFILES_DIR}" > $HOME/.dotfiles_loc
+
 # Get *nix distro
 DISTRO_RAW="" # Gets raw os output
 if [ -r "/etc/*-release" ]; then
