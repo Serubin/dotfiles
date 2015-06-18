@@ -44,6 +44,14 @@ if has('persistent_undo')
   set undofile
 endif
 
+" lightline
+set laststatus=2 " no display fix
+let g:lightline = {
+      \ 'colorscheme': 'powerline',
+      \ }
+
+" TODO add more lightline stuff
+
 set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
 set wildignore+=*vim/backups*
 set wildignore+=*sass-cache*

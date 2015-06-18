@@ -21,7 +21,7 @@ Bundle "gmarik/vundle"
 " Generic
 
 Bundle "itchyny/lightline.vim"
-
+Bundle "tpope/vim-fugitive"
 " Completion & snippets
 
 Plugin 'Valloric/YouCompleteMe'
