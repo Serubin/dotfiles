@@ -15,15 +15,15 @@ fi
 echo "Starting vim install"
 
 # determin distro
-if [ $DISTRO == "Debian" | $DISTRO="Ubuntu" ]; then
+if [ $DISTRO == "Debian" ] || [ $DISTRO="Ubuntu" ]; then
 	source $DOTFILES_DIR/install/vim/vim.debian
 elif [ $DISTRO == "Darwin" ]; then
 	source $DOTFILES_DIR/install/vim/vim.osx
 fi
 # config install
-ln -sfv "$DOTFILES_DIR/install/vim/config/.vimrc" ~
+ln -sfv "install/vim/config/.vimrc" ~
 mkdir -p ~/.vim/
-ln -sfv "$DOTFILES_DIR/install/vim/config/vundle.vim" ~/.vim/
+ln -sfv "install/vim/config/vundle.vim" ~/.vim/
 
 BUNDLE_DIR=~/.vim/bundle
 
