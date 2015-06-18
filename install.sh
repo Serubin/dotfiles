@@ -15,12 +15,12 @@ fi
 DISTRO=`echo $DISTRO_RAW | perl -lne '/(Ubuntu)|(Debian)|(Darwin)/gi && print $&' | head -n1`
 unset DISTRO_RAW # unsets util var
 
-# Update dotfiles itself first
+# Update dotfiles itself first - 
 [ -d "$DOTFILES_DIR/.git" ] && git --work-tree="$DOTFILES_DIR" --git-dir="$DOTFILES_DIR/.git" pull origin master
 
 # Backing up current configurations
 echo "Moving previous configurations to dotfiles/bak/"
-mkdir $DOTFILES_DIR/.dotfiles-bak
+mkdir $HOME/.dotfiles-bak
 
 if [ -r "$HOME/.bash_profile" ]; then
 	mv $HOME/.bash_profile $HOME/.dotfiles-bak/
@@ -36,12 +36,12 @@ fi
 
 echo "Creating symlinks"
 # Bunch of symlinks
-ln -sfv "$DOTFILES_DIR/runcom/.bashrc" ~
-ln -sfv "$DOTFILES_DIR/runcom/.bash_profile" ~
-ln -sfv "$DOTFILES_DIR/runcom/.inputrc" ~
+ln -sfv "runcom/.bashrc" ~
+ln -sfv "runcom/.bash_profile" ~
+ln -sfv "runcom/.inputrc" ~
 
 if [ ! -r "$HOME/.custom" ]; then
-	cp $DOTFILES_DIR/bash/.custom  ~
+	cp bash/.custom  ~
 fi
 
 source install/vim/vim.sh
