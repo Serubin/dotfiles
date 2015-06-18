@@ -15,7 +15,7 @@ fi
 echo "Starting vim install"
 
 # determin distro
-if [ $DISTRO == "Debian" ] || [ $DISTRO="Ubuntu" ]; then
+if [ $DISTRO == "Debian" ] || [ $DISTRO == "Ubuntu" ]; then
 	source $DOTFILES_DIR/install/vim/vim.debian
 elif [ $DISTRO == "Darwin" ]; then
 	source $DOTFILES_DIR/install/vim/vim.osx
