@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # PS1 Prompt
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants

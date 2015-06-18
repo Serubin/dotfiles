@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # pre-req
 sudo apt-get -y install build-essential cmake python-dev

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Starting Serubin's dotfile install..."
 # Get current dir (so run this script from anywhere)

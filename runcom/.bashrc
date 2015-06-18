@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Determins dot file location
 if [ -r "$HOME/.dotfiles_loc" ]; then # checks for stored location
 	source "$HOME/.dotfiles_loc"

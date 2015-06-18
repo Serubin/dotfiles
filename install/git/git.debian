@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Building git from source"
 # Remove packaged Git
