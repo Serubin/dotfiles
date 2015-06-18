@@ -11,13 +11,13 @@ if [ -r "$HOME/.gitconfig_global" ]; then
 	mv $HOME/.gitconfig_global $HOME/.dotfiles-bak/
 fi
 
-if [ $DISTRO == "Debian" | $DISTRO == "Ubuntu" ]; then
-	source $DOTFILES_DIR/install/git/git.debian
+if [ $DISTRO == "Debian" ] || [ $DISTRO == "Ubuntu" ]; then
+	source install/git/git.debian
 elif [ $DISTRO = "Darwin" ]; then
-	source $DOTFILES_DIR/install/git/git.osx
+	source install/git/git.osx
 else
 	echo "ERROR: This os doesn't support sublime installations."
 fi
 
-ln -sfv "$DOTFILES_DIR/install/git/.gitconfig" ~
-ln -sfv "$DOTFILES_DIR/install/git/.gitignore_global" ~ # needs creation
+ln -sfv "install/git/config/.gitconfig" ~
+ln -sfv "install/git/config/.gitignore_global" ~ # needs creation
