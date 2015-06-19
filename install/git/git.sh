@@ -11,7 +11,7 @@ if [ -r "$HOME/.gitconfig_global" ]; then
 	mv $HOME/.gitconfig_global $HOME/.dotfiles-bak/
 fi
 
-if [ "$DISTRO" == "Debian" ] || [ $DISTRO == "Ubuntu" ]; then
+if [ "$DISTRO" == "Debian" ] || [ "$DISTRO" == "Ubuntu" ]; then
 	source $DOTFILES_DIR/install/git/git.debian
 elif [ "$DISTRO" == "Darwin" ]; then
 	source $DOTFILES_DIR/install/git/git.osx
