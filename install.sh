@@ -9,7 +9,8 @@ echo "export DOTFILES_DIR=${DOTFILES_DIR}" > $HOME/.dotfiles_loc
 
 # Get *nix distro
 DISTRO_RAW="" # Gets raw os output
-if [ -r "/etc/*-release" ]; then
+DISTRO_RAW_LOC=`echo /etc/*-release`
+if [ -r "$DISTRO_RAW_LOC" ]; then
 	DISTRO_RAW=$(cat /etc/*-release)
 else
 	DISTRO_RAW=$(uname)
