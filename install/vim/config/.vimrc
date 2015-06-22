@@ -9,7 +9,6 @@ set pastetoggle=<F2>			"Paste without being smart
 set backspace=indent,eol,start  "Allow backspace in insert mode
 set history=1000				"Store lots of :cmdline history
 set showcmd						"Show incomplete cmds down the bottom
-set showmode					"Show current mode down the bottom
 set visualbell					"No sounds
 set noerrorbells				"Removes error bells
 set autoread					"Reload files changed outside vim
@@ -46,6 +45,7 @@ endif
 
 " lightline
 set laststatus=2 " no display fix
+set noshowmode " TODO something preventing this. fix
 let g:lightline = {
       \ 'colorscheme': 'powerline',
       \ }
