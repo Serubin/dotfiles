@@ -47,8 +47,8 @@ endif
 set laststatus=2 " no display fix
 set noshowmode " TODO something preventing this. fix
 let g:lightline = {
-      \ 'colorscheme': 'powerline',
-      \ }
+    \ 'colorscheme': 'powerline',
+    \ }
 
 " TODO add more lightline stuff
 
