@@ -5,7 +5,7 @@ echo "Building git from source"
 sudo apt-get remove git-core
 
 # Install dependencies
-sudo apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
+sudo apt-get install -y curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
 
 # Download and compile from source
 cd /tmp
@@ -17,3 +17,7 @@ make prefix=/usr/local all
 
 # Install into /usr/local/bin
 sudo make prefix=/usr/local install
+
+cd ..
+rm -rf git-2.4.3
+cd $DOTFILES_DIR
