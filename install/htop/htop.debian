@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo apt-get install -y htop
+
+ln -sfv "$DOTFILES_HOME/install/htop/config/htoprc" ~/.config/htop/
