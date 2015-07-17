@@ -12,6 +12,7 @@ In order to change the location of the installtion you will have to re-run the i
 * OS X (with brew)
 * Debian
 * Ubuntu
+
 The install script takes care of all the pre-requists excluding git, bash, and sudo. However this only works with OSX Debian and Ubuntu (for the moment). 
 
 In OS X the script will install brew and all needed components. 
