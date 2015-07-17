@@ -69,3 +69,15 @@ Listed are all aliases for all applictions. As always, for a better picture take
 * Ip Aliases
  * ```ip``` retreives public ip
  * ```ipl``` parses for local ip
+
+#### Git
+* ```git ap```, add -p
+* ```git s```, status
+* ```git ci```, commit
+* ```git co```, checkout
+* ```git contrib```, shortlog --summary --numbered
+* ```git br```,branch
+* ```git  l```, log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+* ```git lg```, log -p
+* ```git 	ll```, log --pretty=oneline --graph --abbrev-commit
+* ```git lm```, log --pretty=format:'* %s (%h)'
