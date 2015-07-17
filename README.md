@@ -42,13 +42,13 @@ This setup creates a clean bash envirnment with several other applications. Belo
 
 #### Sublime (x server/Desktop Environment)
 * Custom Theme - Monkia
-* Packages --
-* All Autocomplete
-* Apply Syntax
-* BracketHighlighter
-* CodeFormatter
-* SideBarEnhancements
-* Various Completion packages
+* Packages
+ * All Autocomplete
+ * Apply Syntax
+ * BracketHighlighter
+ * CodeFormatter
+ * SideBarEnhancements
+ * Various Completion packages
 
 ## Aliases
 Listed are all aliases for all applictions. As always, for a better picture take a look at the actual files.
