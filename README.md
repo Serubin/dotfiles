@@ -20,16 +20,16 @@ In OS X the script will install brew and all needed components.
 
 This setup creates a clean bash envirnment with several other applications. Below is each application created and the features added. Of course I encourage you to look through the files to get a better picture of what this will set up for you.
 
-### Bash
+#### Bash
 *   Aliases (listed below)
 *   Custom PS1 prompt with git integration
 *   Functions to make life easy (listed below)
 
-### git
+#### git
 * Global ignore for mac os x
 * Git Aliases (listed below)
 
-### Vim
+#### Vim
 * "Smart" features
 * Shortcuts
 * Line numbers
@@ -39,7 +39,7 @@ This setup creates a clean bash envirnment with several other applications. Belo
 * Presistent undo
 * Various completion packages
 
-### Sublime (x server/Desktop Environment)
+#### Sublime (x server/Desktop Environment)
 * Custom Theme - Monkia
 * Packages --
 * All Autocomplete
@@ -49,3 +49,23 @@ This setup creates a clean bash envirnment with several other applications. Belo
 * SideBarEnhancements
 * Various Completion packages
 
+## Aliases
+Listed are all aliases for all applictions. As always, for a better picture take a look at the actual files.
+
+#### Bash
+* Easy directory reversals
+ * ```..``` one back
+ * ```...``` two back
+ * ```....``` three back
+* Ls
+ * ```la``` with -A option
+ * ```ll``` -lhAr options
+* shortcuts
+ * ```_``` sudo
+ * ```g``` git
+ * ```v``` vim
+ * ```rr``` rm with -rf options
+
+* Ip Aliases
+ * ```ip``` retreives public ip
+ * ```ipl``` parses for local ip
