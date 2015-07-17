@@ -24,10 +24,10 @@ else
 fi
 # config install
 ln -sfv "$DOTFILES_DIR/install/vim/config/.vimrc" ~
-mkdir -p ~/.vim/
+mkdir -p $HOME/.vim/
 ln -sfv "$DOTFILES_DIR/install/vim/config/vundle.vim" ~/.vim/
 
-BUNDLE_DIR=~/.vim/bundle
+BUNDLE_DIR=$HOME/.vim/bundle
 
 # Install/update Vundle
 mkdir -p "$BUNDLE_DIR" && (git clone https://github.com/gmarik/vundle.git "$BUNDLE_DIR/vundle" || (cd "$BUNDLE_DIR/vundle" && git pull origin master))
@@ -39,6 +39,10 @@ vim +PluginInstall +qall
 cd "$BUNDLE_DIR/YouCompleteMe" && ./install.sh
 
 cd -
+
+# Installs Monokia theme (Molokia)
+mkdir $HOME/.vim/colors
+curl -G https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim -o $HOME/.vim/colors/molokia.vim
 
 # Removing variables
 unset BUNDLE_DIR

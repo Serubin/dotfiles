@@ -19,17 +19,15 @@ Bundle "gmarik/vundle"
 " Keeping vim rather simple
 
 " Generic
-
 Bundle "itchyny/lightline.vim"
 Bundle "tpope/vim-fugitive"
-" Completion & snippets
 
+" Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
 " JavaScript
-
 Bundle "pangloss/vim-javascript"
 
 call vundle#end()

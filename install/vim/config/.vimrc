@@ -37,6 +37,13 @@ if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
 endif
 
+" colors
+let g:rehash256 = 1
+if filereadable(expand("~/.vim/colors/molokia.vim"))
+	source ~/.vim/colors/molokia.vim
+endif
+
+" Undo
 if has('persistent_undo')
   silent !mkdir ~/.vim/undo > /dev/null 2>&1
   set undodir=~/.vim/undo
