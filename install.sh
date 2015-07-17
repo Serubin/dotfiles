@@ -48,6 +48,8 @@ if [ ! -r "$HOME/.custom" ]; then
 	cp $DOTFILES_DIR/bash/.custom  ~
 fi
 
+source $DOTFILES_DIR/install/required/required.sh
+
 source $DOTFILES_DIR/install/git/git.sh
 
 source $DOTFILES_DIR/install/vim/vim.sh

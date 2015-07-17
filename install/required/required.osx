@@ -19,6 +19,7 @@ brew upgrade
 
 apps=(
     cmake
+    dig
     git
     gnu-sed --default-names
     grep --default-names
