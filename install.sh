@@ -10,14 +10,14 @@ echo "export DOTFILES_DIR=${DOTFILES_DIR}" > $HOME/.dotfiles_loc
 # Get *nix distro
 DISTRO_RAW="" # Gets raw os output
 DISTRO_RAW_LOC=`echo /etc/*-release`
-if [ -s "$DISTRO_RAW_LOC" ]; then
+if [ "$DISTRO_RAW_LOC" != "" ]; then
 	DISTRO_RAW=$(cat /etc/*-release)
 else
 	DISTRO_RAW=$(uname)
 fi
 # Parses out specific distro
 DISTRO=`echo $DISTRO_RAW | perl -lne '/(Ubuntu)|(Debian)|(Darwin)/gi && print $&' | head -n1`
-unset DISTRO_RAW DISTRO_RAW_LOC # unsets util var
+#unset DISTRO_RAW DISTRO_RAW_LOC # unsets util var
 
 # Update dotfiles itself first - 
 [ -d "$DOTFILES_DIR/.git" ] && git --work-tree="$DOTFILES_DIR" --git-dir="$DOTFILES_DIR/.git" pull origin master
