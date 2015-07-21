@@ -54,6 +54,7 @@ This setup creates a clean bash envirnment with several other applications. Belo
 Listed are all aliases for all applictions. As always, for a better picture take a look at the actual files.
 
 #### Bash
+##### Aliases
 * Easy directory reversals
  * ```..``` one back
  * ```...``` two back
@@ -70,6 +71,13 @@ Listed are all aliases for all applictions. As always, for a better picture take
 * Ip Aliases
  * ```ip``` retreives public ip
  * ```ipl``` parses for local ip
+
+##### Functions
+* mk <new directory>
+ * Creates a new directory and pushes you into it. 
+* extract
+ * Extracts nearly any compressed/archived file.
+ * Supports: tar, tar.bz2, tar.gz, bz2, gz, dmg, tbz2, tgz, zip, pax, z (see ```bash/.function``` for full support)
 
 #### Git
 * ```git ap```, add -p
