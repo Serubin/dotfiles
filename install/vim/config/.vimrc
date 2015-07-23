@@ -65,6 +65,11 @@ endif
 " lightline
 set laststatus=2 " no display fix
 set noshowmode " TODO something preventing this. fix
+
+if !has('gui_running') " no color fix
+	set t_Co=256
+endif
+
 let g:lightline = {
     \ 'colorscheme': 'powerline',
     \ }
