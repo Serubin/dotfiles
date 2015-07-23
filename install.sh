@@ -1,5 +1,17 @@
 #!/bin/bash
 
+getInputBoolean() {
+	read -p "${1}(Y/n) " in;
+	if [ "$in" == "y" ]; then
+		echo 1;
+	elif [ "$in" == "n" ]; then
+		echo 0;
+	else
+		echo 1;
+	fi
+}
+
+
 echo "Starting Serubin's dotfile install..."
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -17,7 +29,12 @@ else
 fi
 # Parses out specific distro
 DISTRO=`echo $DISTRO_RAW | perl -lne '/(Ubuntu)|(Debian)|(Darwin)/gi && print $&' | head -n1`
-#unset DISTRO_RAW DISTRO_RAW_LOC # unsets util var
+unset DISTRO_RAW DISTRO_RAW_LOC # unsets util var
+
+git=`getInputBoolean "Install git? "`
+vim=`getInputBoolean "Install vim? "`
+sublime=`getInputBoolean "Install sublime? "`
+htop=`getInputBoolean "Install htop? "`
 
 # Update dotfiles itself first - 
 [ -d "$DOTFILES_DIR/.git" ] && git --work-tree="$DOTFILES_DIR" --git-dir="$DOTFILES_DIR/.git" pull origin master
@@ -50,13 +67,23 @@ fi
 
 source $DOTFILES_DIR/install/required/required.sh
 
-source $DOTFILES_DIR/install/git/git.sh
+if [ "$git" == "1" ]; then
+	source $DOTFILES_DIR/install/git/git.sh
+fi
 
-source $DOTFILES_DIR/install/vim/vim.sh
+if [ "$vim" == "1" ]; then
+	source $DOTFILES_DIR/install/vim/vim.sh
+fi
 
-source $DOTFILES_DIR/install/sublime/sublime.sh
+if [ "$htop" == "1" ]; then
+	source $DOTFILES_DIR/install/htop/htop.sh
+fi
+
+if [ "$sublime" == "1" ]; then
+	source $DOTFILES_DIR/install/sublime/sublime.sh
+fi
 
 source ~/.bashrc
 
 # Removing variables
-unset DOTFILES_DIR
+unset DOTFILES_DIR git vim htop sublime
