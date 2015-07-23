@@ -91,6 +91,7 @@ Listed are all aliases for all applictions. As always, for a better picture take
 * ```git 	ll```, log --pretty=oneline --graph --abbrev-commit
 * ```git lm```, log --pretty=format:'* %s (%h)'
 * 
+
 ## Vim
 
 ### Features
