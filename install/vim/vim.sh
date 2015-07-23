@@ -25,7 +25,8 @@ fi
 # config install
 ln -sfv "$DOTFILES_DIR/install/vim/config/.vimrc" ~
 mkdir -p $HOME/.vim/
-ln -sfv "$DOTFILES_DIR/install/vim/config/vundle.vim" ~/.vim/
+ln -sfv "$DOTFILES_DIR/install/vim/config/.vim/vex.vim" ~/.vim/
+ln -sfv "$DOTFILES_DIR/install/vim/config/.vim/vundle.vim" ~/.vim/
 
 BUNDLE_DIR=$HOME/.vim/bundle
 

@@ -24,13 +24,20 @@ set ignorecase					"Ignores case in searches
 set shiftround					"Move word to word with shift navigation
 set history=1000				"Command history
 set undolevels=1000				"Undo history
-
+" netrw 
 let g:netrw_liststyle=3 		"List styles for file explorer
+let g:netrw_altv=1
+let g:netrw_preview=1
+let g:netrw_sort_sequence = '[\/]$,*' " sort is affecting only: directories on the top, files below
+let g:netrw_list_hide= '.*\.swp$'
 
 " Key mappings
-nnoremap <leader><space> :noh<cr>	" Clear search highlighting with ,<space>
+let mapleader = "\<Space>"
+nnoremap <leader>c :noh<cr>	" Clear search highlighting with ,<space>
 nnoremap <tab> :bnext<cr>			" Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>		" Shift-tab to previous buffer
+noremap <Leader><tab> :call VexToggle(getcwd())<CR>	" vex mappings
+noremap <Leader>` :call VexToggle("")<CR>
 
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
@@ -41,6 +48,11 @@ endif
 let g:rehash256 = 1
 if filereadable(expand("~/.vim/colors/molokia.vim"))
 	source ~/.vim/colors/molokia.vim
+endif
+
+" vex menu
+if filereadable(expand("~/.vim/vex.vim"))
+	source ~/.vim/vex.vim
 endif
 
 " Undo
@@ -58,6 +70,8 @@ let g:lightline = {
     \ }
 
 " TODO add more lightline stuff
+
+" use the previous window to
 
 set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
 set wildignore+=*vim/backups*
