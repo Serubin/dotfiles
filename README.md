@@ -90,3 +90,18 @@ Listed are all aliases for all applictions. As always, for a better picture take
 * ```git lg```, log -p
 * ```git 	ll```, log --pretty=oneline --graph --abbrev-commit
 * ```git lm```, log --pretty=format:'* %s (%h)'
+* 
+## Vim
+
+### Features
+* Lightline status bar
+* Youcompleteme
+* Vim Vex - minimal nerdtree like sidebar
+
+### Key bindings
+* ```<leader>``` ```<space>```
+* ```<tab>``` - next buffer
+* ```<tab-s>``` - prev buffer
+* ```<leader><tab>``` - vim vex side bar (toggle)
+* ```<leader>``` - explcitily close vim vex
+* ```<leader>c``` - clear search highlights
