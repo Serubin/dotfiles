@@ -1,3 +1,8 @@
+"
+" Vim Vex sidebar
+" From: https://github.com/ivanbrennan/dotvim
+"
+
 fun! VexToggle(dir)
 	if exists("t:vex_buf_nr")
 		call VexClose()

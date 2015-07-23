@@ -12,7 +12,6 @@ set showcmd						"Show incomplete cmds down the bottom
 set visualbell					"No sounds
 set noerrorbells				"Removes error bells
 set autoread					"Reload files changed outside vim
-set ruler						"Shows file ruler
 set autoindent					"Auto indentation
 set smartindent					"Smart indentation
 set smartcase					"Smart casing
@@ -64,7 +63,7 @@ endif
 
 " lightline
 set laststatus=2 " no display fix
-set noshowmode " TODO something preventing this. fix
+set noshowmode
 
 if !has('gui_running') " no color fix
 	set t_Co=256
