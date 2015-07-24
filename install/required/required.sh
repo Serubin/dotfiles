@@ -6,5 +6,5 @@ if [ "$DISTRO" == "Debian" ] || [ "$DISTRO" == "Ubuntu" ]; then
 elif [ "$DISTRO" == "Darwin" ]; then
         source $DOTFILES_DIR/install/required/required.osx
 else
-        echo "ERROR: This os doesn't support vim installations."
+        echo "ERROR: This os doesn't support the required installations."
 fi
