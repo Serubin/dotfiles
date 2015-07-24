@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ `getInputBoolean "Install archey?"` == "1" ]; then
+	sudo apt-get install scrot
+	curl -L http://github.com/downloads/djmelik/archey/archey-0.2.8.deb  -o /tmp/archey.deb
+	sudo dpkg -i archey.deb 
+	rm /tmp/archey.deb
+fi
