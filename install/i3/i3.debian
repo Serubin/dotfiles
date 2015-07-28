@@ -67,8 +67,11 @@ ln -sfv $DOTFILES_DIR/install/i3/config/config.termite $HOME/.config/termite/con
 # ##############################
  
 
-rm $HOME/.lock
-ln -sfv $DOTFILES_DIR/install/i3/resources/lock $HOME/.lock
+rm $HOME/.i3/lock
+ln -sfv $DOTFILES_DIR/install/i3/resources/lock $HOME/.i3/lock
+
+rm $HOME/.i3/bin
+ln -sfv $DOTFILES_DIR/install/i3/resources/bin $HOME/.i3/bin
 
 chmod 775 $DOTFILES_DIR/install/i3/resources/lock/lock.sh
 
