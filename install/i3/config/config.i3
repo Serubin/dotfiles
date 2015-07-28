@@ -55,8 +55,9 @@ bindsym 				$mod+Shift+e exec "i3-nagbar -t warning -m 'Do you really want to lo
 #######################################################################
 
 bindsym 				$mod+Return exec termite
-bindsym					$mod+space exec rofi -show run -terminal termite -lines 3 -eh 2 -width 100 -padding 800 -opacity "70" -bw 0 -bc "#000000" -bg "$background" -fg "$foreground" -hlbg "#000000" -hlfg "#ffffff"
+bindsym					$mod+space exec rofi -show run -terminal termite -lines 5 -eh 2 -opacity "70" -bw 1 -bc "#22262f" -bg "$background" -fg "$foreground" -hlbg "$outline" -hlfg "$background" -width 100 -padding 800
 bindsym 				$mod+l exec ~/.i3/lock/lock.sh # lock system
+bindsym 				$mod+Shift+l exec ~/.i3/bin/logout-menu.sh # lock system
 
 #######################################################################
 #                           focus bindings                            #
@@ -154,7 +155,6 @@ bar {
 
 exec termite
 exec nitrogen --restore
-
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
