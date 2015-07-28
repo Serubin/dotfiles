@@ -35,6 +35,7 @@ git=`getInputBoolean "Install git? "`
 vim=`getInputBoolean "Install vim? "`
 sublime=`getInputBoolean "Install sublime? "`
 htop=`getInputBoolean "Install htop? "`
+other=`getInputBoolean "Select other installs? "`
 
 # Update dotfiles itself first - 
 [ -d "$DOTFILES_DIR/.git" ] && git --work-tree="$DOTFILES_DIR" --git-dir="$DOTFILES_DIR/.git" pull origin master
@@ -81,6 +82,10 @@ fi
 
 if [ "$sublime" == "1" ]; then
 	source $DOTFILES_DIR/install/sublime/sublime.sh
+fi
+
+if [ "$other" == "1" ]; then
+	source $DOTFILES_DIR/install/optional/optional.sh
 fi
 
 source ~/.bashrc
