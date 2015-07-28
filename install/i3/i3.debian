@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# i3 install with thanks to
+# https://www.reddit.com/r/unixporn/comments/3efhs7/i3_gaps_a_bit_obsessed_with_material_design/
+#
+
+# ##############################
+#              i3              #
+# ##############################
+
 echo "Installing I3"
 #Install i3
 sudo apt-get -y install i3 i3locks scrot
@@ -26,6 +34,10 @@ mkdir -p .i3
 
 ln -sfv $DOTFILES_DIR/install/i3/config/config.i3 $HOME/.i3/config
 
+# ##############################
+#            Termite           #
+# ##############################
+
 # installs termite terminal
 echo "Installing termite terminal"
 sudo apt-get -y install g++ libgtk-3-dev gtk-doc-tools gnutls-bin valac libglib3.0-cil-dev libgnutls28-dev libgirepository1.0-dev libxml2-utils gperf
@@ -50,9 +62,29 @@ mkdir -p $HOME/.config/termite/
 
 ln -sfv $DOTFILES_DIR/install/i3/config/config.termite $HOME/.config/termite/config
 
+# ##############################
+#              i3locks         #
+# ##############################
+ 
+
 rm $HOME/.lock
 ln -sfv $DOTFILES_DIR/install/i3/resources/lock $HOME/.lock
 
 chmod 775 $DOTFILES_DIR/install/i3/resources/lock/lock.sh
+
+# #############################
+#          rofi               #
+# #############################
+
+cd /tmp/
+git clone https://github.com/DaveDavenport/rofi.git
+cd rofi
+
+autoreconf -i
+mkdir build/ 
+cd build/
+../configure
+make
+sudo make install
 
 cd $DOTFILES_DIR

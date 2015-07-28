@@ -1,4 +1,6 @@
 #!/bin/bash
+# Locking script
+# generously from: https://github.com/jearbear/dotfiles
 
 scrot -e 'convert -resize 20% -fill "#282828" -colorize 50% -blur 0x1 -resize 500% $f ~/.lock/lockbg.png'
 convert -gravity center -composite $HOME/.lock/lockbg.png $HOME/.lock/lock.png $HOME/.lock/lockfinal.png
