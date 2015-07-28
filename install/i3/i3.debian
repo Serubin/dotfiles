@@ -15,7 +15,7 @@ sudo apt-get -y install i3 i3locks scrot
 # Install/build i3-gaps
 sudo apt-get -y install libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
 
-cd /tmp/
+cd /tmp
 
 # clone the repository
 git clone https://www.github.com/Airblader/i3 i3-gaps
@@ -29,8 +29,8 @@ make
 sudo make install
 
 rm -rf /tmp/i3-gaps
-# i3 config
-mkdir -p .i3
+
+mkdir -p $HOME/.i3
 
 ln -sfv $DOTFILES_DIR/install/i3/config/config.i3 $HOME/.i3/config
 
