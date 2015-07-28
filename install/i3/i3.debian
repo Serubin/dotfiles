@@ -46,9 +46,13 @@ sudo cp /usr/local/lib/libvte-2.91.a /usr/local/lib/libvte-2.91.la \
 rm -rf /tmp/vte-ng /tmp/termite
 
 # termite config
-mkdir -p .config/termite/
+mkdir -p $HOME/.config/termite/
 
 ln -sfv $DOTFILES_DIR/install/i3/config/config.termite $HOME/.config/termite/config
 
+rm $HOME/.lock
 ln -sfv $DOTFILES_DIR/install/i3/resources/lock $HOME/.lock
+
+chmod 775 $DOTFILES_DIR/install/i3/resources/lock/lock.sh
+
 cd $DOTFILES_DIR
