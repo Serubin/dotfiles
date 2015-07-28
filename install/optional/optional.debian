@@ -6,3 +6,7 @@ if [ `getInputBoolean "Install archey?"` == "1" ]; then
 	sudo dpkg -i archey.deb 
 	rm /tmp/archey.deb
 fi
+
+if [ `getInputBoolean "Install i3?"` == "1" ]; then
+	source $DOTFILES_DIR/install/i3/i3.sh
+fi
