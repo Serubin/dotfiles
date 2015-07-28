@@ -36,7 +36,7 @@ bindsym $mod+Return exec termite
 bindsym $mod+Shift+q kill
 
 # lock
-bindsym $mod+Shift+l exec i3lock
+bindsym $mod+l exec ~/.lock/lock.sh
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
@@ -44,12 +44,6 @@ bindsym $mod+d exec dmenu_run
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
-
-# change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+semicolon focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
