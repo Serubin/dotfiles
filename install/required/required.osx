@@ -30,3 +30,14 @@ apps=(
 )
 
 brew install ${apps[@]}
+
+if [ `getInputBoolean "Install clock alias?"` == "1" ]; then
+	clock=(
+		watch
+		figlet
+		toliet
+	)
+	brew install ${clock[@]}
+	unset clock
+fi
+unset apps
