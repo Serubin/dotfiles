@@ -28,6 +28,7 @@ git checkout gaps && git pull
 make
 sudo make install
 
+cd -
 rm -rf /tmp/i3-gaps
 
 mkdir -p $HOME/.i3
@@ -35,32 +36,15 @@ mkdir -p $HOME/.i3
 ln -sfv $DOTFILES_DIR/install/i3/config/config.i3 $HOME/.i3/config
 
 # ##############################
-#            Termite           #
+#         XFCE Terminal        #
 # ##############################
 
-cd # installs termite terminal
-echo "Installing termite terminal"
-sudo apt-get -y install g++ libgtk-3-dev gtk-doc-tools gnutls-bin valac libglib3.0-cil-dev libgnutls28-dev libgirepository1.0-dev libxml2-utils gperf
-cd -
-cd /tmp
-git clone --recursive https://github.com/thestinger/termite.git
-git clone https://github.com/thestinger/vte-ng.git
+echo "Installing xfce terminal"
+sudo apt-get -y install xfce4-terminal
 
-cd vte-ng && ./autogen.sh && make && sudo make install
-cd ../termite && make && sudo make install
+mkdir -p $HOME/.config/xfce4/terminal/
 
-sudo desktop-file-install termite.desktop
-
-sudo cp /usr/local/lib/libvte-2.91.a /usr/local/lib/libvte-2.91.la \
-/usr/local/lib/libvte-2.91.so /usr/local/lib/libvte-2.91.so.0 \
-/usr/local/lib/libvte-2.91.so.0.4000.2 /usr/lib
-
-rm -rf /tmp/vte-ng /tmp/termite
-
-# termite config
-mkdir -p $HOME/.config/termite/
-
-ln -sfv $DOTFILES_DIR/install/i3/config/config.termite $HOME/.config/termite/config
+ln -sfv $DOTFILES_DIR/install/i3/config/terminalrc $HOME/.config/xfce4/terminal/
 
 # ##############################
 #              i3locks         #
