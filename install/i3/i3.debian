@@ -33,7 +33,7 @@ rm -rf /tmp/i3-gaps
 
 mkdir -p $HOME/.i3
 
-ln -sfv $DOTFILES_DIR/install/i3/config/config.i3 $HOME/.i3/config
+ln -sfv $DOTFILES_DIR/install/i3/config/i3.config $HOME/.i3/config
 
 # ##############################
 #         XFCE Terminal        #
