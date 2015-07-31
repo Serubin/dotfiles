@@ -47,7 +47,7 @@ mkdir -p $HOME/.config/xfce4/terminal/
 ln -sfv $DOTFILES_DIR/install/i3/config/terminalrc $HOME/.config/xfce4/terminal/
 
 # ##############################
-#              i3locks         #
+#        i3locks/status        #
 # ##############################
  
 
@@ -58,6 +58,10 @@ rm $HOME/.i3/bin
 ln -sfv $DOTFILES_DIR/install/i3/resources/bin $HOME/.i3/bin
 
 chmod 775 $DOTFILES_DIR/install/i3/resources/lock/lock.sh
+
+mkdir -p $HOME/.config/i3status/
+
+ln -sfv $DOTFILES_DIR/install/i3/config/i3status.config $HOME/.config/i3status/config
 
 # #############################
 #          rofi               #
