@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# sublime install for osx
+
+########################################
+# Darwin install of sublime
+# Text editor
+########################################
 
 # install sublime
 brew cask install caskroom/versions/sublime-text3
@@ -14,6 +18,6 @@ mkdir "${sublime_loc}Installed Packages"
 
 wget https://packagecontrol.io/Package%20Control.sublime-package -O "${sublime_loc}Installed Packages/Package Control.sublime-package"
 
-cp -r "$DOTFILES_DIR/install/sublime/config/" "${sublime_loc}/Packages"
+cp -r "${PACKAGE_INSTALL}/config/" "${sublime_loc}/Packages"
 
 

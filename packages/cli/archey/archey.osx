@@ -1,0 +1,7 @@
+#!/bin/bash
+
+########################################
+# Darwin install of Archey
+# Pretty System info
+########################################
+brew install archey

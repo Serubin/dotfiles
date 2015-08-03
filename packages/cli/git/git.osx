@@ -1,0 +1,8 @@
+#!/bin/bash
+
+########################################
+# OSX install of git
+# Version Control
+########################################
+
+brew install git

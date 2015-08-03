@@ -1,0 +1,12 @@
+#!/bin/bash
+
+########################################
+# Darwin install of vim
+# ViImproved
+########################################
+
+# pre-req
+brew install cmake
+
+# vim
+brew install vim

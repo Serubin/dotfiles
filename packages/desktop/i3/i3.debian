@@ -1,5 +1,10 @@
 #!/bin/bash
 
+########################################
+# Debian install of i3
+# Tiled Window Manager
+########################################
+
 # i3 install with thanks to
 # https://www.reddit.com/r/unixporn/comments/3efhs7/i3_gaps_a_bit_obsessed_with_material_design/
 #
@@ -33,7 +38,7 @@ rm -rf /tmp/i3-gaps
 
 mkdir -p $HOME/.i3
 
-ln -sfv $DOTFILES_DIR/install/i3/config/i3.config $HOME/.i3/config
+ln -sfv ${PACKAGE_INSTALL}/config/i3.config $HOME/.i3/config
 
 # ##############################
 #         XFCE Terminal        #
@@ -44,7 +49,7 @@ sudo apt-get -y install xfce4-terminal
 
 mkdir -p $HOME/.config/xfce4/terminal/
 
-ln -sfv $DOTFILES_DIR/install/i3/config/terminalrc $HOME/.config/xfce4/terminal/
+ln -sfv ${PACKAGE_INSTALL}/config/terminalrc $HOME/.config/xfce4/terminal/
 
 # ##############################
 #        i3locks/status        #
@@ -52,16 +57,16 @@ ln -sfv $DOTFILES_DIR/install/i3/config/terminalrc $HOME/.config/xfce4/terminal/
  
 
 rm $HOME/.i3/lock
-ln -sfv $DOTFILES_DIR/install/i3/resources/lock $HOME/.i3/lock
+ln -sfv ${PACKAGE_INSTALL}/resources/lock $HOME/.i3/lock
 
 rm $HOME/.i3/bin
-ln -sfv $DOTFILES_DIR/install/i3/resources/bin $HOME/.i3/bin
+ln -sfv ${PACKAGE_INSTALL}/resources/bin $HOME/.i3/bin
 
-chmod 775 $DOTFILES_DIR/install/i3/resources/lock/lock.sh
+chmod 775 ${PACKAGE_INSTALL}/resources/lock/lock.sh
 
 mkdir -p $HOME/.config/i3status/
 
-ln -sfv $DOTFILES_DIR/install/i3/config/i3status.config $HOME/.config/i3status/config
+ln -sfv ${PACKAGE_INSTALL}/config/i3status.config $HOME/.config/i3status/config
 
 # #############################
 #          rofi               #
@@ -78,4 +83,4 @@ cd build/
 make
 sudo make install
 
-cd $DOTFILES_DIR
+cd -

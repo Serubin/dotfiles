@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# i3 Info file
+#
+
+export package_support="Debian Ubuntu"
+
+echo "I3: A tiled windows manager"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Archey Info file
+#
+
+export package_support="Debian Ubuntu Darwin"
+
+echo "Archey: Pretty System info"

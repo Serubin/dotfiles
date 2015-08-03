@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Sublime Info file
+#
+
+export package_support="Debian Ubuntu Darwin"
+
+echo "Sublime: An Advanced text editor"

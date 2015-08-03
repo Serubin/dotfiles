@@ -1,0 +1,10 @@
+#!/bin/bash
+
+########################################
+# Debian install of htop
+# Top for humans
+########################################
+
+sudo apt-get install -y htop
+
+ln -sfv "${PACKAGE_INSTALL}/config/htoprc" ~/.config/htop/

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# pre-req
-brew install cmake
-
-# vim
-brew install vim
