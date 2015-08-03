@@ -6,6 +6,8 @@ else # otherwise assumes the following
 	DOTFILES_DIR="$HOME/.dotfiles"
 fi
 
+source $DOTFILES_DIR/util/detectos.sh
+
 # source all bash base files
 for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
 	[ -d "$DOTFILE" ] && continue;
