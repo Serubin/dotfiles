@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "-------- Setting up Serubin's Dotfiles --------"
+
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -14,7 +16,15 @@ source ${DOTFILES_DIR}/packages/install_package.sh
 source ${DOTFILES_DIR}/util/detectos.sh
 
 # Update dotfiles itself first - 
+echo "Fetching latest from git:"
 [ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull origin master
+
+# Get sudo up to avoid typing it in mid script
+echo ""
+echo "------------ Sudo/Root Required ------------"
+echo "Root or sudo is required to install most packages. Please sudo up:"
+sudo echo 'Running in sudo mode'
+echo ""
 
 # Backing up current configurations
 echo "Moving previous configurations to dotfiles/bak/"
