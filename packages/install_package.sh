@@ -31,7 +31,8 @@ installPackage() {
 	fi
 
 	package_install=`getInputBoolean "Do you want to install ${NAME}"?`
-
+	
+	#If user doesn't wish ti install - skip
 	if [ "$package_install" == "0" ]; then
 		return
 	fi
@@ -43,6 +44,7 @@ installPackage() {
 	elif [ "$DISTRO" == "Darwin" ]; then
 		source "${PACKAGE_INSTALL}/${NAME}.osx"
 	else
+		# FYI: This shouldn't ever happen - make an issue if it does?
 		echo "ERROR: This os doesn't support ${NAME} installations."a
 		return
 	fi

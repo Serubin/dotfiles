@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# Takes in input (yes or no) defaults to yes
 getInputBoolean() {      
-        read -p "${1}(Y/n) " in;  
+        read -p "${1} (Y/n) " in;  
         if [ "$in" == "y" ]; then 
                 echo 1;  
         elif [ "$in" == "n" ]; then

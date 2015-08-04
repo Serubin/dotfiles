@@ -38,11 +38,12 @@ ln -sfv "${DOTFILES_DIR}/runcom/.bashrc" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.bash_profile" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.inputrc" ~
 
+# Copy .custom if not exist
 if [ ! -r "${HOME}/.custom" ]; then
 	cp ${DOTFILES_DIR}/bash/.custom  ~
 fi
 
-
+# package installations
 installPackage "" "required" # required packages
 
 installPackage "cli" "git"
@@ -50,6 +51,7 @@ installPackage "cli" "vim"
 installPackage "cli" "htop"
 installPackage "cli" "archey"
 
+# Prompt for desktop
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
 	installPackage "desktop" "sublime"
 	installPackage "desktop" "i3"
@@ -60,4 +62,4 @@ source ~/.bashrc
 cd $DOTFILES_DIR
 
 # Removing variables
-unset DOTFILES_DIR git vim htop sublime
+unset DOTFILES_DIR
