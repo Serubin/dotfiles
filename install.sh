@@ -57,5 +57,7 @@ fi
 
 source ~/.bashrc
 
+cd $DOTFILES_DIR
+
 # Removing variables
 unset DOTFILES_DIR git vim htop sublime
