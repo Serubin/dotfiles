@@ -24,8 +24,7 @@ installPackage() {
 	source "${PACKAGE_INSTALL}/${NAME}.info"
 
 	package_supported=`echo $package_support | grep -o $DISTRO`
-	echo $package_supported;
-	echo $DISTRO;
+	
 	if [ "$package_supported" != "$DISTRO" ]; then 
 		echo "${NAME} cannot be installed on ${DISTRO}."
 		return
