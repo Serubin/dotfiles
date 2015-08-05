@@ -1,5 +1,5 @@
 # Serubin's DotFiles
-
+ This readme is still be written..
 ## Installiation
 
 Installing is fairly straight forward, just clone the repo and place it anywhere and use the install script provided.

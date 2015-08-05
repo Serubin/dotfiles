@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "-------- Setting up Serubin's Dotfiles --------"
+
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -14,7 +16,15 @@ source ${DOTFILES_DIR}/packages/install_package.sh
 source ${DOTFILES_DIR}/util/detectos.sh
 
 # Update dotfiles itself first - 
+echo "Fetching latest from git:"
 [ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull origin master
+
+# Get sudo up to avoid typing it in mid script
+echo ""
+echo "------------ Sudo/Root Required ------------"
+echo "Root or sudo is required to install most packages. Please sudo up:"
+sudo echo 'Running in sudo mode'
+echo ""
 
 # Backing up current configurations
 echo "Moving previous configurations to dotfiles/bak/"
@@ -38,11 +48,12 @@ ln -sfv "${DOTFILES_DIR}/runcom/.bashrc" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.bash_profile" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.inputrc" ~
 
+# Copy .custom if not exist
 if [ ! -r "${HOME}/.custom" ]; then
 	cp ${DOTFILES_DIR}/bash/.custom  ~
 fi
 
-
+# package installations
 installPackage "" "required" # required packages
 
 installPackage "cli" "git"
@@ -50,6 +61,7 @@ installPackage "cli" "vim"
 installPackage "cli" "htop"
 installPackage "cli" "archey"
 
+# Prompt for desktop
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
 	installPackage "desktop" "sublime"
 	installPackage "desktop" "i3"
@@ -57,5 +69,7 @@ fi
 
 source ~/.bashrc
 
+cd $DOTFILES_DIR
+
 # Removing variables
-unset DOTFILES_DIR git vim htop sublime
+unset DOTFILES_DIR
