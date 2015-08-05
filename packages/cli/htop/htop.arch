@@ -1,0 +1,8 @@
+#/bin/bash
+
+########################################
+# Arch install of htop
+# Top for humans
+########################################
+
+sudo pacman -S htop

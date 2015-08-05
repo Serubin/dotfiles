@@ -42,6 +42,8 @@ installPackage() {
 		source "${PACKAGE_INSTALL}/${NAME}.debian"
 	elif [ "$DISTRO" == "Darwin" ]; then
 		source "${PACKAGE_INSTALL}/${NAME}.osx"
+	elif [ "$DISTRO" == "Arch" ]; then
+		source "${PACKAGE_INSTALL}/${NAME}.arch"
 	else
 		echo "ERROR: This os doesn't support ${NAME} installations."a
 		return

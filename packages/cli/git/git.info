@@ -4,6 +4,6 @@
 # Git Info file
 #
 
-export package_support="Debian Ubuntu Darwin"
+export package_support="Debian Ubuntu Darwin Arch"
 
 echo "Git: A version control system"

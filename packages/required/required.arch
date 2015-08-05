@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sudo pacman -Syu --nocomfirm 
+sudo apt-get -y install dnsutils lsb-release perl
+
+if [ `getInputBoolean "Install clock alias?"` == "1" ]; then
+	sudo apt-get -y install watch figlet toilet
+fi
