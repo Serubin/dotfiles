@@ -7,7 +7,8 @@
 
 # i3 install with thanks to
 # https://www.reddit.com/r/unixporn/comments/3efhs7/i3_gaps_a_bit_obsessed_with_material_design/
-#
+# and
+# aur.sh (it's a website and a script)
 
 # ##############################
 #              i3              #
@@ -15,37 +16,19 @@
 
 echo "Installing I3"
 #Install i3
-sudo pacman -S --nocomfirm i3 i3locks scrot
+sudo pacman -S --noconfirm i3 i3lock scrot xcb-util-cursor
 
-# Install/build i3-gaps
-sudo pacman -S --nocomfirm libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev dh-autoreconf libxinerama-dev 
+bash <(curl aur.sh) -si i3-gaps-git
 
-cd /tmp
-
-# clone the repository
-git clone https://www.github.com/Airblader/i3 i3-gaps
-cd i3-gaps
-
-# do this if you want the stable branch, skip it if you want the dev branch (gaps-next)
-git checkout gaps && git pull
-
-# compile & install
-make
-sudo make install
-
-cd -
-rm -rf /tmp/i3-gaps
-
-mkdir -p $HOME/.i3
-
-ln -sfv ${PACKAGE_INSTALL}/config/i3.config $HOME/.i3/config
+echo "No need to worry about the missing xcb-util-cursor-git. The non-git package has been installed and should be enough"
+rm -rf ${DOTFILES_DIR}/i3-gaps-git 
 
 # ##############################
 #         XFCE Terminal        #
 # ##############################
 
 echo "Installing xfce terminal"
-sudo pacman -S --nocomfirm xfce4-terminal
+sudo pacman -S --noconfirm xfce4-terminal
 
 mkdir -p $HOME/.config/xfce4/terminal/
 

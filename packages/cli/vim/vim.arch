@@ -5,4 +5,4 @@
 # ViImproved
 ########################################
 
-sudo pacman -S vim
+sudo pacman -S --noconfirm vim

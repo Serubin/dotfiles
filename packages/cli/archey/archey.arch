@@ -5,4 +5,4 @@
 # Pretty System info
 ########################################
 
-sudo pacman -S scrot archey
+sudo pacman -S scrot archey3 --noconfirm 
