@@ -53,6 +53,15 @@ if [ ! -r "${HOME}/.custom" ]; then
 	cp ${DOTFILES_DIR}/bash/.custom  ~
 fi
 
+# Give Arch users a chance to abort
+if [ ${DISTRO} == "Arch" ]; then
+	echo "====> WARNING <===="
+	echo "This script will perform a full system upgrade"
+	if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
+		exit 0
+	fi
+fi
+
 # package installations
 installPackage "" "required" # required packages
 
