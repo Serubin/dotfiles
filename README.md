@@ -1,6 +1,6 @@
 # Serubin's DotFiles
- This readme is still be written..
-## Installiation
+ This readme is still in progress... 
+## Installation
 
 Installing is fairly straight forward, just clone the repo and place it anywhere and use the install script provided.
 ```bash
@@ -12,23 +12,24 @@ In order to change the location of the installtion you will have to re-run the i
 * OS X (with brew)
 * Debian
 * Ubuntu
+* Arch
 
-The install script takes care of all the pre-requists excluding git, bash, and sudo. However this only works with OSX Debian and Ubuntu (for the moment). 
+The install script takes care of all the pre-requists excluding git, bash, and sudo. However this only works with OSX, Arch,  Debian, and Ubuntu (for the moment). 
 
 In OS X the script will install brew and all needed components. 
 
-## What's this set up do?
+## What does this set up do?
 
 This setup creates a clean bash envirnment with several other applications. Below is each application created and the features added. Of course I encourage you to look through the files to get a better picture of what this will set up for you.
 
 #### Bash
-*   Aliases (listed below)
+*   Aliases (listed in bash/.alias)
 *   Custom PS1 prompt with git integration
-*   Functions to make life easy (listed below)
+*   Functions to make life easy (listed in bash/.function) 
 
 #### git
 * Global ignore for mac os x
-* Git Aliases (listed below)
+* Git Aliases (listed in packages/cli/git/config/.gitconfig)
 
 #### Vim
 * "Smart" features
@@ -40,7 +41,7 @@ This setup creates a clean bash envirnment with several other applications. Belo
 * Presistent undo
 * Various completion packages
 
-#### Sublime (x server/Desktop Environment)
+#### Sublime (x server/Desktop Environment) (not included on Arch)
 * Custom Theme - Monkia
 * Packages
  * All Autocomplete
