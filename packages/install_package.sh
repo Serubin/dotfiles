@@ -18,7 +18,7 @@ installPackage() {
 
 	# Every package must have a name.info file in it's directory. It must contain:
 	# * supported oses (exported to package_support [comma delemiter])
-	# * Breif description of the package (echoed)
+	# * Brief description of the package (echoed)
 	# * Additional packages installed (not including dependancies, echoed)
 
 	source "${PACKAGE_INSTALL}/${NAME}.info"

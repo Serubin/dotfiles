@@ -1,8 +1,8 @@
 [user]
-	name = Serubin
-	email = Serubin@serubin.net
+	name = Andrew 
+	email = ARamsey118@users.noreply.github.com 
 [github]
-	user = Serubin
+	user = ARamsey118  
 [core]
 	excludesfile = ~/.gitignore_global
 	editor = vim

@@ -6,3 +6,5 @@
 ########################################
 
 sudo pacman -S --noconfirm htop
+
+ln -sfv "${PACKAGE_INSTALL}/config/htoprc" ~/.config/htop/
