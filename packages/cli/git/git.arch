@@ -1,0 +1,8 @@
+#!/bin/bash
+
+########################################
+# Arch install of git
+# Version Control
+########################################
+
+sudo pacman -S --noconfirm git 

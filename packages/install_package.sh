@@ -18,7 +18,7 @@ installPackage() {
 
 	# Every package must have a name.info file in it's directory. It must contain:
 	# * supported oses (exported to package_support [comma delemiter])
-	# * Breif description of the package (echoed)
+	# * Brief description of the package (echoed)
 	# * Additional packages installed (not including dependancies, echoed)
 
 	source "${PACKAGE_INSTALL}/${NAME}.info"
@@ -43,6 +43,8 @@ installPackage() {
 		source "${PACKAGE_INSTALL}/${NAME}.debian"
 	elif [ "$DISTRO" == "Darwin" ]; then
 		source "${PACKAGE_INSTALL}/${NAME}.osx"
+	elif [ "$DISTRO" == "Arch" ]; then
+		source "${PACKAGE_INSTALL}/${NAME}.arch"
 	else
 		# FYI: This shouldn't ever happen - make an issue if it does?
 		echo "ERROR: This os doesn't support ${NAME} installations."a

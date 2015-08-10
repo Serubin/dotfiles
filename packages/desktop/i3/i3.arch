@@ -1,0 +1,69 @@
+#!/bin/bash
+
+########################################
+# Arch install of i3
+# Tiled Window Manager
+########################################
+
+# i3 install with thanks to
+# https://www.reddit.com/r/unixporn/comments/3efhs7/i3_gaps_a_bit_obsessed_with_material_design/
+# and
+# aur.sh (it's a website and a script)
+
+# ##############################
+#              i3              #
+# ##############################
+
+echo "Installing I3"
+#Install i3
+sudo pacman -S --noconfirm i3 i3lock scrot xcb-util-cursor
+
+bash <(curl aur.sh) -si i3-gaps-git
+
+echo "No need to worry about the missing xcb-util-cursor-git. The non-git package has been installed and should be enough"
+rm -rf ${DOTFILES_DIR}/i3-gaps-git 
+
+# ##############################
+#         XFCE Terminal        #
+# ##############################
+
+echo "Installing xfce terminal"
+sudo pacman -S --noconfirm xfce4-terminal
+
+mkdir -p $HOME/.config/xfce4/terminal/
+
+ln -sfv ${PACKAGE_INSTALL}/config/terminalrc $HOME/.config/xfce4/terminal/
+
+# ##############################
+#        i3locks/status        #
+# ##############################
+ 
+
+rm $HOME/.i3/lock
+ln -sfv ${PACKAGE_INSTALL}/resources/lock $HOME/.i3/lock
+
+rm $HOME/.i3/bin
+ln -sfv ${PACKAGE_INSTALL}/resources/bin $HOME/.i3/bin
+
+chmod 775 ${PACKAGE_INSTALL}/resources/lock/lock.sh
+
+mkdir -p $HOME/.config/i3status/
+
+ln -sfv ${PACKAGE_INSTALL}/config/i3status.config $HOME/.config/i3status/config
+
+# #############################
+#          rofi               #
+# #############################
+
+cd /tmp/
+git clone https://github.com/DaveDavenport/rofi.git
+cd rofi
+
+autoreconf -i
+mkdir build/ 
+cd build/
+../configure
+make
+sudo make install
+
+cd -

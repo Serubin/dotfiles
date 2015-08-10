@@ -8,7 +8,7 @@ mk() {
 	mkdir -p "$@" && cd "$@"
 }
 
-# Extract many types of compress files
+# Extract many types of compressed files
 # Source: http://nparikh.org/notes/zshrc.txt
 
 extract() {

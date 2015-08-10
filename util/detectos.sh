@@ -15,6 +15,5 @@ if [ "$DISTRO_RAW_LOC" != "" ]; then
 else
         DISTRO_RAW=$(uname)
 fi
-
-# Parses out specific distro and exports
-export DISTRO=`echo $DISTRO_RAW | perl -lne '/(Ubuntu)|(Debian)|(Darwin)/gi && print $&' | head -n1`
+# Parses out specific distro
+export DISTRO=`echo $DISTRO_RAW | perl -lne '/(Ubuntu)|(Debian)|(Darwin)|(Arch)/gi && print $&' | head -n1`
