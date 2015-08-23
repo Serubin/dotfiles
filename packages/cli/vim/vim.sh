@@ -29,6 +29,7 @@ mkdir -p "${BUNDLE_DIR}" && (git clone https://github.com/gmarik/vundle.git "${B
 # Install bundles
 vim +PluginInstall +qall
 
+echo "Compiling ycm"
 # Compile YouCompleteMe
 cd "${BUNDLE_DIR}/YouCompleteMe" && ./install.sh
 
