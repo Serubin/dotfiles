@@ -1,7 +1,7 @@
 #!/bin/bash
 # Determins dot file location
-if [ -r "$HOME/.dotfiles_loc" ]; then # checks for stored location
-	source "$HOME/.dotfiles_loc"
+if [ -r "$HOME/.dotfiles.info" ]; then # checks for stored location
+	source "$HOME/.dotfiles.info"
 else # otherwise assumes the following
 	DOTFILES_DIR="$HOME/.dotfiles"
 fi

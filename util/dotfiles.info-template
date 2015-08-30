@@ -1,3 +1,5 @@
-location{e}
-git-name{e}
-git-email{e}
+#!/bin/bash
+
+location="%location%"
+git_name="%git-name%"
+git_email="%git-email%"

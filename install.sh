@@ -11,16 +11,16 @@ if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	echo "If you want to change this later you can edit '~/dotfiles.info'"
 
 	cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
-	read -p "Name: " gitName
-	perl -p -i -e 's/git-name{(.*)}/git-name{'${gitName}'}/x' ~/.dotfiles.info
+	read -p "Name: " git_name
+	sed -i -e 's/%git-name%/'${git_name}'/g' ${HOME}/.dotfiles.info
 
-	read -p "Email: " gitEmail
-	gitEmail=$(echo $gitEmail | sed -e 's/[@&]/\\&/g') # escapes @ sign
-	perl -p -i -e 's/git-email{.*}/git-email{Serubin\@serubin.net}/x'  ~/.dotfiles.info
+	read -p "Email: " git_email
+	git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
+	sed -i -e 's/%git-email%/'${git_email}'/g' ${HOME}/.dotfiles.info
 fi
 
 # saves dotfile location
-perl -p -i -e 's#location{(.*)}#location{'${DOTFILES_DIR}'}#' ~/.dotfiles.info
+sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
 
 # Source install functions
 source ${DOTFILES_DIR}/util/inputFunc.sh
