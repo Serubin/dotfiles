@@ -5,8 +5,22 @@ echo "-------- Setting up Serubin's Dotfiles --------"
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+if [ ! -r "${HOME}/.dotfiles.info" ]; then
+	echo "-------- Git Author Info --------"
+	echo "Please enter your git author information. (name and email)."
+	echo "If you want to change this later you can edit '~/dotfiles.info'"
+
+	cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
+	read -p "Name: " gitName
+	perl -p -i -e 's/git-name{(.*)}/git-name{'${gitName}'}/x' ~/.dotfiles.info
+
+	read -p "Email: " gitEmail
+	gitEmail=$(echo $gitEmail | sed -e 's/[@&]/\\&/g') # escapes @ sign
+	perl -p -i -e 's/git-email{.*}/git-email{Serubin\@serubin.net}/x'  ~/.dotfiles.info
+fi
+
 # saves dotfile location
-echo "export DOTFILES_DIR=${DOTFILES_DIR}" > ${HOME}/.dotfiles_loc
+perl -p -i -e 's#location{(.*)}#location{'${DOTFILES_DIR}'}#' ~/.dotfiles.info
 
 # Source install functions
 source ${DOTFILES_DIR}/util/inputFunc.sh
