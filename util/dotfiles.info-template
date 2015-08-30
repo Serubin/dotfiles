@@ -1,5 +1,5 @@
 #!/bin/bash
 
-location="%location%"
+DOTFILES_DIR="%location%"
 git_name="%git-name%"
 git_email="%git-email%"
