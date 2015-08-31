@@ -52,5 +52,5 @@ if [ $? -eq 0 ]; then \
   fi) '$BWhite$Color_Off'";
 else \
   # @2 - Prompt when not in GIT repo
-  echo "'$BWhite\$$Color_Off' "; \
+  echo "'$BWhite$PromptSymbol$Color_Off' "; \
 fi)'
