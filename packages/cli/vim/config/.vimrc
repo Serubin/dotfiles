@@ -23,12 +23,19 @@ set ignorecase					"Ignores case in searches
 set shiftround					"Move word to word with shift navigation
 set history=1000				"Command history
 set undolevels=1000				"Undo history
+
+" Tex stuff
+autocmd FileType tex setlocal spell spelllang=en_us
+autocmd FileType tex BufReadPre,FileReadPre * :VimtexCompile
+
 " netrw 
 let g:netrw_liststyle=3 		"List styles for file explorer
 let g:netrw_altv=1
 let g:netrw_preview=1
 let g:netrw_sort_sequence = '[\/]$,*' " sort is affecting only: directories on the top, files below
 let g:netrw_list_hide= '.*\.swp$'
+let asmsyntax='armasm'
+let filetype_inc='armasm'
 
 " Key mappings
 let mapleader = "\<Space>"
@@ -89,3 +96,12 @@ set wildignore+=tmp/**
 set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.svg
 set wildignore+=*.swp,*.pyc,*.bak,*.class,*.orig
 set wildignore+=.git,.hg,.bzr,.svn
+
+function! s:SetHighlightings()
+	hi Pmenu           guifg=#66D9EF guibg=#000000
+	hi PmenuSel                      guibg=#808080
+	hi PmenuSbar                     guibg=#080808
+	hi PmenuThumb      guifg=#66D9EF
+endfunction
+call s:SetHighlightings()
+autocmd ColorScheme * call <SID>SetHighlightings()
