@@ -25,4 +25,4 @@
 [help]
 	autocorrect = 1
 [credential]
-	helper = /usr/share/git/credential/gnome-keyring/git-credential-gnome-keyring
+	helper = /usr/lib/git-core/git-credential-gnome-keyring
