@@ -21,7 +21,7 @@ alias _="sudo"
 alias g="git"
 alias v="vim"
 alias rr="rm -rf"
-alias rm="trash"
+#alias rm="trash"
 alias sudo="sudo "
 # ip aliases
 alias ipdns="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -31,6 +31,6 @@ alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([
 alias vi="vim"
 alias vim="vim --servername vim"
 
+alias open="xdg-open"
 # call the cs function in ./.functions to ls the new directory
 alias cd='cs'
-
