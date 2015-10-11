@@ -23,7 +23,7 @@ set ignorecase                  "Ignores case in searches
 set shiftround                  "Move word to word with shift navigation
 set history=1000                "Command history
 set undolevels=1000             "Undo history
-set udf
+set udf                         "Persistant undo across sessions
 
 " Tex stuff
 autocmd FileType tex setlocal spell spelllang=en_us
