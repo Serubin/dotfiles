@@ -81,6 +81,7 @@ installPackage "" "required" # required packages
 
 installPackage "cli" "git"
 installPackage "cli" "vim"
+installPackage "cli" "tmux"
 installPackage "cli" "htop"
 installPackage "cli" "archey"
 
