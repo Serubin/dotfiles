@@ -1,5 +1,4 @@
 # Serubin's DotFiles
- This readme is still in progress... 
 ## Installation
 
 Installing is fairly straight forward, just clone the repo and place it anywhere and use the install script provided.
@@ -14,7 +13,10 @@ In order to change the location of the installtion you will have to re-run the i
 * Ubuntu
 * Arch
 
-The install script takes care of all the pre-requists excluding git, bash, and sudo. However this only works with OSX, Arch,  Debian, and Ubuntu (for the moment). 
+The install script takes care of all the pre-requists excluding git, bash, lsb-release, and sudo. However this only works with OSX, Arch,  Debian, and Ubuntu (for the moment). 
+
+For all *linux* distributions
+*The script will not be able to detect your os without ```lsb-release```, make sure to install it*
 
 In OS X the script will install brew and all needed components. 
 

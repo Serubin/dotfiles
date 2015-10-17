@@ -1,7 +1,7 @@
 #!/bin/bash
 # Determins dot file location
-if [ -r "$HOME/.dotfiles_loc" ]; then # checks for stored location
-	source "$HOME/.dotfiles_loc"
+if [ -r "$HOME/.dotfiles.info" ]; then # checks for stored location
+	source "$HOME/.dotfiles.info"
 else # otherwise assumes the following
 	DOTFILES_DIR="$HOME/.dotfiles"
 fi
@@ -18,3 +18,6 @@ if [ -r ~/.custom ]; then
 	source ~/.custom;
 fi
 
+if [ "$tmux_as_shell" = "1" ]; then
+	[[ $TERM = "xterm-256color" ]] && { tmux && exit 0; }
+fi

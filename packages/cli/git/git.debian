@@ -14,8 +14,8 @@ sudo apt-get install -y curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev
 
 # Download and compile from source - Ubuntu and Debian repos are annoyingly out of date
 cd /tmp
-curl -L --progress https://www.kernel.org/pub/software/scm/git/git-2.5.0.tar.gz | tar xz
-cd git-2.4.3/
+curl -L --progress https://www.kernel.org/pub/software/scm/git/git-2.6.1.tar.gz | tar xz
+cd git-2.6.1/
 
 ./configure
 make prefix=/usr/local all
@@ -24,5 +24,5 @@ make prefix=/usr/local all
 sudo make prefix=/usr/local install
 
 cd ..
-rm -rf git-2.4.3
+rm -rf git-2.6.1/
 cd $DOTFILES_DIR

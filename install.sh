@@ -5,8 +5,22 @@ echo "-------- Setting up Serubin's Dotfiles --------"
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+if [ ! -r "${HOME}/.dotfiles.info" ]; then
+	echo "-------- Git Author Info --------"
+	echo "Please enter your git author information. (name and email)."
+	echo "If you want to change this later you can edit '~/dotfiles.info'"
+
+	cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
+	read -p "Name: " git_name
+	sed -i -e 's/%git-name%/'${git_name}'/g' ${HOME}/.dotfiles.info
+
+	read -p "Email: " git_email
+	git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
+	sed -i -e 's/%git-email%/'${git_email}'/g' ${HOME}/.dotfiles.info
+fi
+
 # saves dotfile location
-echo "export DOTFILES_DIR=${DOTFILES_DIR}" > ${HOME}/.dotfiles_loc
+sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
 
 # Source install functions
 source ${DOTFILES_DIR}/util/inputFunc.sh
@@ -67,6 +81,7 @@ installPackage "" "required" # required packages
 
 installPackage "cli" "git"
 installPackage "cli" "vim"
+installPackage "cli" "tmux"
 installPackage "cli" "htop"
 installPackage "cli" "archey"
 

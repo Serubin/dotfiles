@@ -1,8 +1,6 @@
 [user]
-	name = Andrew 
-	email = axr8451@rit.edu
-[github]
-	user = ARamsey118  
+	name = %git-name%
+	email = %git-email%
 [core]
 	excludesfile = ~/.gitignore_global
 	editor = vim
