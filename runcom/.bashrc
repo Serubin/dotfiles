@@ -18,3 +18,6 @@ if [ -r ~/.custom ]; then
 	source ~/.custom;
 fi
 
+if [ "$tmux_as_shell" = "1" ]; then
+	[[ $TERM = "xterm-256color" ]] && { tmux && exit 0; }
+fi
