@@ -9,7 +9,9 @@ alias ....="cd ../../.."
 
 
 # ls aliases
-if [ "$DISTRO" != "Darwin" ]; then
+if [ "$DISTRO" = "Darwin" ]; then
+	alias ls="gls --color=auto"
+else
 	alias ls="ls --color=auto"
 fi
 
