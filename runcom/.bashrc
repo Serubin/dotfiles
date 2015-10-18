@@ -18,6 +18,11 @@ if [ -r ~/.custom ]; then
 	source ~/.custom;
 fi
 
+if [ -r ~/.dir_colors ]; then
+    eval $(dircolors ~/.dir_colors);
+fi
+
+
 if [ "$tmux_as_shell" = "1" ]; then
 	[[ $TERM = "xterm-256color" ]] && { tmux && exit 0; }
 fi
