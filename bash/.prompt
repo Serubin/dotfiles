@@ -40,7 +40,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 
-export PS1="$BCyan$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite"'$(git branch &>/dev/null;\
+export PS1="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite"'$(git branch &>/dev/null;\
 if [ $? -eq 0 ]; then \
   echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
   if [ "$?" -eq "0" ]; then \
