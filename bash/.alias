@@ -23,12 +23,16 @@ alias _="sudo"
 alias g="git"
 alias v="vim"
 alias rr="rm -rf"
-
+#alias rm="trash"
+alias sudo="sudo "
 # ip aliases
-alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias ipdns="dig +short myip.opendns.com @resolver1.opendns.com"
 alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
 
-# vim correction alias
+# vim 
 alias vi="vim"
+alias vim="vim --servername vim"
 
-alias clock="watch -tcpn.5 'figlet -f big -W \"$(date +%l:%M:%S)\" | toilet -f term --gay | perl -pe \"s,0;1,01,g\"'"
+alias open="xdg-open"
+# call the cs function in ./.functions to ls the new directory
+alias cd='cs'
