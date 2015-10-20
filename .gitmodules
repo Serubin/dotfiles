@@ -1,0 +1,3 @@
+[submodule "runcom/dircolors-solarized"]
+	path = runcom/dircolors-solarized
+	url = https://github.com/seebi/dircolors-solarized.git

@@ -31,7 +31,8 @@ source ${DOTFILES_DIR}/util/detectos.sh
 
 # Update dotfiles itself first - 
 echo "Fetching latest from git:"
-[ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull origin master
+[ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull --recurse-submodules=yes origin master
+
 
 # Get sudo up to avoid typing it in mid script
 echo ""
@@ -61,6 +62,7 @@ echo "Creating symlinks"
 ln -sfv "${DOTFILES_DIR}/runcom/.bashrc" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.bash_profile" ~
 ln -sfv "${DOTFILES_DIR}/runcom/.inputrc" ~
+ln -sfv "${DOTFILES_DIR}/runcom/dircolors-solarized/dircolors.256dark" ~/.dir_colors
 
 # Copy .custom if not exist
 if [ ! -r "${HOME}/.custom" ]; then
