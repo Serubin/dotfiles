@@ -23,5 +23,5 @@ if [ -r ~/.custom ]; then
 fi
 
 if [ "$tmux_as_shell" = "1" ]; then
-	[[ $TERM = "xterm-256color" ]] && { tmux && exit 0; }
+	[[ $TERM = "xterm-256color" ]] && { tmux } # Add && edit 0; for edit like normal shell
 fi
