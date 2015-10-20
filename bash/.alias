@@ -31,7 +31,6 @@ alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([
 
 # vim 
 alias vi="vim"
-alias vim="vim --servername vim"
 
 alias open="xdg-open"
 # call the cs function in ./.functions to ls the new directory

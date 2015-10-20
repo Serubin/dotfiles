@@ -28,5 +28,5 @@ fi
 
 
 if [ "$tmux_as_shell" = "1" ]; then
-	[[ $TERM = "xterm-256color" ]] && { tmux } # Add && edit 0; for edit like normal shell
+	[[ $TERM = "xterm-256color" ]] && { tmux; } # Add && edit 0; for edit like normal shell
 fi
