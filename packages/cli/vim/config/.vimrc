@@ -32,8 +32,15 @@ augroup latex
     autocmd BufWinEnter *.tex :VimtexCompile 
 augroup END
 let g:tex_flavor='latex'
-"Tabs to spaces
+" Testing Tex stuff
+if !exists('g:ycm_semantic_triggers')
+  let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers.tex = [
+      \ 're!\\[A-Za-z]*(ref|cite)[A-Za-z]*([^]]*])?{([^}]*, ?)*'
+        \ ]
 
+"Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 " netrw 
 let g:netrw_liststyle=3         "List styles for file explorer
@@ -46,7 +53,7 @@ let filetype_inc='armasm'
 
 " Key mappings
 let mapleader = "\<Space>"
-nnoremap <leader>c :noh<cr> " Clear search highlighting with ,<space>
+nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
