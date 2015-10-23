@@ -26,8 +26,11 @@ set undolevels=1000             "Undo history
 set udf                         "Persistant undo across sessions
 
 " Tex stuff
-autocmd FileType tex setlocal spell spelllang=en_us
-" autocmd FileType tex BufReadPre,FileReadPre * :VimtexCompile
+augroup latex
+    autocmd!
+    autocmd FileType tex setlocal spell spelllang=en_us
+    autocmd BufWinEnter *.tex :VimtexCompile 
+augroup END
 let g:tex_flavor='latex'
 "Tabs to spaces
 
