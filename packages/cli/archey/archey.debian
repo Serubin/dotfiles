@@ -5,7 +5,7 @@
 # Pretty System info
 ########################################
 
-sudo apt-get install scrot
+sudo apt-get -y install scrot
 curl -L http://github.com/downloads/djmelik/archey/archey-0.2.8.deb  -o /tmp/archey.deb
 sudo dpkg -i /tmp/archey.deb 
 rm /tmp/archey.deb
