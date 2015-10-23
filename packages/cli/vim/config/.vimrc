@@ -40,6 +40,10 @@ let g:ycm_semantic_triggers.tex = [
       \ 're!\\[A-Za-z]*(ref|cite)[A-Za-z]*([^]]*])?{([^}]*, ?)*'
         \ ]
 
+" TeX PDF viewer integration
+let g:vimtex_view_method = 'zathura'
+
+
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 " netrw 

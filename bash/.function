@@ -59,4 +59,13 @@ function cs()
   fi
 }
 
+# launch vim server with *.tex files only
 
+function vim_with_servername()
+{
+    if [[ "$@" == *"tex" ]]; then
+        \vim --servername VIM "$@"
+    else
+        \vim "$@"
+    fi
+}
