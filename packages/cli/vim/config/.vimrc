@@ -112,11 +112,15 @@ set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.svg
 set wildignore+=*.swp,*.pyc,*.bak,*.class,*.orig
 set wildignore+=.git,.hg,.bzr,.svn
 
-function! s:SetHighlightings()
-    hi Pmenu           guifg=#66D9EF guibg=#000000
-    hi PmenuSel                      guibg=#808080
-    hi PmenuSbar                     guibg=#080808
-    hi PmenuThumb      guifg=#66D9EF
-endfunction
-call s:SetHighlightings()
-autocmd ColorScheme * call <SID>SetHighlightings()
+" function! s:SetHighlightings()
+"     hi Pmenu           guifg=#66D9EF guibg=#000000
+"     hi PmenuSel                      guibg=#808080
+"     hi PmenuSbar                     guibg=#080808
+"     hi PmenuThumb      guifg=#66D9EF
+" endfunction
+" call s:SetHighlightings()
+" 
+" augroup color_scheme  " Currently broken and I'm not sure why, but 
+"     augroup!          " I think it has to do with the function above
+"     autocmd ColorScheme * call <SID>SetHighlightings()
+" augroup END
