@@ -29,7 +29,9 @@ Plugin 'honza/vim-snippets'
 
 " Load LaTeX if installed
 if filereadable(expand("~/.vim/latex.vim"))
-  source ~/.vim/latex.vim
+    " Vimtex plugin
+    Plugin 'lervag/vimtex'
+    source ~/.vim/latex.vim
 endif
 
 " JavaScript

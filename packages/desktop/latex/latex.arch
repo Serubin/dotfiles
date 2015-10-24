@@ -10,7 +10,7 @@
 # ##############################
 
 echo "Installing LaTeX"
-sudo pacman -S --noconfirm texlive-core
+#sudo pacman -S --noconfirm texlive-core
 
 
 # ##############################
