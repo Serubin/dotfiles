@@ -33,18 +33,24 @@ User="\u"
 HostName="\h"
 PathShort="\w"
 PathFull="\W"
+PromptSymbol="#"
+
+if [ "$EUID" -ne 0 ]; then
+	PromptSymbol="$"
+fi
+
 
 export PS1="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite"'$(git branch &>/dev/null;\
 if [ $? -eq 0 ]; then \
   echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
   if [ "$?" -eq "0" ]; then \
     # @4 - Clean repository - nothing to commit
-    echo "'\$$Green'"$(__git_ps1 " (%s)"); \
+    echo "'$PromptSymbol$Green'"$(__git_ps1 " (%s)"); \
   else \
     # @5 - Changes to working tree
-    echo "'\$$Red'"$(__git_ps1 " {%s}"); \
+    echo "'$PromptSymbol$Red'"$(__git_ps1 " {%s}"); \
   fi) '$BWhite$Color_Off'";
 else \
   # @2 - Prompt when not in GIT repo
-  echo "'$BWhite\$$Color_Off' "; \
+  echo "'$BWhite$PromptSymbol$Color_Off' "; \
 fi)'

@@ -11,7 +11,7 @@ fi
 
 # get contents of uname or lsb-release
 if [ "$DISTRO_RAW_LOC" != "" ]; then
-        DISTRO_RAW=$(cat /etc/*-release)
+        DISTRO_RAW=$(cat /etc/*-release 2> /dev/null)
 else
         DISTRO_RAW=$(uname)
 fi
