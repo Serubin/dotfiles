@@ -1,20 +1,33 @@
 #!/bin/bash
 
 ########################################
-# Debian install of zathura
-# Minimalistic document viewer
+# Debian install of LaTeX
+# A Markup Language
 ########################################
 
-sudo apt-get install -y zathura
+    
+# ##############################
+#           LaTeX              #
+# ##############################
+
+echo "Installing LaTeX"
+sudo apt-get install -y texlive
+
+
+# ##############################
+#           zathura            #
+# ##############################
+
+
+sudo apt-get install -y zathura xdotool 
 
 local VERSION = "0.2.8"
 curl -L https://pwmt.org/projects/zathura-pdf-mupdf/download/zathura-pdf-mupdf-"$VERSION".tar.gz
 tar xfv zathura-pdf-mupdf-"$VERSION".tar.gz
 cd zathura-pdf-mupdf-"$VERSION"
 make
-make install 
+sudo make install 
 cd ..
 rm -r zathura-pdf-mupdf-"$VERSION"
 rm  zathura-pdf-mupdf-"$VERSION".tar.gz
 
-ln -sfv "${PACKAGE_INSTALL}/config/.latexmkrc" ~

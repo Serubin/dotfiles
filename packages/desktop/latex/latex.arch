@@ -1,0 +1,23 @@
+#!/bin/bash
+
+########################################
+# Arch install of LaTeX
+# A Markup Language
+########################################
+
+# ##############################
+#           LaTeX              #
+# ##############################
+
+echo "Installing LaTeX"
+sudo pacman -S --noconfirm texlive-core
+
+
+# ##############################
+#           zathura            #
+# ##############################
+
+echo "Installing zathura"
+#Install zathura
+sudo pacman -S --noconfirm zathura zathura-pdf-mupdf xdotool
+

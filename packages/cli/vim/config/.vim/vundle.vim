@@ -26,7 +26,11 @@ Bundle "tpope/vim-fugitive"
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
-Plugin 'lervag/vimtex'
+
+" Load LaTeX if installed
+if filereadable(expand("~/.vim/latex.vim"))
+  source ~/.vim/latex.vim
+endif
 
 " JavaScript
 Bundle "pangloss/vim-javascript"

@@ -22,3 +22,4 @@ ln -sfv "${PACKAGE_INSTALL}/config/.gitignore_global" ~
 
 # Removes file that appears from the void
 rm "${PACKAGE_INSTALL}/config/.gitconfig-e"
+
