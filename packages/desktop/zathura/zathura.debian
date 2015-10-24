@@ -1,0 +1,20 @@
+#!/bin/bash
+
+########################################
+# Debian install of zathura
+# Minimalistic document viewer
+########################################
+
+sudo apt-get install -y zathura
+
+local VERSION = "0.2.8"
+curl -L https://pwmt.org/projects/zathura-pdf-mupdf/download/zathura-pdf-mupdf-"$VERSION".tar.gz
+tar xfv zathura-pdf-mupdf-"$VERSION".tar.gz
+cd zathura-pdf-mupdf-"$VERSION"
+make
+make install 
+cd ..
+rm -r zathura-pdf-mupdf-"$VERSION"
+rm  zathura-pdf-mupdf-"$VERSION".tar.gz
+
+ln -sfv "${PACKAGE_INSTALL}/config/.latexmkrc" ~

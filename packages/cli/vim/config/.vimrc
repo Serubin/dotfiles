@@ -57,6 +57,7 @@ let filetype_inc='armasm'
 
 " Key mappings
 let mapleader = "\<Space>"
+let maplocalleader = "\\"
 nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer

@@ -63,7 +63,7 @@ function cs()
 
 function vim_with_servername()
 {
-    if [[ "$@" == *"tex" ]]; then
+    if [[ "$@" == *"tex"* ]]; then
         \vim --servername VIM "$@"
     else
         \vim "$@"

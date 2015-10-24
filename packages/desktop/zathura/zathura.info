@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# zathura Info file
+#
+
+export package_support="Debian Ubuntu Arch"
+
+echo "zathura: Minimalistic document viewer"
