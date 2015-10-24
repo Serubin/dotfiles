@@ -18,7 +18,8 @@ if [ -r "${HOME}/.vim/latex.vim" ]; then
 	mv ${HOME}/.vim/latex.vim ${HOME}/.dotfiles-bak/
 fi
 
-
+# Reinstall plugins for vimtex
+vim +PluginInstall +qall
 
 ln -sfv "${PACKAGE_INSTALL}/config/.latexmkrc" ~
 ln -sfv "${PACKAGE_INSTALL}/config/zathurarc" ~/.config/zathura/

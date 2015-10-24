@@ -6,6 +6,16 @@
 ########################################
 
 # ##############################
+#           gVim               #
+# ##############################
+# Needed for reverse search in latex
+
+echo "Installing gVim"
+sudo pacman -Rs --noconfirm vim
+sudo pacman -S --noconfirm gvim
+
+
+# ##############################
 #           LaTeX              #
 # ##############################
 
@@ -18,6 +28,5 @@ sudo pacman -S --noconfirm texlive-core
 # ##############################
 
 echo "Installing zathura"
-#Install zathura
 sudo pacman -S --noconfirm zathura zathura-pdf-mupdf xdotool
 
