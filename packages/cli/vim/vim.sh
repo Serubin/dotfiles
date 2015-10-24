@@ -31,7 +31,7 @@ vim +PluginInstall +qall
 
 echo "Compiling ycm"
 # Compile YouCompleteMe
-cd "${BUNDLE_DIR}/YouCompleteMe" #&& ./install.sh
+cd "${BUNDLE_DIR}/YouCompleteMe" && ./install.sh
 
 cd -
 
