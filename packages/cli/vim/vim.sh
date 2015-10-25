@@ -8,11 +8,11 @@
 echo "Backing up previous vim config"
 
 if [ -r "${HOME}/.vim" ]; then
-	mv ${HOME}/.vim ${HOME}/.dotfiles-bak/
+	mv -f ${HOME}/.vim ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
 if [ -r "${HOME}/.vimrc" ]; then
-	mv ${HOME}/.vimrc ${HOME}/.dotfiles-bak/
+	mv ${HOME}/.vimrc ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
 # config install
@@ -31,7 +31,7 @@ vim +PluginInstall +qall
 
 echo "Compiling ycm"
 # Compile YouCompleteMe
-cd "${BUNDLE_DIR}/YouCompleteMe" && ./install.sh
+cd "${BUNDLE_DIR}/YouCompleteMe" && python install.py
 
 cd -
 

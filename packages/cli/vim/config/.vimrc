@@ -102,11 +102,22 @@ set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.svg
 set wildignore+=*.swp,*.pyc,*.bak,*.class,*.orig
 set wildignore+=.git,.hg,.bzr,.svn
 
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
+
+"let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+"let g:ctrlp_custom_ignore = {
+ " \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+ " \ 'file': '\v\.(exe|so|dll)$',
+ " \ 'link': 'some_bad_symbolic_links',
+ " \ }
+
 function! s:SetHighlightings()
     hi Pmenu           guifg=#66D9EF guibg=#000000
     hi PmenuSel                      guibg=#808080
     hi PmenuSbar                     guibg=#080808
     hi PmenuThumb      guifg=#66D9EF
 endfunction
+
 call s:SetHighlightings()
 autocmd ColorScheme * call <SID>SetHighlightings()
