@@ -108,5 +108,6 @@ function! s:SetHighlightings()
     hi PmenuSbar                     guibg=#080808
     hi PmenuThumb      guifg=#66D9EF
 endfunction
+
 call s:SetHighlightings()
 autocmd ColorScheme * call <SID>SetHighlightings()
