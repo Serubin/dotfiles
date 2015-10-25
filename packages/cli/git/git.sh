@@ -7,17 +7,19 @@
 
 # back up old files
 if [ -r "${HOME}/.gitconfig" ]; then
-	mv ${HOME}/.gitconfig ${HOME}/.dotfiles-bak/
+	mv ${HOME}/.gitconfig ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
 if [ -r "${HOME}/.gitconfig_global" ]; then
-	mv ${HOME}/.gitconfig_global ${HOME}/.dotfiles-bak/
+	mv ${HOME}/.gitconfig_global ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
-sed -i -e 's/%git-name%/'$git_name'/g' ${PACKAGE_INSTALL}/config/.gitconfig
-sed -i -e 's/%git-email%/'$git_email'/g' ${PACKAGE_INSTALL}/config/.gitconfig
+rm ${HOME}/.gitconfig
+cp -v "${PACKAGE_INSTALL}/config/.gitconfig" ${HOME}/.gitconfig
 
-ln -sfv "${PACKAGE_INSTALL}/config/.gitconfig" ~
+sed -i -e 's/%git-name%/'$git_name'/g' ${HOME}/.gitconfig
+sed -i -e 's/%git-email%/'$git_email'/g' ${HOME}/.gitconfig
+
 ln -sfv "${PACKAGE_INSTALL}/config/.gitignore_global" ~
 
 # Removes file that appears from the void
