@@ -14,7 +14,7 @@ if [ -r "${HOME}/.gitconfig_global" ]; then
 	mv ${HOME}/.gitconfig_global ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
-rm ${HOME}/.gitconfig
+rm ${HOME}/.gitconfig 2> /dev/null
 cp -v "${PACKAGE_INSTALL}/config/.gitconfig" ${HOME}/.gitconfig
 
 sed -i -e 's/%git-name%/'$git_name'/g' ${HOME}/.gitconfig
@@ -23,4 +23,4 @@ sed -i -e 's/%git-email%/'$git_email'/g' ${HOME}/.gitconfig
 ln -sfv "${PACKAGE_INSTALL}/config/.gitignore_global" ~
 
 # Removes file that appears from the void
-rm "${PACKAGE_INSTALL}/config/.gitconfig-e"
+rm "${PACKAGE_INSTALL}/config/.gitconfig-e" 2> /dev/null
