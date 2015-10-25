@@ -1,18 +1,17 @@
 #!/bin/bash
 
 ########################################
-# Debian install of LaTeX
+# Darwin install of LaTeX
 # A Markup Language
 ########################################
 
-     
 # ##############################
 #           gVim               #
 # ##############################
 
 echo "Installing gVim"
-sudo apt-get remove -y vim
-sudo apt-get install -y vim-gtk
+#sudo apt-get remove -y vim
+brew install vim --with-client-server --with-features=huge
 
    
 # ##############################
@@ -20,11 +19,14 @@ sudo apt-get install -y vim-gtk
 # ##############################
 
 echo "Installing LaTeX"
-sudo apt-get install -y texlive
+brew install caskroom/cask/brew-cask
+brew cask install mactex 
 
 
 # ##############################
 #           zathura            #
 # ##############################
-
-sudo apt-get install -y zathura xdotool zathura-pdf-poppler
+brew tap zegervdv/zathura
+brew install zathura 
+brew install zathura-pdf-poppler
+brew install xdotool
