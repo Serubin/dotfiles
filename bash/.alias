@@ -9,7 +9,9 @@ alias ....="cd ../../.."
 
 
 # ls aliases
-if [ "$DISTRO" != "Darwin" ]; then
+if [ "$DISTRO" = "Darwin" ]; then
+	alias ls="gls --color=auto"
+else
 	alias ls="ls --color=auto"
 fi
 
@@ -20,8 +22,7 @@ alias ll="ls -lhAr"
 alias _="sudo"
 alias g="git"
 alias v="vim"
-alias rr="rm -rf"
-#alias rm="trash"
+alias rr="rm -r"
 alias sudo="sudo "
 # ip aliases
 alias ipdns="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -33,5 +34,6 @@ alias vi="vim"
 alias vim='vim_with_servername'
 
 alias open="xdg-open"
-# call the cs function in ./.functions to ls the new directory
-alias cd='cs'
+
+# listing cd
+alias cd="long_and_annoying_cd"

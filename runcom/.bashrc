@@ -8,6 +8,10 @@ fi
 
 source $DOTFILES_DIR/util/detectos.sh
 
+if [ "$DISTRO" == "Darwin" ]; then
+	alias ls="gls"
+fi
+
 # source all bash base files
 for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
 	[ -d "$DOTFILE" ] && continue;
@@ -24,5 +28,5 @@ fi
 
 
 if [ "$tmux_as_shell" = "1" ]; then
-	[[ $TERM = "xterm-256color" ]] && { tmux && exit 0; }
+	[[ $TERM = "xterm-256color" ]] && { tmux; } # Add && edit 0; for edit like normal shell
 fi

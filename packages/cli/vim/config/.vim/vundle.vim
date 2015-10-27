@@ -37,6 +37,9 @@ endif
 " JavaScript
 Bundle "pangloss/vim-javascript"
 
+" Tags
+Plugin 'kien/ctrlp.vim'
+
 call vundle#end()
 
 "Filetype plugin indent on is required by vundle

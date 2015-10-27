@@ -13,9 +13,11 @@ sudo apt-get remove git-core
 sudo apt-get install -y curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
 
 # Download and compile from source - Ubuntu and Debian repos are annoyingly out of date
+git_version="2.6.2"
+
 cd /tmp
-curl -L --progress https://www.kernel.org/pub/software/scm/git/git-2.6.1.tar.gz | tar xz
-cd git-2.6.1/
+curl -L --progress https://www.kernel.org/pub/software/scm/git/git-${git_version}.tar.gz | tar xz
+cd git-${git_version}/
 
 ./configure
 make prefix=/usr/local all
@@ -24,5 +26,5 @@ make prefix=/usr/local all
 sudo make prefix=/usr/local install
 
 cd ..
-rm -rf git-2.6.1/
+rm -rf git-${git_version}/
 cd $DOTFILES_DIR

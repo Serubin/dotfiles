@@ -3,7 +3,7 @@
 echo "-------- Setting up Serubin's Dotfiles --------"
 
 # Get current dir (so run this script from anywhere)
-export DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export DOTFILES_DIR="$( \cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	echo "-------- Git Author Info --------"
@@ -31,7 +31,7 @@ source ${DOTFILES_DIR}/util/detectos.sh
 
 # Update dotfiles itself first - 
 echo "Fetching latest from git:"
-[ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull --recurse-submodules=yes origin master
+[ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull --recurse-submodules=yes origin master && git submodule init && git submodule update
 
 
 # Get sudo up to avoid typing it in mid script
