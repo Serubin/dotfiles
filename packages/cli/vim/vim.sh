@@ -8,6 +8,10 @@
 echo "Backing up previous vim config"
 
 if [ -r "${HOME}/.vim" ]; then
+    if [ -r "${HOME}/.dotfiles-bak/.vim" ]; then
+        rm -rf ${HOME}/.dotfiles-bak/.vim 2> /dev/null
+    fi
+
 	mv -f ${HOME}/.vim ${HOME}/.dotfiles-bak/ 2> /dev/null
 fi
 
@@ -31,7 +35,13 @@ vim +PluginInstall +qall
 
 echo "Compiling ycm"
 # Compile YouCompleteMe
-cd "${BUNDLE_DIR}/YouCompleteMe" && python install.py
+cd "${BUNDLE_DIR}/YouCompleteMe"
+
+if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
+    python2 install.py
+else
+    python install.py
+fi
 
 cd -
 

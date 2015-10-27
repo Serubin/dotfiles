@@ -59,4 +59,8 @@ function long_and_annoying_cd()
   fi
 }
 
+function clock() {
+    watch -tcpn.5 'figlet -f big -W \"$(date +%l:%M:%S)\" | toilet -f term --gay | perl -pe \"s,0;1,01,g\"'
+}
+
 
