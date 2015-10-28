@@ -1,5 +1,7 @@
-" File to control LaTeX integration with Vim
-" Also installs the vimtex plugin using vundle
+" Useful to move around in long blocks of text
+map j gj
+map k gk
+
 augroup latex
     autocmd!
     autocmd FileType tex setlocal spell spelllang=en_us
