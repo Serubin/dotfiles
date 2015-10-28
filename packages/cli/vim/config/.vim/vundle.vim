@@ -38,7 +38,7 @@ endif
 Bundle "pangloss/vim-javascript"
 
 " Tags
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 
 call vundle#end()
 
