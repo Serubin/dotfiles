@@ -8,10 +8,6 @@ fi
 
 source $DOTFILES_DIR/util/detectos.sh
 
-if [ "$DISTRO" == "Darwin" ]; then
-	alias ls="gls"
-fi
-
 # source all bash base files
 for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
 	[ -d "$DOTFILE" ] && continue;

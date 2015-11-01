@@ -31,7 +31,9 @@ alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([
 # vim 
 alias vi="vim"
 
-alias open="xdg-open"
+if [ "$DISTRO" != "Darwin" ]; then
+    alias open="xdg-open"
+fi
 
 # listing cd
 alias cd="long_and_annoying_cd"
