@@ -28,8 +28,9 @@ Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'lervag/vimtex'
 
-" JavaScript
+" Web
 Bundle "pangloss/vim-javascript"
+Plugin 'Valloric/MatchTagAlways'
 
 " Tags
 Plugin 'kien/ctrlp.vim'
