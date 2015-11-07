@@ -46,8 +46,16 @@ nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
-inoremap jk <ESC>
-inoremap <ESC> <nop>
+
+"inoremap jk <ESC>             " Prevent cursor from moving left on exit
+"inoremap <ESC> <nop>
+"nnoremap jk <ESC>
+"nnoremap <ESC> <nop>
+""vnoremap jk <ESC>
+""vnoremap <ESC> <nop>
+"onoremap jk <ESC>
+"onoremap <ESC> <nop>
+
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
