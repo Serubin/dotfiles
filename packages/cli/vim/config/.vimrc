@@ -24,13 +24,10 @@ set shiftround                  "Move word to word with shift navigation
 set history=1000                "Command history
 set undolevels=1000             "Undo history
 set udf                         "Persistant undo across sessions
+set scrolloff=8                 "Makes cursor stay 8 lines away from the top or bottom
 
-" Tex stuff
-autocmd FileType tex setlocal spell spelllang=en_us
-" autocmd FileType tex BufReadPre,FileReadPre * :VimtexCompile
-let g:tex_flavor='latex'
+
 "Tabs to spaces
-
 set tabstop=4 shiftwidth=4 expandtab
 " netrw 
 let g:netrw_liststyle=3         "List styles for file explorer
@@ -43,11 +40,22 @@ let filetype_inc='armasm'
 
 " Key mappings
 let mapleader = "\<Space>"
-nnoremap <leader>c :noh<cr> " Clear search highlighting with ,<space>
+let maplocalleader = "\\"
+nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
 noremap <Leader>` :call VexToggle("")<CR>
+noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
+
+"inoremap jk <ESC>             " Prevent cursor from moving left on exit
+"inoremap <ESC> <nop>
+"nnoremap jk <ESC>
+"nnoremap <ESC> <nop>
+""vnoremap jk <ESC>
+""vnoremap <ESC> <nop>
+"onoremap jk <ESC>
+"onoremap <ESC> <nop>
 
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
@@ -101,7 +109,6 @@ set wildignore+=tmp/**
 set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.svg
 set wildignore+=*.swp,*.pyc,*.bak,*.class,*.orig
 set wildignore+=.git,.hg,.bzr,.svn
-
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 

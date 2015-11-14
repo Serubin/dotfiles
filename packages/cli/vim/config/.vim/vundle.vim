@@ -26,14 +26,20 @@ Bundle "tpope/vim-fugitive"
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
-Plugin 'lervag/vimtex'
+
+" Load LaTeX if installed
+if filereadable(expand("~/.vim/latex.vim"))
+    " Vimtex plugin
+    Plugin 'lervag/vimtex'
+    source ~/.vim/latex.vim
+endif
 
 " Web
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'
 
 " Tags
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 
 call vundle#end()
 

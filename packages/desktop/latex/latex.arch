@@ -1,0 +1,32 @@
+#!/bin/bash
+
+########################################
+# Arch install of LaTeX
+# A Markup Language
+########################################
+
+# ##############################
+#           gVim               #
+# ##############################
+# Needed for reverse search in latex
+
+echo "Installing gVim"
+sudo pacman -Rs --noconfirm vim
+sudo pacman -S --noconfirm gvim
+
+
+# ##############################
+#           LaTeX              #
+# ##############################
+
+echo "Installing LaTeX"
+sudo pacman -S --noconfirm texlive-core
+
+
+# ##############################
+#           zathura            #
+# ##############################
+
+echo "Installing zathura"
+sudo pacman -S --noconfirm zathura zathura-pdf-mupdf xdotool
+
