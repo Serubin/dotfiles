@@ -48,19 +48,15 @@ noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 
-"inoremap jk <ESC>             " Prevent cursor from moving left on exit
-"inoremap <ESC> <nop>
-"nnoremap jk <ESC>
-"nnoremap <ESC> <nop>
-""vnoremap jk <ESC>
-""vnoremap <ESC> <nop>
-"onoremap jk <ESC>
-"onoremap <ESC> <nop>
-
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
 endif
+
+" better key bindings for UltiSnipsExpandTrigger
+let g:UltiSnipsExpandTrigger = "<C-j>"
+let g:UltiSnipsJumpForwardTrigger = "<C-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 
 " colors
 let g:rehash256 = 1
@@ -118,6 +114,11 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'file': '\v\.(exe|so|dll)$',
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
+ 
+ augroup makefile
+     autocmd!
+     autocmd FileType make setlocal noexpandtab
+augroup END
 
 function! s:SetHighlightings()
     hi Pmenu           guifg=#66D9EF guibg=#000000
