@@ -91,6 +91,7 @@ installPackage "cli" "archey"
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
 	installPackage "desktop" "sublime"
 	installPackage "desktop" "i3"
+    installPackage "desktop" "latex"
 fi
 
 source ~/.bashrc

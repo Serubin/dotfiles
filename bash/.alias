@@ -30,6 +30,8 @@ alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([
 
 # vim 
 alias vi="vim"
+# calls the server function
+alias vim='vim_with_servername'
 
 if [ "$DISTRO" != "Darwin" ]; then
     alias open="xdg-open"

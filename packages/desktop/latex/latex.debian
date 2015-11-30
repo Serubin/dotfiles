@@ -1,0 +1,30 @@
+#!/bin/bash
+
+########################################
+# Debian install of LaTeX
+# A Markup Language
+########################################
+
+     
+# ##############################
+#           gVim               #
+# ##############################
+
+echo "Installing gVim"
+sudo apt-get remove -y vim
+sudo apt-get install -y vim-gtk
+
+   
+# ##############################
+#           LaTeX              #
+# ##############################
+
+echo "Installing LaTeX"
+sudo apt-get install -y texlive
+
+
+# ##############################
+#           zathura            #
+# ##############################
+
+sudo apt-get install -y zathura xdotool zathura-pdf-poppler

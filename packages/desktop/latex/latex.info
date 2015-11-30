@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# LaTeX Info file
+#
+
+export package_support="Debian Ubuntu Arch Darwin"
+
+echo "LaTeX: A markup language"
