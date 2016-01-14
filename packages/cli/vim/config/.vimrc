@@ -47,6 +47,7 @@ nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
+nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
