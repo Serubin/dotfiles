@@ -49,6 +49,13 @@ noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
+map j gj
+map k gk
+
+augroup spell_check
+	autocmd!
+	autocmd FileType no ft setlocal spell spelllang-en_us
+augroup END
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
@@ -116,7 +123,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
  
- augroup makefile
+augroup makefile
      autocmd!
      autocmd FileType make setlocal noexpandtab
 augroup END
