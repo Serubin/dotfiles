@@ -37,6 +37,7 @@ endif
 " Web
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'
+Plugin 'othree/html5.vim'
 
 " Tags
 Plugin 'ctrlpvim/ctrlp.vim'
