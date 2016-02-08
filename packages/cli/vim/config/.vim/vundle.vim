@@ -27,6 +27,8 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
+Bundle "scrooloose/syntastic"
+
 " Load LaTeX if installed
 if filereadable(expand("~/.vim/latex.vim"))
     " Vimtex plugin
