@@ -29,5 +29,4 @@ echo "Removing temporary files"
 rm -rf git-${git_version}/
 
 cd $PACKAGE_INSTALL
-~
-~
+
