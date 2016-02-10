@@ -1,4 +1,4 @@
 #!/bin/bash
 
 sudo dnf update -y
-sudo dnf install dnsutils perl autoconf automake cmake make gcc clang python2 curl-devel -y
+sudo dnf install perl autoconf automake cmake gcc clang python2 libcurl-devel -y
