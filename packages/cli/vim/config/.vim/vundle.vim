@@ -38,6 +38,8 @@ endif
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'
 Plugin 'othree/html5.vim'
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'cakebaker/scss-syntax.vim'
 
 " Tags
 Plugin 'ctrlpvim/ctrlp.vim'
