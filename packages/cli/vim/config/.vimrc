@@ -52,6 +52,8 @@ nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 map j gj
 map k gk
 
+runtime! ftplugin/man.vim
+
 augroup spell_check
 	autocmd!
 	autocmd FileType no ft setlocal spell spelllang-en_us
