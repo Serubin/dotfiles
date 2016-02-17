@@ -1,0 +1,14 @@
+#!/bin/bash
+
+########################################
+# Fedora install of i3
+# Tiled Window Manager
+########################################
+
+echo "Installing I3 and dependencies"
+#Install i3
+sudo dnf install i3 i3lock scrot libxcb-devel xcb-util-keysyms-devel xcb-util-devel xcb-util-wm-devel yajl-devel libXrandr-devel startup-notification-devel libev-devel xcb-util-cursor-devel libXinerama-devel libxkbcommon-devel libxkbcommon-x11-devel pcre-devel pango-devel git gcc ImageMagick -y
+
+echo "Installing xfce terminal"
+sudo dnf install xfce4-terminal -y
+ 

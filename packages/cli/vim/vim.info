@@ -4,6 +4,6 @@
 # Vim Info file
 #
 
-export package_support="Debian Ubuntu Darwin Arch"
+export package_support="Debian Ubuntu Darwin Arch Fedora"
 
 echo "Vim: An extensive text editor"

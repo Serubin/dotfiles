@@ -45,6 +45,8 @@ installPackage() {
 		source "${PACKAGE_INSTALL}/${NAME}.osx"
 	elif [ "$DISTRO" == "Arch" ]; then
 		source "${PACKAGE_INSTALL}/${NAME}.arch"
+	elif [ "$DISTRO" == "Fedora" ]; then
+		source "${PACKAGE_INSTALL}/${NAME}.fedora"
 	else
 		# FYI: This shouldn't ever happen - make an issue if it does?
 		echo "ERROR: This os doesn't support ${NAME} installations."a
