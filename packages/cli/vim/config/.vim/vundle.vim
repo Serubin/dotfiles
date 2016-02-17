@@ -24,8 +24,11 @@ Bundle "tpope/vim-fugitive"
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+
+Bundle "scrooloose/syntastic"
 
 " Load LaTeX if installed
 if filereadable(expand("~/.vim/latex.vim"))

@@ -12,7 +12,7 @@ alias ....="cd ../../.."
 if [ "$DISTRO" = "Darwin" ]; then
 	alias ls="gls --color=auto"
 else
-	alias ls="ls --color=auto"
+	alias ls="ls --color=auto -N"
 fi
 
 alias la="ls -A"
