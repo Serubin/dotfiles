@@ -24,6 +24,7 @@ Bundle "tpope/vim-fugitive"
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
@@ -39,6 +40,7 @@ endif
 " Web
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'
+Plugin 'othree/html5.vim'
 
 " Tags
 Plugin 'ctrlpvim/ctrlp.vim'

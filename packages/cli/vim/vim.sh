@@ -38,7 +38,7 @@ echo "Compiling ycm"
 cd "${BUNDLE_DIR}/YouCompleteMe"
 
 if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    python2 install.py
+    python2 install.py --clang-completer --system-libclang
 else
     python install.py
 fi
