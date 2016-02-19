@@ -80,6 +80,7 @@ if filereadable(expand("~/.vim/vex.vim"))
     source ~/.vim/vex.vim
 endif
 
+
 " Undo
 if has('persistent_undo')
   silent !mkdir ~/.vim/undo > /dev/null 2>&1
@@ -124,7 +125,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'file': '\v\.(exe|so|dll)$',
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
- 
+
 augroup makefile
      autocmd!
      autocmd FileType make setlocal noexpandtab
