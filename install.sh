@@ -86,6 +86,7 @@ installPackage "cli" "vim"
 installPackage "cli" "tmux"
 installPackage "cli" "htop"
 installPackage "cli" "archey"
+installPackage "cli" "vhdl"
 
 # Prompt for desktop
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
