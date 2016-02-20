@@ -5,4 +5,4 @@
 # terminal multiplexer
 ########################################
 
-sudo pacman -S --noconfirm tmux
+sudo pacman -S --noconfirm --needed tmux

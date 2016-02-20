@@ -16,7 +16,7 @@
 
 echo "Installing I3"
 #Install i3
-sudo pacman -S --noconfirm i3 i3lock scrot xcb-util-cursor libev libxkbcommon-x11 pango perl startup-notification xcb-util-cursor-git xcb-util-keysyms xcb-util-wm yajl asciidoc docbook-xsl pkgconfig
+sudo pacman -S --noconfirm --needed i3 i3lock scrot xcb-util-cursor libev libxkbcommon-x11 pango perl startup-notification xcb-util-cursor-git xcb-util-keysyms xcb-util-wm yajl asciidoc docbook-xsl pkgconfig
 
 cd /tmp
 
@@ -49,7 +49,7 @@ ln -sfv ${PACKAGE_INSTALL}/config/i3.config ${HOME}/.i3/config
 # ##############################
 
 echo "Installing xfce terminal"
-sudo pacman -S --noconfirm xfce4-terminal
+sudo pacman -S --noconfirm --needed xfce4-terminal
 
 mkdir -p $HOME/.config/xfce4/terminal/
 

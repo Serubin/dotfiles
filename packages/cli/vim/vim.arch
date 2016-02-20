@@ -5,4 +5,4 @@
 # ViImproved
 ########################################
 
-sudo pacman -S --noconfirm vim clang
+sudo pacman -S --noconfirm --needed vim clang

@@ -4,6 +4,6 @@ sudo pacman -Syu --noconfirm
 sudo pacman -S --needed base-devel cmake wget
 
 if [ `getInputBoolean "Install clock alias?"` == "1" ]; then
-	sudo pacman -S --noconfirm figlet 
+	sudo pacman -S --noconfirm --needed figlet 
 	# TODO find a toilet package
 fi

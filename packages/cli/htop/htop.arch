@@ -5,6 +5,6 @@
 # Top for humans
 ########################################
 
-sudo pacman -S --noconfirm htop
+sudo pacman -S --noconfirm --needed htop
 
 ln -sfv "${PACKAGE_INSTALL}/config/htoprc" ~/.config/htop/

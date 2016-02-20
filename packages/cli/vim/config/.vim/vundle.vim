@@ -40,7 +40,7 @@ endif
 if filereadable(expand("~/.vim/vhdl.vim"))
     " Vimtex plugin
     Plugin 'JPR75/VIP'
-    Plugin 'vim-scripts/hdl_plugin'
+    Plugin 'hdl_plugin'
     source ~/.vim/vhdl.vim
 endif
 
