@@ -8,9 +8,9 @@
 echo "Building git from source"
 
 # Install dependencies
-# This is a dirty solution for os specific pre-requs. I feel dirty.
+# This is a dirty solution for os specific pre-requs. I feel dirty. TODO shove this into required packages
 sudo apt-get install -y curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
-sudo dnf install curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential -y
+sudo dnf install curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential -y # TODO half these packages don't exist in the dnf repos... fix the names.
 
 # Download and compile from source - Ubuntu and Debian repos are annoyingly out of date
 git_version="2.7.1"
