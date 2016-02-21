@@ -9,7 +9,8 @@
 sudo apt-get remove -y vim vim-runtime gvim vim-tiny vim-common vim-gui-common vim-nox
 
 # vim install
-sudo apt-get install -y vim-nox build-essential cmake python-dev
+sudo apt-get install -y vim-nox build-essential cmake python-dev clang
+echo -e "\e[0;31mWarning: Using the system version of libclang may break things for YCM. See https://github.com/Valloric/YouCompleteMe#full-installation-guide for more infomation"
 
 sudo update-alternatives --install /usr/bin/editor editor /usr/bin/vim 1
 sudo update-alternatives --set editor /usr/bin/vim

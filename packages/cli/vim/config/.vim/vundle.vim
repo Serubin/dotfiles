@@ -24,8 +24,11 @@ Bundle "tpope/vim-fugitive"
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+
+Bundle "scrooloose/syntastic"
 
 " Load LaTeX if installed
 if filereadable(expand("~/.vim/latex.vim"))
@@ -38,6 +41,8 @@ endif
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'
 Plugin 'othree/html5.vim'
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'cakebaker/scss-syntax.vim'
 
 " Tags
 Plugin 'ctrlpvim/ctrlp.vim'
