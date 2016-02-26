@@ -1,9 +1,8 @@
 #/bin/bash
 
 ########################################
-# Arch install of htop
+# Base install of htop
 # Top for humans
 ########################################
 
-sudo pacman -S --noconfirm htop
-
+ln -sfv "${PACKAGE_INSTALL}/config/htoprc" ~/.config/htop/
