@@ -29,12 +29,16 @@ set scrolloff=8                 "Makes cursor stay 8 lines away from the top or 
 
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
+
 " netrw 
 let g:netrw_liststyle=3         "List styles for file explorer
 let g:netrw_altv=1
 let g:netrw_preview=1
-let g:netrw_sort_sequence = '[\/]$,*' " sort is affecting only: directories on the top, files below
-let g:netrw_list_hide= '.*\.swp$'
+let g:netrw_sort_sequence='[\/]$,*' " sort is affecting only: directories on the top, files below
+let g:netrw_list_hide='.*\.swp$'
+let g:netrw_use_noswf=0
+let g:netrw_browse_split=4 
+
 let asmsyntax='armasm'
 let filetype_inc='armasm'
 

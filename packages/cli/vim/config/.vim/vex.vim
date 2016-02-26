@@ -27,7 +27,7 @@ fun! VexClose()
 	let cur_win_nr = winnr()
 	let target_nr = ( cur_win_nr == 1 ? winnr("#") : cur_win_nr )
 
-	1wincmd w
+	wincmd w
 	close
 	unlet t:vex_buf_nr
 
