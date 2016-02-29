@@ -18,7 +18,7 @@ fun! VexOpen(dir)
 
 	execute "Vexplore " . a:dir
 	let t:vex_buf_nr = bufnr("%")
-	wincmd H
+	1wincmd H
 
 	call VexSize(vex_width)
 endf

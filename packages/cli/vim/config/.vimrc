@@ -37,7 +37,6 @@ let g:netrw_preview=1
 let g:netrw_sort_sequence='[\/]$,*' " sort is affecting only: directories on the top, files below
 let g:netrw_list_hide='.*\.swp$'
 let g:netrw_use_noswf=0
-let g:netrw_browse_split=4 
 
 let asmsyntax='armasm'
 let filetype_inc='armasm'
