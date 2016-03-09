@@ -28,7 +28,9 @@ Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
-Bundle "scrooloose/syntastic"
+Bundle 'scrooloose/syntastic'
+Bundle 'scrooloose/nerdtree'
+Bundle 'jistr/vim-nerdtree-tabs'
 
 " Load LaTeX if installed
 if filereadable(expand("~/.vim/latex.vim"))

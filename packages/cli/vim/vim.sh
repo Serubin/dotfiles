@@ -22,7 +22,6 @@ fi
 # config install
 ln -sfv "${PACKAGE_INSTALL}/config/.vimrc" ~
 mkdir -p ${HOME}/.vim/
-ln -sfv "${PACKAGE_INSTALL}/config/.vim/vex.vim" ~/.vim/
 ln -sfv "${PACKAGE_INSTALL}/config/.vim/vundle.vim" ~/.vim/
 
 BUNDLE_DIR=${HOME}/.vim/bundle
