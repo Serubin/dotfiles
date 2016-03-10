@@ -41,6 +41,7 @@ if filereadable(expand("~/.vim/vhdl.vim"))
     " Vimtex plugin
     Plugin 'JPR75/VIP'
     Plugin 'hdl_plugin'
+    Plugin 'salinasv/vim-vhdl'
     source ~/.vim/vhdl.vim
 endif
 

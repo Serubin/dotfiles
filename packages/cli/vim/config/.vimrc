@@ -61,6 +61,7 @@ augroup END
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
+  source ~/.vim/bundle/hdl_plugin/ftplugin/hdl_plugin.vim
 endif
 
 " better key bindings for UltiSnipsExpandTrigger

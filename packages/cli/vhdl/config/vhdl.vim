@@ -1,6 +1,6 @@
 augroup vhdl
 	autocmd!
-	autocmd FileType vhdl setlocal omnifunc=syntaxcomplete#Complete
+	autocmd FileType vhdl :call VHDL_init()
 augroup END
 let g:UltiSnipsSnippetDir="~/.vim/UltiSnips/"
 nnoremap <leader>C <Plug>SpecialVHDLPasteComponent
