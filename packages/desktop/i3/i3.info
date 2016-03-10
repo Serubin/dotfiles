@@ -4,6 +4,6 @@
 # i3 Info file
 #
 
-export package_support="Debian Ubuntu Arch"
+export package_support="Debian Ubuntu Arch Fedora"
 
 echo "I3: A tiled windows manager"

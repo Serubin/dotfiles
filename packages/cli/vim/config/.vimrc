@@ -29,12 +29,20 @@ set scrolloff=8                 "Makes cursor stay 8 lines away from the top or 
 
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
-" netrw 
+
+" netrw
 let g:netrw_liststyle=3         "List styles for file explorer
 let g:netrw_altv=1
 let g:netrw_preview=1
-let g:netrw_sort_sequence = '[\/]$,*' " sort is affecting only: directories on the top, files below
-let g:netrw_list_hide= '.*\.swp$'
+let g:netrw_sort_sequence='[\/]$,*' " sort is affecting only: directories on the top, files below
+let g:netrw_list_hide='.*\.swp$'
+let g:netrw_use_noswf=0
+
+" nerdtree
+let NERDTreeShowHidden=1
+let NERDTreeSortOrder=['[\/]$', '*']
+let NERDTreeIgnore=['.*\.swp$', '.*\.swo$',]
+
 let asmsyntax='armasm'
 let filetype_inc='armasm'
 
@@ -44,7 +52,7 @@ let maplocalleader = "\\"
 nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
-noremap <Leader><tab> :call VexToggle(getcwd())<CR> " vex mappings
+noremap <Leader><tab> :NERDTreeTabsToggle<CR>
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
@@ -75,12 +83,6 @@ if filereadable(expand("~/.vim/colors/molokia.vim"))
     source ~/.vim/colors/molokia.vim
     set t_ut=
 endif
-
-" vex menu
-if filereadable(expand("~/.vim/vex.vim"))
-    source ~/.vim/vex.vim
-endif
-
 
 " Undo
 if has('persistent_undo')

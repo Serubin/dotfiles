@@ -12,6 +12,7 @@ In order to change the location of the installtion you will have to re-run the i
 * Debian
 * Ubuntu
 * Arch
+* Fedora
 
 The install script takes care of all the pre-requists excluding git, bash, lsb-release, and sudo. However this only works with OSX, Arch,  Debian, and Ubuntu (for the moment). 
 
@@ -37,13 +38,14 @@ This setup creates a clean bash envirnment with several other applications. Belo
 * "Smart" features
 * Shortcuts
 * Line numbers
-* Inteligent ignores
+* Intelligent ignores
 * lightline
 * YouCompleteMe
+* NerdTree
 * Presistent undo
 * Various completion packages
 
-#### Sublime (x server/Desktop Environment) (not included on Arch)
+#### Sublime (x server/Desktop Environment) (not included on Arch, mostly replaced by Vim at this point)
 * Custom Theme - Monkia
 * Packages
  * All Autocomplete

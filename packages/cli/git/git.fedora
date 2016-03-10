@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ########################################
-# Debian install of git
+# Fedora install of git
 # Version Control
 ########################################
 
 # Remove packaged Git
-sudo apt-get remove git-core
+sudo dnf remove git -y
 
 # Source build file
 source $PACKAGE_INSTALL/git.build.sh
