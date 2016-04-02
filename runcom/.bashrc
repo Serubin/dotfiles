@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Skip if non-interactive
+[[ $- != *i* ]] && return
+
 # Determins dot file location
 if [ -r "$HOME/.dotfiles.info" ]; then # checks for stored location
 	source "$HOME/.dotfiles.info"
