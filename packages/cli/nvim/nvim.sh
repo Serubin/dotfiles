@@ -25,6 +25,11 @@ mkdir -p ${HOME}/.config/nvim/
 ln -sfv "${PACKAGE_INSTALL}/config/nvim/vundle.vim" ~/.config/nvim/
 ln -sfv "${PACKAGE_INSTALL}/config/nvim/init.vim" ~/.config/nvim/
 
+cp "${PACKAGE_INSTALL}/config/nvim/python.vim" ~/.config/nvim/
+sed -i -e 's#%python-path%#'`which python3`'#g' ~/.config/nvim/python.vim
+
+sudo pip3 install neovim
+
 BUNDLE_DIR=${HOME}/.config/nvim/bundle
 
 # Install/update Vundle

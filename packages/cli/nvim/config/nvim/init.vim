@@ -65,6 +65,10 @@ augroup spell_check
 	autocmd FileType no ft setlocal spell spelllang-en_us
 augroup END
 
+if filereadable(expand("~/.config/nvim/python.vim"))
+    source ~/.config/nvim/python.vim
+endif
+
 " Load plugins
 if filereadable(expand("~/.config/nvim/vundle.vim"))
   source ~/.config/nvim/vundle.vim
