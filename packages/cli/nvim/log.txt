@@ -1,0 +1,2 @@
+Vim: Warning: Output is not to a terminal
+[?1049h[H[J[?2004h[?1004h[8;24;80t[H[J[1;1H[1;1H[34h[?25h[?25l[?1002h[?1006h[H[J[1;1H[1;1H[34h[?25h[?25l[24;1HError[24;7Hdetected[24;16Hwhile[24;22Hprocessing[24;33Hcommand[24;41Hline:[24;46H[34h[?25h[?25l[1;24r[1;1H[M[1;24r[24;46H[24;1HE492:[24;7HNot[24;11Han[24;14Heditor[24;21Hcommand:[24;30HPluginInstall[24;1H[?1002l[?1006l[m[34h[?25h[?1049l[?2004l[?1004l[34h[?25h

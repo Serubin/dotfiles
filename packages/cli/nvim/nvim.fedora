@@ -1,0 +1,10 @@
+#!/bin/bash
+
+########################################
+# Fedora install of vim
+# A better Vi Improved
+########################################
+
+sudo dnf -y install dnf-plugins-core
+sudo dnf -y copr enable dperson/neovim
+sudo dnf -y install neovim
