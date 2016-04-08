@@ -10,7 +10,9 @@ sudo apt-get remove -y vim vim-runtime gvim vim-tiny vim-common vim-gui-common v
 # vim install
 sudo apt-get install build-essential libtool libtool-bin autoconf automake cmake g++ pkg-config unzip python-dev python-pip python3-dev python3-pip
 
-#source $PACKAGE_INSTALL/nvim.build.sh
+source $PACKAGE_INSTALL/nvim.build.sh
+
+sudo pip3 install neovim
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
 sudo update-alternatives --config vi

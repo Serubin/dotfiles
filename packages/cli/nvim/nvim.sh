@@ -26,9 +26,16 @@ ln -sfv "${PACKAGE_INSTALL}/config/nvim/vundle.vim" ~/.config/nvim/
 ln -sfv "${PACKAGE_INSTALL}/config/nvim/init.vim" ~/.config/nvim/
 
 cp "${PACKAGE_INSTALL}/config/nvim/python.vim" ~/.config/nvim/
-sed -i -e 's#%python-path%#'`which python3`'#g' ~/.config/nvim/python.vim
 
-sudo pip3 install neovim
+cp $PACK
+
+if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
+    python3_path=`which python`
+else
+    python3_path=`which python3`
+fi
+sed -i -e 's#%python-path%#'${python3_path}'#g' ~/.config/nvim/python.vim
+
 
 BUNDLE_DIR=${HOME}/.config/nvim/bundle
 

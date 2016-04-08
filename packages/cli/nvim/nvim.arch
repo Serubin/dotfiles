@@ -5,4 +5,4 @@
 # A better Vi Improved
 ########################################
 
-sudo pacman -S --noconfirm neovim clang
+sudo pacman -S --noconfirm python-neovim clang
