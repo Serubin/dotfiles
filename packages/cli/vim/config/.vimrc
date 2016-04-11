@@ -77,6 +77,9 @@ let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 
+let g:ycm_filetype_blacklist = {
+      \ 'pdf' : 1
+      \}
 " colors
 let g:rehash256 = 1
 if filereadable(expand("~/.vim/colors/molokia.vim"))
