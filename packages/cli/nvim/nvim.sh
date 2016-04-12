@@ -30,9 +30,9 @@ cp "${PACKAGE_INSTALL}/config/nvim/python.vim" ~/.config/nvim/
 cp $PACK
 
 if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    python3_path=`which python`
+    python3_path=`which python2`
 else
-    python3_path=`which python3`
+    python3_path=`which python`
 fi
 sed -i -e 's#%python-path%#'${python3_path}'#g' ~/.config/nvim/python.vim
 

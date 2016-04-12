@@ -12,7 +12,7 @@ sudo apt-get install build-essential libtool libtool-bin autoconf automake cmake
 
 source $PACKAGE_INSTALL/nvim.build.sh
 
-sudo pip3 install neovim
+sudo pip install neovim
 
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
 sudo update-alternatives --config vi
