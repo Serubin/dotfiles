@@ -6,8 +6,8 @@
 #
 ###############################################
 
-declare -a packages
-packages_length=0
+declare -a packages # Package 
+packages_length=0 # package length
 
 registerPackage() {
     
@@ -20,8 +20,6 @@ registerPackage() {
     package_install="${TYPE}_${NAME}_${install_confirm}"
     packages+=($package_install)
     let packages_length+=1
-
-    echo $package_install
 }
 
 installPackage() {
@@ -45,6 +43,7 @@ installPackage() {
             continue
         fi
         
+
         echo ""
         echo "------------ ${NAME} ------------"
 
