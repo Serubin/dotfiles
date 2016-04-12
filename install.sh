@@ -79,21 +79,23 @@ if [ ${DISTRO} == "Arch" ]; then
 fi
 
 # package installations
-installPackage "" "required" # required packages
+registerPackage "cli" "required" # required packages
 
-installPackage "cli" "git"
-installPackage "cli" "vim"
-installPackage "cli" "nvim"
-installPackage "cli" "tmux"
-installPackage "cli" "htop"
-installPackage "cli" "archey"
+registerPackage "cli" "git"
+registerPackage "cli" "vim"
+registerPackage "cli" "nvim"
+registerPackage "cli" "tmux"
+registerPackage "cli" "htop"
+registerPackage "cli" "archey"
 
 # Prompt for desktop
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
-	installPackage "desktop" "sublime"
-	installPackage "desktop" "i3"
-    installPackage "desktop" "latex"
+	registerPackage "desktop" "sublime"
+	registerPackage "desktop" "i3"
+    registerPackage "desktop" "latex"
 fi
+
+installPackage
 
 source ~/.bashrc
 
