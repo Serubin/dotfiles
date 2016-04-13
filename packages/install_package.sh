@@ -27,7 +27,6 @@ registerPackage() {
 }
 
 installPackage() {
-    OLDIFS="$IFS"
 
     for i in $(seq 0 $packages_length); do
 	    if [ $i == $packages_length ]; then
@@ -37,8 +36,16 @@ installPackage() {
         # Reads in package from array
         raw_name="${packages[$i]}"
         
-        IFS=_ read TYPE NAME install_confirm <<< $raw_name # split
+        OLDIFS="$IFS"
+        
+        # Split
+        IFS=_ arr=($raw_name) 
+        install_confirm=${arr[2]}
+        NAME=${arr[1]}
+        TYPE=${arr[0]}
                
+        IFS="$OLDIFS"
+        
         # Install location
         PACKAGE_INSTALL="${DOTFILES_DIR}/packages/${TYPE}/${NAME}"
 
@@ -89,6 +96,5 @@ installPackage() {
         fi
     done
 
-    IFS="$OLDIFS"
 	unset PACKAGE_INSTALL package_support package_supported packages_length packages
 }
