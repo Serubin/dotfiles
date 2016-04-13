@@ -16,9 +16,3 @@ ln -sfv "${PACKAGE_INSTALL}/config/.tmux.conf" ~
 
 as_shell=`getInputBoolean "Do you want tmux to launch as your main shell?"`
 
-if [ "$as_shell" == "1" ]; then
-	echo "tmux_as_shell=1" >> ${HOME}/.dotfiles.info
-fi
-
-
-
