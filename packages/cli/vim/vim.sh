@@ -5,14 +5,6 @@
 # ViImproved
 ########################################
 
-echo "!!!!!!!!!! IMPORTANT"
-printf "Vim is being \033[0;31m deprecated \033[0m in favor of NeoVim\n" # lol printf. I wnated colors
-doit=`getInputBoolean "Are you sure you want to install?"`
-
-if [ "$doit" == "0" ]; then
-    return;
-fi
-
 echo "Backing up previous vim config"
 
 if [ -r "${HOME}/.vim" ]; then
