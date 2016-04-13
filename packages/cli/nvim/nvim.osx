@@ -13,3 +13,6 @@ sudo easy_install pip
 
 brew tap neovim/neovim
 brew install neovim
+
+sudo pip install neovim
+
