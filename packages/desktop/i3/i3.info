@@ -7,3 +7,5 @@
 export package_support="Debian Ubuntu Arch Fedora"
 
 echo "I3: A tiled windows manager"
+echo "This is legacy and not very well supported."
+
