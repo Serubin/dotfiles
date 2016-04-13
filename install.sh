@@ -95,6 +95,7 @@ if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; t
     registerPackage "desktop" "latex"
 fi
 
+echo "------------ Installing "
 installPackage
 
 source ~/.bashrc
