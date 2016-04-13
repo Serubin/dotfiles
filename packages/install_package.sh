@@ -16,6 +16,13 @@ registerPackage() {
     NAME=${2}
     TYPE=${1}
 
+    echo "-------"
+    # Echos descriptions
+    PACKAGE_INSTALL="${DOTFILES_DIR}/packages/${TYPE}/${NAME}"
+    source "${PACKAGE_INSTALL}/${NAME}.info"
+    
+    unset package_support
+
     install_confirm=`getInputBoolean "Do you want to install ${NAME}"?` #TODO move to ask function
 
     # Saves in formate <type>_<name>_<confirm>
