@@ -45,7 +45,7 @@ installPackage() {
         TYPE=${arr[0]}
                
         IFS="$OLDIFS"
-        
+              
         # Install location
         PACKAGE_INSTALL="${DOTFILES_DIR}/packages/${TYPE}/${NAME}"
 
@@ -56,7 +56,7 @@ installPackage() {
         fi
         
 
-        echo ""
+        sudo echo "" # Maintain sudo access
         echo "------------ ${NAME} ------------"
 
         # Every package must have a name.info file in it's directory. It must contain:
