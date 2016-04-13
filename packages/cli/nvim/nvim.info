@@ -6,4 +6,4 @@
 
 export package_support="Debian Ubuntu Darwin Arch Fedora"
 
-echo "Vim: An extensive text editor"
+echo "NeoVim: An better extensive text editor"

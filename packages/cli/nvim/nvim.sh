@@ -5,8 +5,9 @@
 # ViImproved
 ########################################
 
-echo "Backing up previous vim config"
+echo "Backing up previous nvim config"
 
+# TODO not working for sum reason.
 if [ -r "${HOME}/.config/nvim" ]; then
     if [ -r "${HOME}/.dotfiles-bak/.nvim" ]; then
         rm -rf ${HOME}/.dotfiles-bak/.nvim 2> /dev/null
