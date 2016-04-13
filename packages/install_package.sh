@@ -18,23 +18,27 @@ registerPackage() {
 
     # Saves in formate <type>_<name>_<confirm>
     package_install="${TYPE}_${NAME}_${install_confirm}"
+    
     packages+=($package_install)
     let packages_length+=1
+    
+    unset package_install
+
 }
 
 installPackage() {
     OLDIFS="$IFS"
 
-    for i in $(seq 1 $packages_length); do
-	    if [ $i == "0" ]; then
+    for i in $(seq 0 $packages_length); do
+	    if [ $i == $packages_length ]; then
             continue
         fi
 
         # Reads in package from array
         raw_name="${packages[$i]}"
         
-        IFS=$"_" read TYPE NAME install_confirm <<< $raw_name # split
-        
+        IFS=_ read TYPE NAME install_confirm <<< $raw_name # split
+               
         # Install location
         PACKAGE_INSTALL="${DOTFILES_DIR}/packages/${TYPE}/${NAME}"
 
@@ -86,5 +90,5 @@ installPackage() {
     done
 
     IFS="$OLDIFS"
-	unset PACKAGE_INSTALL package_support package_supported
+	unset PACKAGE_INSTALL package_support package_supported packages_length packages
 }
