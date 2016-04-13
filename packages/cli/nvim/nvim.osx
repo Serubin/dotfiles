@@ -12,4 +12,4 @@ brew install python
 sudo easy_install pip
 
 brew tap neovim/neovim
-brew install --HEAD neovim
+brew install neovim
