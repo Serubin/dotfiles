@@ -6,6 +6,8 @@
 #
 ###############################################
 
+unset PACKAGE_INSTALL package_support package_supported packages_length packages
+
 declare -a packages # Package 
 packages_length=0 # package length
 
