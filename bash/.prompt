@@ -29,7 +29,11 @@ BCyan="\[\033[1;36m\]"        # Cyan
 BWhite="\[\033[1;37m\]"       # White
 
 # Various variables you might want for your PS1 prompt instead
-User="\u"
+User="$USER" #Capitalize username
+if [ "$prompt_ucfUser" != "" ]; then
+    User="$(tr '[:lower:]' '[:upper:]' <<< ${User:0:1})${User:1}"
+fi
+
 HostName="\h"
 PathShort="\w"
 PathFull="\W"
