@@ -1,1 +1,1 @@
-let g:python3_host_prog = '%python-path%'
+let g:python2_host_prog = '%python-path%'
