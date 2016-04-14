@@ -25,7 +25,7 @@ set history=1000                "Command history
 set undolevels=1000             "Undo history
 set udf                         "Persistant undo across sessions
 set scrolloff=8                 "Makes cursor stay 8 lines away from the top or bottom
-
+set mouse=""                    "Turns off mouse interaction
 
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
