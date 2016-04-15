@@ -1,4 +1,0 @@
-#!/bin/bash
-
-sudo dnf update -y
-sudo dnf install perl autoconf automake cmake gcc clang python2 libcurl-devel -y

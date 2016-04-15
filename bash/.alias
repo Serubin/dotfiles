@@ -21,7 +21,7 @@ alias ll="ls -lhAr"
 # shortcuts
 alias _="sudo"
 alias g="git"
-alias v="vim"
+alias v="nvim"
 alias rr="rm -r"
 alias sudo="sudo "
 # ip aliases
@@ -29,9 +29,12 @@ alias ipdns="dig +short myip.opendns.com @resolver1.opendns.com"
 alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
 
 # vim 
-alias vi="vim"
+alias vim="nvim"
+alias vi="nvim"
 # calls the server function
-alias vim='vim_with_servername'
+if [ -f "${HOME}/.latexmkrc" ]; then
+    alias vim='vim_with_servername'
+fi
 
 if [ "$DISTRO" != "Darwin" ]; then
     alias open="xdg-open"

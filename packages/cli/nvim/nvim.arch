@@ -1,0 +1,8 @@
+#!/bin/bash
+
+########################################
+# Arch install of vim
+# A better Vi Improved
+########################################
+
+sudo pacman -S --noconfirm python2-neovim clang

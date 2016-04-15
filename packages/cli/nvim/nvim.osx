@@ -1,0 +1,20 @@
+#!/bin/bash
+
+########################################
+# Darwin install of vim
+# ViImproved
+########################################
+
+
+# vim
+brew install python
+
+sudo easy_install pip
+
+sudo pip uninstall -y neovim
+
+brew tap neovim/neovim
+brew install neovim
+
+sudo pip install neovim
+

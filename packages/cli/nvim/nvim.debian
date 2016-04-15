@@ -1,0 +1,21 @@
+#!/bin/bash
+
+########################################
+# Debian install of vim
+# A better Vi Improved
+########################################
+
+# vim install
+sudo apt-get install build-essential libtool libtool-bin autoconf automake cmake g++ pkg-config unzip python-dev python-pip python3-dev python3-pip
+
+source $PACKAGE_INSTALL/nvim.build.sh
+
+sudo pip install neovim
+
+sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
+sudo update-alternatives --config vi
+sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+sudo update-alternatives --config vim
+sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+sudo update-alternatives --config editor
+

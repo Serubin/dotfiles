@@ -68,8 +68,8 @@ function clock() {
 function vim_with_servername()
 {
     if [[ "$@" == *".tex"* ]]; then
-        \vim --servername VIM "$@"
+        \nvim --servername VIM "$@"
     else
-        \vim "$@"
+        \nvim "$@"
     fi
 }
