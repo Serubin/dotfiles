@@ -99,7 +99,12 @@ set noshowmode
 
 let g:lightline = {
     \ 'colorscheme': 'powerline',
-    \ }
+	\ 'component': {
+    \   'readonly': '%{&readonly?"":""}',
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '', 'right': '' }
+  \ }
 
 
 if !has('gui_running') " no color fix
