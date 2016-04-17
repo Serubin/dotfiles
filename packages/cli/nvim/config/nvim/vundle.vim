@@ -39,12 +39,13 @@ if filereadable(expand("~/.config/nvim/latex.vim"))
     source ~/.config/nvim/latex.vim
 endif
 
-" Web
-Bundle "pangloss/vim-javascript"
-Plugin 'Valloric/MatchTagAlways'
-Plugin 'othree/html5.vim'
-Plugin 'hail2u/vim-css3-syntax'
-Plugin 'cakebaker/scss-syntax.vim'
+if filereadable(expand("~/.config/nvim/vhdl.vim"))
+    " Vimtex plugin
+    Plugin 'JPR75/VIP'
+    Plugin 'hdl_plugin'
+    Plugin 'salinasv/vim-vhdl'
+    source ~/.config/nvim/vhdl.vim
+endif
 
 " Tags
 Plugin 'ctrlpvim/ctrlp.vim'
