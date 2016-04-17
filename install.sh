@@ -87,6 +87,7 @@ registerPackage "cli" "nvim"
 registerPackage "cli" "tmux"
 registerPackage "cli" "htop"
 registerPackage "cli" "archey"
+registerPackage "cli" "vhdl"
 
 # Prompt for desktop
 if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
