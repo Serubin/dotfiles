@@ -159,3 +159,7 @@ endfunction
 
 call s:SetHighlightings()
 autocmd ColorScheme * call <SID>SetHighlightings()
+
+" Spell check
+autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us 
+
