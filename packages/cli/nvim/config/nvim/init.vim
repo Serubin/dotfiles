@@ -82,7 +82,8 @@ let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 " colors
 let g:rehash256 = 1
 if filereadable(expand("~/.config/nvim/colors/molokia.vim"))
-    source ~/.config/nvim/colors/molokia.vim
+    colorscheme molokia
+"    source ~/.config/nvim/colors/molokia.vim
     set t_ut=
 endif
 

@@ -27,6 +27,7 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+Plugin 'alisdair/vim-armasm'
 
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'
