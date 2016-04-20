@@ -27,7 +27,12 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+
+" ARM Assembly syntax
 Plugin 'alisdair/vim-armasm'
+
+" Colorscheme
+Plugin 'altercation/vim-colors-solarized'
 
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'

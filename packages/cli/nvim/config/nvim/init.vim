@@ -1,8 +1,6 @@
-syntax on
-
 set nocompatible
 set number                      "Line numbers are good
-highlight LineNr ctermfg=grey   "Colored line numbers are better"
+highlight LineNr ctermfg=grey   "Colored line numbers are better
 set title                       "Titles are cool
 set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>            "Paste without being smart
@@ -80,12 +78,18 @@ let g:UltiSnipsJumpForwardTrigger = "<C-j>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 
 " colors
-let g:rehash256 = 1
-if filereadable(expand("~/.config/nvim/colors/molokia.vim"))
-    colorscheme molokia
-"    source ~/.config/nvim/colors/molokia.vim
-    set t_ut=
-endif
+let g:solarized_termcolors=256
+let g:solarized_contrast="high"
+syntax enable
+set background=dark
+colorscheme solarized
+
+"let g:rehash256 = 1
+"if filereadable(expand("~/.config/nvim/colors/molokia.vim"))
+"    colorscheme molokia
+""    source ~/.config/nvim/colors/molokia.vim
+"    set t_ut=
+"endif
 
 " Undo
 if has('persistent_undo')
