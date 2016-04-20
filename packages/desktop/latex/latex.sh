@@ -5,23 +5,14 @@
 # A Markup Language
 ########################################
 
-# back up old files
-if [ -r "${HOME}/.latexmkrc" ]; then
-	mv ${HOME}/.latexmkrc ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "${HOME}/.config/zathura/zathurarc" ]; then
-	mv ${HOME}/.config/zathura/zathurarc ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "${HOME}/.vim/latex.vim" ]; then
-	mv ${HOME}/.vim/latex.vim ${HOME}/.dotfiles-bak/
-fi
-
-# Reinstall plugins for vimtex
-vim +PluginInstall +qall
 
 ln -sfv "${PACKAGE_INSTALL}/config/.latexmkrc" ~
 ln -sfv "${PACKAGE_INSTALL}/config/zathurarc" ~/.config/zathura/
-ln -sfv "${PACKAGE_INSTALL}/config/latex.vim" ~/.vim/
+ln -sfv "${PACKAGE_INSTALL}/config/latex.vim" ~/.config/nvim/
 
+# Vimtex needs --remote in vim, so this puts it back for neovim
+pip install --user neovim-remote
+
+# Reinstall plugins for vimtex
+nvim +PluginInstall +qall
+echo "NOTE: For spell checking to run properly \":set spell\" (without quotes) will need to be run the first time a .tex file is opened. After that, it will work properly."

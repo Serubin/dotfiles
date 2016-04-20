@@ -6,6 +6,6 @@
 ########################################
 
 sudo dnf -y copr enable dperson/neovim
-sudo dnf -y install python-dev python-pip neovim
+sudo dnf -y install python-dev python-pip neovim xsel
 
 sudo pip install neovim

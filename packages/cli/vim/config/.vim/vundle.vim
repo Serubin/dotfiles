@@ -39,6 +39,14 @@ if filereadable(expand("~/.vim/latex.vim"))
     source ~/.vim/latex.vim
 endif
 
+if filereadable(expand("~/.vim/vhdl.vim"))
+    " Vimtex plugin
+    Plugin 'JPR75/VIP'
+    Plugin 'hdl_plugin'
+    Plugin 'salinasv/vim-vhdl'
+    source ~/.vim/vhdl.vim
+endif
+
 " Web
 Bundle "pangloss/vim-javascript"
 Plugin 'Valloric/MatchTagAlways'

@@ -8,7 +8,9 @@ augroup latex
     autocmd BufWinEnter *.tex :VimtexCompile 
 augroup END
 let g:tex_flavor='latex'
-
+let g:vimtex_fold_enabled = '1'
+let g:vimtex_fold_manual = '1'
+let g:vimtex_latexmk_progname = '~/.local/bin/nvr'
 " Testing Tex stuff (not really sure what it does yet)
 if !exists('g:ycm_semantic_triggers')
   let g:ycm_semantic_triggers = {}

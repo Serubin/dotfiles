@@ -5,4 +5,4 @@
 # A better Vi Improved
 ########################################
 
-sudo pacman -S --noconfirm python2-neovim clang
+sudo pacman -S --noconfirm --needed python2-neovim clang xsel

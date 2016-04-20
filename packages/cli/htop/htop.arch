@@ -5,5 +5,5 @@
 # Top for humans
 ########################################
 
-sudo pacman -S --noconfirm htop
+sudo pacman -S --noconfirm --needed htop
 

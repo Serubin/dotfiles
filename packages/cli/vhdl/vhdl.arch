@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ########################################
-# Arch install of Tmux
-# terminal multiplexer
+# Arch install of VHDL
+# Very hard description language
 ########################################
 
-sudo pacman -S --noconfirm --needed tmux
+# Put some cool stuff here later

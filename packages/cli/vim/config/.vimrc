@@ -60,6 +60,8 @@ nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 map j gj
 map k gk
 
+runtime! ftplugin/man.vim
+
 augroup spell_check
 	autocmd!
 	autocmd FileType no ft setlocal spell spelllang-en_us
@@ -67,6 +69,7 @@ augroup END
 " Load plugins
 if filereadable(expand("~/.vim/vundle.vim"))
   source ~/.vim/vundle.vim
+  source ~/.vim/bundle/hdl_plugin/ftplugin/hdl_plugin.vim
 endif
 
 " better key bindings for UltiSnipsExpandTrigger
@@ -74,6 +77,9 @@ let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 
+let g:ycm_filetype_blacklist = {
+      \ 'pdf' : 1
+      \}
 " colors
 let g:rehash256 = 1
 if filereadable(expand("~/.vim/colors/molokia.vim"))
@@ -125,7 +131,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'file': '\v\.(exe|so|dll)$',
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
- 
+
 augroup makefile
      autocmd!
      autocmd FileType make setlocal noexpandtab
