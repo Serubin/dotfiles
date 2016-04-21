@@ -33,8 +33,6 @@ Plugin 'alisdair/vim-armasm'
 
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
-Plugin 'flazz/vim-colorschemes'
-Plugin 'felixhummel/setcolors.vim'
 
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'
