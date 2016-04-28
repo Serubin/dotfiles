@@ -13,13 +13,13 @@ fi
 source $DOTFILES_DIR/util/detectos.sh
 
 # source all bash base files
-for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
+for DOTFILE in "$DOTFILES_DIR"/packages/shell/bash/config/.*; do
 	[ -d "$DOTFILE" ] && continue;
 	[ -r "$DOTFILE" ] && source "$DOTFILE"
 done
 
-if [ -r ~/.custom ]; then
-	source ~/.custom;
+if [ -r ~/.custom.bash ]; then
+	source ~/.custom.bash;
 fi
 
 if [ -r ~/.dir_colors ]; then

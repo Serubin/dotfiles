@@ -3,7 +3,7 @@
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants
 
-source $DOTFILES_DIR/bash/.prompt-git
+source $DOTFILES_DIR/packages/shell/bash/config/.prompt-git
 
 # Reset
 Color_Off="\[\033[0m\]"       # Text Reset

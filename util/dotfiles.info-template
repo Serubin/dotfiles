@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# These will get filled in automaticly
 DOTFILES_DIR="%location%"
+DOTFILES_SHELL="%shell%"
 git_name="%git-name%"
 git_email="%git-email%"
+
+# "Secret" Settings
+prompt_ucfUser="" # Uppercase first letter of username

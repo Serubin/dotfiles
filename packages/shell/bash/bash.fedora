@@ -1,0 +1,9 @@
+#!/bin/bash
+
+########################################
+# Fedora install of htop
+# Top for humans
+########################################
+
+sudo dnf install bash -y 
+

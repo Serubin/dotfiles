@@ -41,45 +41,23 @@ echo "Root or sudo is required to install most packages. Please sudo up:"
 sudo echo 'Running in sudo mode'
 echo ""
 
-# Backing up current configurations
-echo "Moving previous configurations to dotfiles/bak/"
-mkdir -p ${HOME}/.dotfiles-bak
-
-if [ -r "${HOME}/.bash_profile" ]; then
-	mv ${HOME}/.bash_profile ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "$HOME/.bashrc" ]; then
-	mv ${HOME}/.bashrc ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "${HOME}/.inputrc" ]; then
-	mv ${HOME}/.inputrc ${HOME}/.dotfiles-bak/
-fi
-
-echo "Creating symlinks"
-# Bunch of symlinks
-ln -sfv "${DOTFILES_DIR}/runcom/.bashrc" ~
-ln -sfv "${DOTFILES_DIR}/runcom/.bash_profile" ~
-ln -sfv "${DOTFILES_DIR}/runcom/.inputrc" ~
-ln -sfv "${DOTFILES_DIR}/runcom/dircolors-solarized/dircolors.256dark" ~/.dir_colors
-
-# Copy .custom if not exist
-if [ ! -r "${HOME}/.custom" ]; then
-	cp ${DOTFILES_DIR}/bash/.custom  ~
-fi
-
 # Give Arch users a chance to abort
 if [ ${DISTRO} == "Arch" ]; then
 	echo "====> WARNING <===="
 	echo "This script will perform a full system upgrade"
 	if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
-		exit 0
+		return;
 	fi
 fi
 
+ln -sfv "${DOTFILES_DIR}/common/dircolors-solarized/dircolors.256dark" ~/.dir_colors
+
 # package installations
 registerPackage "cli" "required" # required packages
+
+echo "Which shell would you like to use? It's recommend to select ONE."
+registerPackage "shell" "bash"
+# TODO add fish
 
 registerPackage "cli" "git"
 registerPackage "cli" "vim"
@@ -98,8 +76,6 @@ fi
 
 echo "------------ Installing "
 installPackage
-
-source ~/.bashrc
 
 cd $DOTFILES_DIR
 
