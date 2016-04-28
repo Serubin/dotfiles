@@ -38,7 +38,7 @@ registerPackage() {
 installPackage() {
 
     for i in $(seq 0 $packages_length); do
-	    if [ $i == $packages_length ]; then
+	    if [[ $i == $packages_length ]]; then
             continue
         fi
 
@@ -60,7 +60,7 @@ installPackage() {
 
         
         #If user doesn't wish to install - skip
-        if [ "$install_confirm" == "0" ]; then
+        if [[ "$install_confirm" == "0" ]]; then
             continue
         fi
         
@@ -85,13 +85,13 @@ installPackage() {
 
         echo "Attempting to install ${NAME}..."
         # Os specific
-        if [ "$DISTRO" == "Debian" ] || [ "$DISTRO" == "Ubuntu" ]; then
+        if [[ "$DISTRO" == "Debian" ]] || [[ "$DISTRO" == "Ubuntu" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.debian"
-        elif [ "$DISTRO" == "Darwin" ]; then
+        elif [[ "$DISTRO" == "Darwin" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.osx"
-        elif [ "$DISTRO" == "Arch" ]; then
+        elif [[ "$DISTRO" == "Arch" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.arch"
-        elif [ "$DISTRO" == "Fedora" ]; then
+        elif [[ "$DISTRO" == "Fedora" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.fedora"
         else
             # FYI: This shouldn't ever happen - make an issue if it does?

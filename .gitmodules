@@ -4,4 +4,4 @@
 
 [submodule "packages/shell/zsh/config/autosuggest"]
 	path = packages/shell/zsh/config/autosuggest
-	url = https://github.com/zsh-users/zsh-autosuggestions.git
+	url = https://github.com/Serubin/zsh-autosuggestions.git

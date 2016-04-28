@@ -1,8 +1,8 @@
 #/bin/bash
 
 ########################################
-# Arch install of htop
-# Top for humans
+# Arch install of Bash
+# Bash shell
 ########################################
 
 sudo pacman -S --noconfirm --needed bash

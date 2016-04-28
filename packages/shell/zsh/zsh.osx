@@ -1,8 +1,8 @@
 #/bin/bash
 
 ########################################
-# Darwin install of bash
-# Bash Shell
+# Zsh
+# Z Shell
 ########################################
 
-brew install bash
+brew install zsh

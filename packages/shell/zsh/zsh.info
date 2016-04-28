@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Zsh Info file
+#
+
+export package_support="Debian Ubuntu Darwin Arch Fedora"
+
+echo "Zsh: Z Shell"

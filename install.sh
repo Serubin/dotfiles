@@ -5,6 +5,8 @@ echo "-------- Setting up Serubin's Dotfiles --------"
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( \cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+mkdir -p ${HOME}/.dotfiles-bak 2> /dev/null
+
 if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	echo "-------- Git Author Info --------"
 	echo "Please enter your git author information. (name and email)."
@@ -42,7 +44,7 @@ sudo echo 'Running in sudo mode'
 echo ""
 
 # Give Arch users a chance to abort
-if [ ${DISTRO} == "Arch" ]; then
+if [[ ${DISTRO} == "Arch" ]]; then
 	echo "====> WARNING <===="
 	echo "This script will perform a full system upgrade"
 	if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
@@ -57,7 +59,7 @@ registerPackage "cli" "required" # required packages
 
 echo "Which shell would you like to use? It's recommend to select ONE."
 registerPackage "shell" "bash"
-# TODO add fish
+registerPackage "shell" "zsh"
 
 registerPackage "cli" "git"
 registerPackage "cli" "vim"
@@ -68,7 +70,7 @@ registerPackage "cli" "archey"
 registerPackage "cli" "vhdl"
 
 # Prompt for desktop
-if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
+if [[ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]]; then
 	registerPackage "desktop" "sublime"
 	registerPackage "desktop" "i3"
     registerPackage "desktop" "latex"

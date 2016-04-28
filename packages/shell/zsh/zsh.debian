@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ########################################
-# Fedora install of bash
-# Top for bash shell
+# Debian install of zsh
+# Z Shell
 ########################################
 
-sudo dnf install bash -y 
+sudo apt-get install -y zsh
 
