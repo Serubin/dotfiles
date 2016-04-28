@@ -2,3 +2,6 @@
 	path = common/dircolors-solarized
 	url = https://github.com/seebi/dircolors-solarized.git
 
+[submodule "packages/shell/zsh/config/autosuggest"]
+	path = packages/shell/zsh/config/autosuggest
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
