@@ -1,3 +1,4 @@
 [submodule "common/dircolors-solarized"]
 	path = common/dircolors-solarized
 	url = https://github.com/seebi/dircolors-solarized.git
+
