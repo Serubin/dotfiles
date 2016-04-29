@@ -50,17 +50,13 @@ function pdfpextr()
 
 
 # Automatically calls ls after moving to new directory
-function long_and_annoying_cd()
+function cdls()
 {
   if [ $# -eq 0 ]; then # if no arguments
     \cd && ls
   else # if arguments
     \cd "$@" && ls
   fi
-}
-
-function clock() {
-    figlet -f big -W "$(date +%l:%M:%S)" | toilet -f term --gay | perl -pe "s,0;1,01,g"
 }
 
 

@@ -41,4 +41,4 @@ if [ "$DISTRO" != "Darwin" ]; then
 fi
 
 # listing cd
-alias cd="long_and_annoying_cd"
+alias cd="cdls"

@@ -50,7 +50,7 @@ function pdfpextr()
 
 
 # Automatically calls ls after moving to new directory
-function long_and_annoying_cd()
+function cdls()
 {
   if [ $# -eq 0 ]; then # if no arguments
     \cd && ls
