@@ -1,3 +1,10 @@
-[submodule "runcom/dircolors-solarized"]
-	path = runcom/dircolors-solarized
+[submodule "common/dircolors-solarized"]
+	path = common/dircolors-solarized
 	url = https://github.com/seebi/dircolors-solarized.git
+
+[submodule "packages/shell/zsh/config/autosuggest"]
+	path = packages/shell/zsh/config/autosuggest
+	url = https://github.com/Serubin/zsh-autosuggestions.git
+[submodule "common/powerline-shell"]
+	path = common/powerline-shell
+	url = https://github.com/Serubin/powerline-shell.git

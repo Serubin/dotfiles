@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Htop Info file
+#
+
+export package_support="Debian Ubuntu Darwin Arch Fedora"
+
+echo "Bash: Bash shell"

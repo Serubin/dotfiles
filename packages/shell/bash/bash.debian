@@ -1,0 +1,9 @@
+#!/bin/bash
+
+########################################
+# Debian install of bash
+# Bash shell
+########################################
+
+sudo apt-get install -y bash
+

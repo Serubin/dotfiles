@@ -5,6 +5,8 @@ echo "-------- Setting up Serubin's Dotfiles --------"
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( \cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+mkdir -p ${HOME}/.dotfiles-bak 2> /dev/null
+
 if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	echo "-------- Git Author Info --------"
 	echo "Please enter your git author information. (name and email)."
@@ -41,45 +43,23 @@ echo "Root or sudo is required to install most packages. Please sudo up:"
 sudo echo 'Running in sudo mode'
 echo ""
 
-# Backing up current configurations
-echo "Moving previous configurations to dotfiles/bak/"
-mkdir -p ${HOME}/.dotfiles-bak
-
-if [ -r "${HOME}/.bash_profile" ]; then
-	mv ${HOME}/.bash_profile ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "$HOME/.bashrc" ]; then
-	mv ${HOME}/.bashrc ${HOME}/.dotfiles-bak/
-fi
-
-if [ -r "${HOME}/.inputrc" ]; then
-	mv ${HOME}/.inputrc ${HOME}/.dotfiles-bak/
-fi
-
-echo "Creating symlinks"
-# Bunch of symlinks
-ln -sfv "${DOTFILES_DIR}/runcom/.bashrc" ~
-ln -sfv "${DOTFILES_DIR}/runcom/.bash_profile" ~
-ln -sfv "${DOTFILES_DIR}/runcom/.inputrc" ~
-ln -sfv "${DOTFILES_DIR}/runcom/dircolors-solarized/dircolors.256dark" ~/.dir_colors
-
-# Copy .custom if not exist
-if [ ! -r "${HOME}/.custom" ]; then
-	cp ${DOTFILES_DIR}/bash/.custom  ~
-fi
-
 # Give Arch users a chance to abort
-if [ ${DISTRO} == "Arch" ]; then
+if [[ ${DISTRO} == "Arch" ]]; then
 	echo "====> WARNING <===="
 	echo "This script will perform a full system upgrade"
 	if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
-		exit 0
+		return;
 	fi
 fi
 
+ln -sfv "${DOTFILES_DIR}/common/dircolors-solarized/dircolors.256dark" ~/.dir_colors
+
 # package installations
 registerPackage "cli" "required" # required packages
+
+echo "Which shell would you like to use? It's recommend to select ONE."
+registerPackage "shell" "bash"
+registerPackage "shell" "zsh"
 
 registerPackage "cli" "git"
 registerPackage "cli" "vim"
@@ -90,7 +70,7 @@ registerPackage "cli" "archey"
 registerPackage "cli" "vhdl"
 
 # Prompt for desktop
-if [ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]; then
+if [[ `getInputBoolean "Would you like to install desktop packages?"` == "1" ]]; then
 	registerPackage "desktop" "sublime"
 	registerPackage "desktop" "i3"
     registerPackage "desktop" "latex"
@@ -98,8 +78,6 @@ fi
 
 echo "------------ Installing "
 installPackage
-
-source ~/.bashrc
 
 cd $DOTFILES_DIR
 

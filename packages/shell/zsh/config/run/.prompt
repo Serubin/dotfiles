@@ -1,0 +1,85 @@
+#!/bin/zsh
+# PS1 Prompt
+# original git bash prompt by Mike Stewart - http://MediaDoneRight.com
+# color constants
+
+if [[ $PROMPT_POWERLINE != "" ]]; then
+	source $DOTFILES_DIR/common/powerline-shell.zsh
+	return;
+fi
+
+source $DOTFILES_DIR/packages/shell/zsh/config/run/.prompt-git
+
+# Reset
+Color_Off="%b%f"       # Text Reset
+
+# Regular Colors
+Black="%F{black}"    # Black
+Red="%F{red}"        # Red
+Green="%F{green}"    # Green
+Yellow="%F{yellow}"  # Yellow
+Blue="%F{blue}"      # Blue
+Purple="%F{purple}"  # Purple
+Cyan="%F{cyan}"      # Cyan
+White="%F{white}"    # White
+
+# Bold
+BBlack="%B%F{black}"    # Black
+BRed="%B%F{red}"        # Red
+BGreen="%B%F{green}"    # Green
+BYellow="%B%F{yellow}"  # Yellow
+BBlue="%B%F{blue}"      # Blue
+BPurple="%B%F{purple}"  # Purple
+BCyan="%B%F{cyan}"      # Cyan
+BWhite="%B%F{white}"    # White
+
+# Various variables you might want for your PS1 prompt instead
+User="$USER" #Capitalize username
+if [ "$prompt_ucfUser" != "" ]; then
+    User="$(tr '[:lower:]' '[:upper:]' <<< ${User:0:1})${User:1}"
+fi
+
+HostName="%m"
+PathShort="%~"
+PathFull="%/"
+PromptSymbol="#"
+
+if [ "$EUID" -ne 0 ]; then
+	PromptSymbol="$"
+fi
+
+function gitprompt_precmd() {
+    GIT_PROMPT=$(git branch &>/dev/null;\
+    if [ $? -eq 0 ]; then \
+    echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
+    if [ "$?" -eq "0" ]; then \
+        # @4 - Clean repository - nothing to commit
+        echo $PromptSymbol$Green$(__git_ps1 " (%s)"); \
+    else \
+        # @5 - Changes to working tree
+        echo $PromptSymbol$Red$(__git_ps1 " {%s}"); \
+    fi) $BWhite$Color_Off";
+    else \
+    # @2 - Prompt when not in GIT repo
+    echo "$BWhite$PromptSymbol$Color_Off "; \
+    fi \
+    );
+
+    #only show last 3 directories
+    export PROMPT_DIRTRIM=3
+
+    export PROMPT="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$GIT_PROMPT"
+}
+
+function install_gitprompt_precmd() {
+  for s in "${precmd_functions[@]}"; do
+    if [ "$s" = "gitprompt_precmd" ]; then
+      return
+    fi
+  done
+  precmd_functions+=(gitprompt_precmd)
+}
+
+if [ "$TERM" != "linux" ]; then
+    install_gitprompt_precmd
+fi

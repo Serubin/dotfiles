@@ -1,21 +1,21 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Skip if non-interactive
 [[ $- != *i* ]] && return
 
 # Determins dot file location
-if [ -r "$HOME/.dotfiles.info" ]; then # checks for stored location
-	source "$HOME/.dotfiles.info"
+if [ -r "${HOME}/.dotfiles.info" ]; then # checks for stored location
+	source "${HOME}/.dotfiles.info"
 else # otherwise assumes the following
-	DOTFILES_DIR="$HOME/.dotfiles"
+	DOTFILES_DIR="${HOME}/.dotfiles"
 fi
 
 source $DOTFILES_DIR/util/detectos.sh
 
 # source all bash base files
-for DOTFILE in "$DOTFILES_DIR"/bash/.*; do
-	[ -d "$DOTFILE" ] && continue;
-	[ -r "$DOTFILE" ] && source "$DOTFILE"
+for DOTFILE in "$DOTFILES_DIR"/packages/shell/zsh/config/run/.*; do
+	[[ -d "$DOTFILE" ]] && continue;
+	source "$DOTFILE"
 done
 
 if [ -r ~/.custom ]; then

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+########################################
+# Fedora install of zsh
+# Z Shell
+########################################
+
+sudo dnf install zsh -y 
+

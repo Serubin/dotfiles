@@ -1,0 +1,9 @@
+#!/bin/bash
+
+########################################
+# Fedora install of bash
+# Top for bash shell
+########################################
+
+sudo dnf install bash -y 
+
