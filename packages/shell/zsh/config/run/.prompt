@@ -3,6 +3,11 @@
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants
 
+if [[ $PROMPT_POWERLINE != "" ]]; then
+	source $DOTFILES_DIR/common/powerline-shell.zsh
+	return;
+fi
+
 source $DOTFILES_DIR/packages/shell/zsh/config/run/.prompt-git
 
 # Reset
@@ -42,6 +47,7 @@ PromptSymbol="#"
 if [ "$EUID" -ne 0 ]; then
 	PromptSymbol="$"
 fi
+
 function gitprompt_precmd() {
     GIT_PROMPT=$(git branch &>/dev/null;\
     if [ $? -eq 0 ]; then \
