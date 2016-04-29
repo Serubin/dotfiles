@@ -44,9 +44,13 @@ PathShort="%~"
 PathFull="%/"
 PromptSymbol="#"
 
+
 if [ "$EUID" -ne 0 ]; then
 	PromptSymbol="$"
 fi
+
+Title="$User@%m: %~"
+
 
 function gitprompt_precmd() {
     GIT_PROMPT=$(git branch &>/dev/null;\
@@ -69,6 +73,7 @@ function gitprompt_precmd() {
     export PROMPT_DIRTRIM=3
 
     export PROMPT="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$GIT_PROMPT"
+    print -Pn "\e]0;$Title\a"
 }
 
 function install_gitprompt_precmd() {
