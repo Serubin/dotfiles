@@ -3,6 +3,11 @@
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants
 
+if [[ $PROMPT_POWERLINE != "" ]]; then
+	source $DOTFILES_DIR/common/powerline-shell.sh
+	return;
+fi
+
 source $DOTFILES_DIR/packages/shell/bash/config/run/.prompt-git
 
 # Reset
