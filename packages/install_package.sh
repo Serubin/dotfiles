@@ -34,7 +34,7 @@ registerPackage() {
         PRE_INSTALL_OPTIONS
     fi
     
-    unset package_install
+    unset package_install PRE_INSTALL_OPTIONS
 
 }
 
