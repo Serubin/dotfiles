@@ -10,6 +10,11 @@ else # otherwise assumes the following
 	DOTFILES_DIR="$HOME/.dotfiles"
 fi
 
+# Tmux as a shell
+if [[ "$TMUX_AS_SHELL" == "1" ]]; then
+	[[ $TERM = "xterm-256color" ]] && { tmux; } # Add && edit 0; for edit like normal shell
+fi
+
 source $DOTFILES_DIR/util/detectos.sh
 
 # source all bash base files

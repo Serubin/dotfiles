@@ -21,6 +21,8 @@ if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	sed -i -e 's/%git-email%/'${git_email}'/g' ${HOME}/.dotfiles.info
 fi
 
+source ${HOME}/.dotfiles.info
+
 # saves dotfile location
 sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
 

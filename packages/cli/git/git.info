@@ -7,3 +7,8 @@
 export package_support="Debian Ubuntu Darwin Arch Fedora"
 
 echo "Git: A version control system"
+
+PRE_INSTALL_OPTIONS() {
+    echo ""
+}
+

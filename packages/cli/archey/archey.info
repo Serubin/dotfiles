@@ -7,3 +7,8 @@
 export package_support="Debian Ubuntu Darwin Arch"
 
 echo "Archey: Pretty System info"
+
+PRE_INSTALL_OPTIONS() {
+    echo ""
+}
+

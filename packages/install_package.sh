@@ -30,6 +30,9 @@ registerPackage() {
     
     packages+=($package_install)
     let packages_length+=1
+    if [[ "$install_confirm" == "1" ]]; then
+        PRE_INSTALL_OPTIONS
+    fi
     
     unset package_install
 

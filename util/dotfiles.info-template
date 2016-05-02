@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# Dotfiles config verson
+DOTFILE_CONF_VERSION=1
+
 # These will get filled in automaticly
 DOTFILES_DIR="%location%"
 DOTFILES_SHELL="%shell%"
 git_name="%git-name%"
 git_email="%git-email%"
 
+TMUX_AS_SHELL="" # Use tmux as shell
+
 # "Secret" Settings
-prompt_ucfUser="" # Uppercase first letter of username
+PROMPT_POWERLINE="" # Pretty powerline prompt
+PROMPT_UCFUSER="" # Uppercase first letter of username

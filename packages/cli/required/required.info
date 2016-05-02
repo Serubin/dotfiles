@@ -8,4 +8,6 @@ export package_support="Debian Ubuntu Darwin Arch Fedora"
 
 echo "Required Packages are required!: Not installing these may cause issues - you have been warned."
 
-# TODO make this not a y/n option.
+PRE_INSTALL_OPTIONS() {
+    echo ""
+}
