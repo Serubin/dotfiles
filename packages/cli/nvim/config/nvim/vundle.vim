@@ -21,6 +21,7 @@ Plugin 'VundleVim/Vundle.vim'
 " Generic
 Bundle "itchyny/lightline.vim"
 Bundle "tpope/vim-fugitive"
+Plugin 'unblevable/quick-scope'
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
@@ -28,13 +29,21 @@ Plugin 'rdnetto/YCM-Generator'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 
-" ARM Assembly syntax
+" Syntax
 Plugin 'alisdair/vim-armasm'
+Bundle "pangloss/vim-javascript"
+Plugin 'othree/html5.vim'
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'cakebaker/scss-syntax.vim'
+Plugin 'Valloric/MatchTagAlways'
 
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
 
+" Linting
 Bundle 'scrooloose/syntastic'
+
+" File exploring
 Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
 

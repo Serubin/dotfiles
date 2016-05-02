@@ -58,6 +58,9 @@ nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 map j gj
 map k gk
 
+" Trigger a highlight in the appropriate direction when pressing these keys:
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+
 augroup spell_check
 	autocmd!
 	autocmd FileType no ft setlocal spell spelllang-en_us
