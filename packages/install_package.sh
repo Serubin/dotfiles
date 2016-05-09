@@ -76,7 +76,7 @@ installPackage() {
         # * Brief description of the package (echoed)
         # * Additional packages installed (not including dependancies, echoed)
 
-        source "${PACKAGE_INSTALL}/${NAME}.info"
+        source "${PACKAGE_INSTALL}/${NAME}.info" &> /dev/null
 
         package_supported=`echo $package_support | grep -o $DISTRO`
         
