@@ -2,6 +2,8 @@
 
 echo "-------- Setting up Serubin's Dotfiles --------"
 
+source ${HOME}/.dotfiles.info
+
 # Get current dir (so run this script from anywhere)
 export DOTFILES_DIR="$( \cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -20,8 +22,6 @@ if [ ! -r "${HOME}/.dotfiles.info" ]; then
 	git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
 	sed -i -e 's/%git-email%/'${git_email}'/g' ${HOME}/.dotfiles.info
 fi
-
-source ${HOME}/.dotfiles.info
 
 # saves dotfile location
 sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
