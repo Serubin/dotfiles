@@ -81,17 +81,12 @@ let g:UltiSnipsJumpForwardTrigger = "<C-j>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
 
 " colors
-let g:solarized_termcolors=256
-syntax enable
-set background=dark
-colorscheme solarized
-
-"let g:rehash256 = 1
-"if filereadable(expand("~/.config/nvim/colors/molokia.vim"))
-"    colorscheme molokia
-""    source ~/.config/nvim/colors/molokia.vim
-"    set t_ut=
-"endif
+if isdirectory(expand("~/.config/nvim/bundle/vim-colors-solarized/"))
+    let g:solarized_termcolors=256
+    syntax enable
+    set background=dark
+    colorscheme solarized
+endif
 
 " Undo
 if has('persistent_undo')

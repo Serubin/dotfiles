@@ -52,9 +52,5 @@ fi
 
 cd -
 
-# Installs Monokia theme (Molokia)
-mkdir ${HOME}/.config/nvim/colors
-curl -G https://raw.githubusercontent.com/tomasr/molokai/master/colors/molokai.vim -o ${HOME}/.config/nvim/colors/molokia.vim
-
 # Removing variables
 unset BUNDLE_DIR

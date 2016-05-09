@@ -1,9 +1,12 @@
 # Serubin's DotFiles
+
+The purpose of this dotfiles configuration is to create a lightweight and easy to understand configuration.
+
 ## Installation
 
 Installing is fairly straight forward, just clone the repo and place it anywhere and use the install script provided.
 ```bash
-git clone --recursive https://github.com/Serubin/dotfiles.git && cd dotfiles && source install.sh
+git clone --recursive https://github.com/Serubin/dotfiles.git && cd dotfiles && ./install.sh
 ```
 In order to change the location of the installtion you will have to re-run the install script with ```bash source install.sh ```
 
