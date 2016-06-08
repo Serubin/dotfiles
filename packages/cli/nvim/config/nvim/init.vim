@@ -88,6 +88,9 @@ if isdirectory(expand("~/.config/nvim/bundle/vim-colors-solarized/"))
     colorscheme solarized
 endif
 
+highlight ColorColumn ctermbg=235 guibg=#2c2d27
+let &colorcolumn=join(range(81,999),",")
+
 " Undo
 if has('persistent_undo')
   silent !mkdir ~/.config/nvim/undo > /dev/null 2>&1
