@@ -1,6 +1,7 @@
 set nocompatible
 set number                      "Line numbers are good
 highlight LineNr ctermfg=grey   "Colored line numbers are better
+set cursorline          " highlight current line
 set title                       "Titles are cool
 set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>            "Paste without being smart
