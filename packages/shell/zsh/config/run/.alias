@@ -42,3 +42,5 @@ fi
 
 # listing cd
 alias cd="cdls"
+
+alias py="python"
