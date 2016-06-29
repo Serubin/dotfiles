@@ -33,7 +33,6 @@ registerPackage() {
     if [[ "$install_confirm" == "1" ]]; then
         PRE_INSTALL_OPTIONS
         export installed="${installed} ${TYPE}_${NAME}_1"
-        echo $installed
         let installed_len+=1
     fi
     

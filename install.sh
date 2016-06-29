@@ -66,11 +66,14 @@ if [ ! -r "${HOME}/.dotfiles.info" ]; then
 
 	cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
 	read -p "Name: " git_name
-	sed -i -e 's/%git-name%/'${git_name}'/g' ${HOME}/.dotfiles.info
+    export git_name
+    perl -p -i -e 's/git_name=".*"/git_name="$ENV{git_name}"/g;' ${HOME}/.dotfiles.info
 
 	read -p "Email: " git_email
 	git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
-	sed -i -e 's/%git-email%/'${git_email}'/g' ${HOME}/.dotfiles.info
+    export git_email
+    perl -p -i -e 's/git_email=".*"/git_email="$ENV{git_email}"/g;' ${HOME}/.dotfiles.info
+	echo "---------------------------------"
 fi
 
 # saves dotfile location
@@ -128,10 +131,11 @@ if [[ ${flag_update} != "1" ]]; then # if update, don't prompt
         registerPackage "desktop" "i3"
         registerPackage "desktop" "latex"
     fi
-    echo 's/DOTFILES_INSTALLED=".*"/DOTFILES_INSTALLED="'${installed[@]}'"/g' 
-    echo $installed_len
-    sed -i -e 's/DOTFILES_INSTALLED=".*"/DOTFILES_INSTALLED="'${installed[@]}'"/g' ${HOME}/.dotfiles.info
-    sed -i -e 's/DOTFILES_INSTALLED_LEN=".*"/DOTFILES_INSTALLED_LEN="'${installed_len}'"/g' ${HOME}/.dotfiles.info
+
+    # dotfiles.info replacement
+    export installed
+    perl -p -i -e 's/DOTFILES_INSTALLED=".*"/DOTFILES_INSTALLED="$ENV{installed}"/g;' ${HOME}/.dotfiles.info
+    perl -p -i -e 's/DOTFILES_INSTALLED_LEN=".*"/DOTFILES_INSTALLED_LEN="'${installed_len}'"/g;' ${HOME}/.dotfiles.info
 
     echo "------------ Installing "
     installPackage "" ""
@@ -146,4 +150,4 @@ fi
 cd $DOTFILES_DIR
 
 # Removing variables
-unset flag_update flat_install DOTFILES_DIR
+unset flag_update flag_install flag_list flag_help installed git_name git_email DOTFILES_DIR
