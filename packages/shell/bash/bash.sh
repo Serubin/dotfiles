@@ -18,7 +18,7 @@ if [ -r "$HOME/.bashrc" ]; then
 fi
 
 # Sets shell
-sed -i -e "s/%shell%/bash/g" ${HOME}/.dotfiles.info
+perl -p -i -e 's/DOTFILES_SHELL=".*"/DOTFILES_SHELL="bash"/g;' ${HOME}/.dotfiles.info
 
 echo "Creating symlinks"
 # Bunch of symlinks

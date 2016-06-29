@@ -13,7 +13,7 @@ if [ -r "{$HOME}/.zshrc" ]; then
 fi
 
 # Sets shell
-sed -i -e "s/%shell%/zsh/g" ${HOME}/.dotfiles.info
+perl -p -i -e 's/DOTFILES_SHELL=".*"/DOTFILES_SHELL="zsh"/g;' ${HOME}/.dotfiles.info
 
 echo "Creating symlinks"
 # Bunch of symlinks
