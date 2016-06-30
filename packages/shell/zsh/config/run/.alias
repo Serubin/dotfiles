@@ -44,3 +44,5 @@ fi
 alias cd="cdls"
 
 alias py="python"
+
+bindkey '^R' history-incremental-search-backward
