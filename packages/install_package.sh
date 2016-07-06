@@ -32,6 +32,8 @@ registerPackage() {
     let packages_length+=1
     if [[ "$install_confirm" == "1" ]]; then
         PRE_INSTALL_OPTIONS
+        export installed="${installed} ${TYPE}_${NAME}_1"
+        let installed_len+=1
     fi
     
     unset package_install PRE_INSTALL_OPTIONS
@@ -39,7 +41,18 @@ registerPackage() {
 }
 
 installPackage() {
+    
+    # Handles arguments for predefined package lsits
+    if [[ $1 != "" ]]; then
+        packages_length=$1
+    fi
 
+    if [[ $2 != "" ]]; then
+        end=$((2 + $packages_length))
+        packages=(${@:2:$end})
+    fi
+
+    # install loop
     for i in $(seq 0 $packages_length); do
 	    if [[ $i == $packages_length ]]; then
             continue

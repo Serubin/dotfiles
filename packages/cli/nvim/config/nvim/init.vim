@@ -1,6 +1,7 @@
 set nocompatible
 set number                      "Line numbers are good
 highlight LineNr ctermfg=grey   "Colored line numbers are better
+set cursorline          " highlight current line
 set title                       "Titles are cool
 set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>            "Paste without being smart
@@ -87,6 +88,9 @@ if isdirectory(expand("~/.config/nvim/bundle/vim-colors-solarized/"))
     set background=dark
     colorscheme solarized
 endif
+
+highlight ColorColumn ctermbg=235 guibg=#2c2d27
+let &colorcolumn=join(range(81,999),",")
 
 " Undo
 if has('persistent_undo')
