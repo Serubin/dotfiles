@@ -6,7 +6,7 @@ background="#2b303b"
 foreground="#65737e"
 outline="#c0c5ce"
 
-CMD=`echo -e "Logout\nLock\nPoweroff\nReboot\nSuspend" | rofi -dmenu -p "Logout Menu:" -lines 5 -eh 2 -opacity "70" -bw 1 -bc "#22262f" -bg "$background" -fg "$foreground" -hlbg "$outline" -hlfg "$background" -width 100 -padding 800`
+CMD=`echo -e "Logout\nLock\nPoweroff\nReboot\nSuspend" | rofi -dmenu -p "Logout Menu:" -lines 5 -eh 2 -opacity "70" -bw 1 -bc "#22262f" -bg "$background" -fg "$foreground" -hlbg "$outline" -hlfg "$background" -width 100 -padding 400`
 if [ ! $CMD ]; then
     exit
 fi
