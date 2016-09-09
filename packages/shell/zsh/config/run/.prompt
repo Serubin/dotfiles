@@ -19,7 +19,7 @@ Red="%F{red}"        # Red
 Green="%F{green}"    # Green
 Yellow="%F{yellow}"  # Yellow
 Blue="%F{blue}"      # Blue
-Purple="%F{purple}"  # Purple
+Purple="%F{magenta}"  # Purple
 Cyan="%F{cyan}"      # Cyan
 White="%F{white}"    # White
 
@@ -29,7 +29,7 @@ BRed="%B%F{red}"        # Red
 BGreen="%B%F{green}"    # Green
 BYellow="%B%F{yellow}"  # Yellow
 BBlue="%B%F{blue}"      # Blue
-BPurple="%B%F{purple}"  # Purple
+BPurple="%B%F{magenta}"  # Purple
 BCyan="%B%F{cyan}"      # Cyan
 BWhite="%B%F{white}"    # White
 
@@ -44,47 +44,54 @@ PathShort="%~"
 PathFull="%/"
 PromptSymbol="#"
 
-
 if [ "$EUID" -ne 0 ]; then
 	PromptSymbol="$"
 fi
 
 Title="$User@%m: %~"
 
-
-function gitprompt_precmd() {
-    GIT_PROMPT=$(git branch &>/dev/null;\
+function git_stat() {
+    echo $(git branch &>/dev/null;\
     if [ $? -eq 0 ]; then \
     echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
     if [ "$?" -eq "0" ]; then \
         # @4 - Clean repository - nothing to commit
-        echo $PromptSymbol$Green$(__git_ps1 " (%s)"); \
+        echo $git_color_clean$(__git_ps1 "$git_clean_prefix%s$git_clean_suffix"); \
     else \
         # @5 - Changes to working tree
-        echo $PromptSymbol$Red$(__git_ps1 " {%s}"); \
-    fi) $BWhite$Color_Off";
+        echo $git_color_dirty$(__git_ps1 "$git_dirty_prefix%s$git_dirty_suffix"); \
+    fi)$Color_Off";
     else \
     # @2 - Prompt when not in GIT repo
-    echo "$BWhite$PromptSymbol$Color_Off "; \
+    echo ""; \
     fi \
     );
+}
 
+function prompt_precmd() {
+    
     #only show last 3 directories
     export PROMPT_DIRTRIM=3
+    
+    pre_cmd
 
-    export PROMPT="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$GIT_PROMPT"
     print -Pn "\e]0;$Title\a"
 }
 
-function install_gitprompt_precmd() {
+function install_prompt_precmd() {
   for s in "${precmd_functions[@]}"; do
-    if [ "$s" = "gitprompt_precmd" ]; then
+    if [ "$s" = "prompt_precmd" ]; then
       return
     fi
   done
-  precmd_functions+=(gitprompt_precmd)
+  precmd_functions+=(prompt_precmd)
 }
 
 if [ "$TERM" != "linux" ]; then
-    install_gitprompt_precmd
+    install_prompt_precmd
 fi
+
+source $DOTFILES_THEME_PATH
+
+export PROMPT=$prompt_format
+

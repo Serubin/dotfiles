@@ -1,0 +1,27 @@
+#!/bin/zsh
+# ZSH Theme - Default
+
+# Git Prompt Info
+git_color_clean=$Green # Clean working directory
+git_clean_prefix="("
+git_clean_suffix=")"
+
+# pre_cmd updating
+git_color_dirty=$Red # Dirty working directory
+git_dirty_prefix="{"
+git_dirty_suffix="}"
+
+
+function pre_cmd() {
+    # Term Title
+    Title="$User@%m: %~"
+
+    PromptSymbol="#"
+    if [ "$EUID" -ne 0 ]; then
+        PromptSymbol="$"
+    fi
+
+    print -P "$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$PromptSymbol $GIT_PROMPT "
+}
+
+# 

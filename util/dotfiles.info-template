@@ -3,6 +3,9 @@
 # Dotfiles config verson
 DOTFILE_CONF_VERSION=1.1
 
+#Theme Path
+DOTFILES_THEME_PATH="${DOTFILES_DIR}/packages/shell/zsh/config/theme/default.theme"
+
 # These will get filled in automaticly
 DOTFILES_DIR="%location%"
 DOTFILES_SHELL="%shell%"
