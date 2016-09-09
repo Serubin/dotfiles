@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Dotfiles config verson
-DOTFILE_CONF_VERSION=1.1
-
-#Theme Path
-DOTFILES_THEME_PATH="${DOTFILES_DIR}/packages/shell/zsh/config/theme/default.theme"
+DOTFILE_CONF_VERSION=1.2
 
 # These will get filled in automaticly
 DOTFILES_DIR="%location%"
@@ -19,3 +16,6 @@ TMUX_AS_SHELL="" # Use tmux as shell
 # "Secret" Settings
 PROMPT_POWERLINE="" # Pretty powerline prompt
 PROMPT_UCFUSER="" # Uppercase first letter of username
+
+#Theme Path
+DOTFILES_THEME_PATH="${DOTFILES_DIR}/packages/shell/zsh/config/theme/default.theme"
