@@ -13,7 +13,7 @@ sudo apt-get install -y curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev
 sudo dnf install curl libcurl4-openssl-dev libexpat1-dev gettext libz-dev libssl-dev build-essential -y # TODO half these packages don't exist in the dnf repos... fix the names.
 
 # Download and compile from source - Ubuntu and Debian repos are annoyingly out of date
-git_version="2.8.1"
+git_version="2.10.0"
 
 cd /tmp
 curl -L --progress https://www.kernel.org/pub/software/scm/git/git-${git_version}.tar.gz | tar xz
