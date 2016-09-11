@@ -22,12 +22,12 @@ function pre_cmd() {
     Title="$User $PathShort"
 
     # Title and prompt for ssh connections
-    [[ "$SSH_CONNECTION" != '' ]] && Title="$BBlue $User @ $HostName $ShortPath"
+    [[ "$SSH_CONNECTION" != '' ]] && Title="$User@$HostName $ShortPath"
 
-    [[ "$SSH_CONNECTION" != '' ]] && pre_prompt_user="$BBlue $User @ $HostName "
+    [[ "$SSH_CONNECTION" != '' ]] && pre_prompt_user="$BBlue$User@$HostName "
     
     # User for root
-    [[ $UID -eq 0 ]] && pre_prompt_user="$BBlue $User "
+    [[ $UID -eq 0 ]] && pre_prompt_user="$BBlue$User "
     
     local git=`git_stat`
     
