@@ -3,12 +3,10 @@
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants
 
-if [[ $PROMPT_POWERLINE != "" ]]; then
+if [[ $PROMPT_POWERLINE != "" ]]; then #TODO move to theme
 	source $DOTFILES_DIR/common/powerline-shell.sh
 	return;
 fi
-
-source $DOTFILES_DIR/packages/shell/bash/config/run/.prompt-git
 
 # Reset
 Color_Off="\[\033[0m\]"       # Text Reset
@@ -50,20 +48,37 @@ fi
 
 Title="\[\033]0;$User@$HostName: $PathShort\007\]"
 
-#only show last 3 directories
-PROMPT_DIRTRIM=3
+function git_stat() {
+    echo $(git branch &>/dev/null;\
+    if [ $? -eq 0 ]; then \
+    echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
+    if [ "$?" -eq "0" ]; then \
+        # @4 - Clean repository - nothing to commit
+        echo $git_color_clean$(__git_ps1 "$git_clean_prefix%s$git_clean_suffix"); \
+    else \
+        # @5 - Changes to working tree
+        echo $git_color_dirty$(__git_ps1 "$git_dirty_prefix%s$git_dirty_suffix"); \
+    fi)$Color_Off";
+    else \
+    # @2 - Prompt when not in GIT repo
+    echo ""; \
+    fi \
+    );
+}
 
-export PS1="$Title$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite"'$(git branch &>/dev/null;\
-if [ $? -eq 0 ]; then \
-  echo "$(echo `git status` | grep "nothing to commit" > /dev/null 2>&1; \
-  if [ "$?" -eq "0" ]; then \
-    # @4 - Clean repository - nothing to commit
-    echo "'$PromptSymbol$Green'"$(__git_ps1 " (%s)"); \
-  else \
-    # @5 - Changes to working tree
-    echo "'$PromptSymbol$Red'"$(__git_ps1 " {%s}"); \
-  fi) '$BWhite$Color_Off'";
-else \
-  # @2 - Prompt when not in GIT repo
-  echo "'$BWhite$PromptSymbol$Color_Off' "; \
-fi)'
+#only show last 3 directories
+export PROMPT_DIRTRIM=3
+
+function prompt_precmd() {
+    
+    
+    pre_cmd
+
+    #print -Pn "\e]0;$Title\a"
+}
+
+source $DOTFILES_THEME_PATH
+
+export PROMPT_COMMAND=prompt_precmd
+export PS1=$prompt_format
+

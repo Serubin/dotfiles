@@ -1,0 +1,57 @@
+# Prompt Theme - Pure
+# Based on https://github.com/sindresorhus/pure
+
+# Git Prompt Info
+git_color_clean=$Black # Clean working directory
+git_clean_prefix=""
+git_clean_suffix=""
+
+git_color_dirty=$Red # Dirty working directory
+git_dirty_prefix=""
+git_dirty_suffix="*"
+
+
+PromptSymbol="❯"
+
+# pre_cmd updating
+function pre_cmd() {
+    local exit="$?"
+    local pre_prompt_user=""
+
+    # Term Title
+    Title="$User $PathShort"
+
+    # Title and prompt for ssh connections
+    [[ "$SSH_CONNECTION" != '' ]] && Title="$BBlue $User @ $HostName $ShortPath"
+
+    [[ "$SSH_CONNECTION" != '' ]] && pre_prompt_user="$BBlue $User @ $HostName "
+    
+    # User for root
+    [[ $UID -eq 0 ]] && pre_prompt_user="$BBlue $User "
+    
+    local git=`git_stat`
+    
+    # Formatting
+    local preprompt_format="$pre_prompt_user$BCyan$PathShort $git"
+
+    # ZSH - So simple!
+    [[ "$DOTFILES_SHELL" == "zsh" ]] && print -P $preprompt_format
+    
+    # Bash prompt
+    if [[ "$DOTFILES_SHELL" == "bash" ]]; then
+        # Exit status color
+        prompt_color=$Purple
+        [[ $exit != 0 ]] && prompt_color=$Red 
+
+        # Formatting for bash
+        prompt_format="$prompt_color$PromptSymbol $BWhite"
+        export PS1="$preprompt_format \n$prompt_format"
+    fi
+
+
+}
+
+# ZSH
+# Prompt - Should be last
+prompt_format="%(?.$Purple.$Red)$PromptSymbol $BWhite"
+

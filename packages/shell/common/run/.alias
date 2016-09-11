@@ -1,4 +1,3 @@
-#!/bin/zsh
 # Aliases
 #
 
@@ -21,7 +20,7 @@ alias ll="ls -lhAr"
 # shortcuts
 alias _="sudo"
 alias g="git"
-alias v="nvim"
+alias v="vim"
 alias rr="rm -r"
 alias sudo="sudo "
 # ip aliases
@@ -30,19 +29,16 @@ alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([
 
 # vim 
 alias vim="nvim"
-alias vi="nvim"
-# calls the server function
-#if [ -f "${HOME}/.latexmkrc" ]; then
-#    alias vim='vim_with_servername'
-#fi
+alias vi="vim"
 
-if [ "$DISTRO" != "Darwin" ]; then
-    alias open="xdg-open"
-fi
+# calls the server function
+[[ -f "${HOME}/.latexmkrc" ]] && alias vim='vim_with_servername'
+
+[[ "$DISTRO" != "Darwin" ]] && alias open="xdg-open"
 
 # listing cd
 alias cd="cdls"
 
 alias py="python"
 
-bindkey '^R' history-incremental-search-backward
+[[ "$SHELL" == "zsh" ]] && bindkey '^R' history-incremental-search-backward

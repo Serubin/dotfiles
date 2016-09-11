@@ -22,7 +22,7 @@ perl -p -i -e 's/DOTFILES_SHELL=".*"/DOTFILES_SHELL="bash"/g;' ${HOME}/.dotfiles
 
 echo "Creating symlinks"
 # Bunch of symlinks
-ln -sfv "${PACKAGE_INSTALL}/config/.bashrc" ~
+ln -sfv "${DOTFILES_DIR}/packages/shell/common/.rc" ~/.bashrc
 ln -sfv "${PACKAGE_INSTALL}/config/.bash_profile" ~
 
 # Copy .custom if not exist

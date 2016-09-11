@@ -1,5 +1,4 @@
-#!/bin/zsh
-# ZSH Theme - Default
+# Prompt Theme - Default
 
 # Git Prompt Info
 git_color_clean=$Green # Clean working directory
@@ -20,8 +19,12 @@ function pre_cmd() {
     if [ "$EUID" -ne 0 ]; then
         PromptSymbol="$"
     fi
+    
+    local git=`git_stat`
+    [[ "$git" != "" ]] && git=$git" "
 
-    print -P "$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$PromptSymbol $GIT_PROMPT "
+   prompt_format="$BBlue$User@$HostName$BWhite$Color_Off:$BCyan$PathShort$BWhite$PromptSymbol $git"
+   [[ "$DOTFILES_SHELL" == "zsh" ]] && export PROMPT=$prompt_format
+   [[ "$DOTFILES_SHELL" == "bash" ]] && export PS1=$prompt_format
 }
 
-# 

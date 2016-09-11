@@ -17,7 +17,7 @@ perl -p -i -e 's/DOTFILES_SHELL=".*"/DOTFILES_SHELL="zsh"/g;' ${HOME}/.dotfiles.
 
 echo "Creating symlinks"
 # Bunch of symlinks
-ln -sfv "${PACKAGE_INSTALL}/config/.zshrc" ~
+ln -sfv "${DOTFILES_DIR}/packages/shell/common/.rc" ~/.zshrc
 
 # Copy .custom if not exist
 if [ ! -r "${HOME}/.custom" ]; then

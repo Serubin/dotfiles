@@ -18,4 +18,4 @@ PROMPT_POWERLINE="" # Pretty powerline prompt
 PROMPT_UCFUSER="" # Uppercase first letter of username
 
 #Theme Path
-DOTFILES_THEME_PATH="${DOTFILES_DIR}/packages/shell/zsh/config/theme/default.theme"
+DOTFILES_THEME_PATH="${DOTFILES_DIR}/packages/shell/common/theme/default.theme"
