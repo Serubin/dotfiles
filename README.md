@@ -1,6 +1,10 @@
 # Serubin's DotFiles
 
-The purpose of this dotfiles configuration is to create a lightweight and easy to understand configuration.
+The purpose of this dotfiles configuration is to create a lightweight and easy to understand configuration. This was largely created as a multi-platform alternative to OhMyZsh. Personally - I found OhMyZsh to be very overwhelming and more focused on using other's configuration than customizing things to be my own. Thus, I created a framework that allows for two things: Easy management of dotfiles and a simple configuration that anyone could fork and modify to their liking.
+
+Of course, you'll find within this repository my personal configuration: Although it may not be to everyone's liking I think it's a very solid foundation to creating a comfortable and mostly bug free development environment. A lot of the issues people run into when setting up their own dev-envs have already been solved here. An excellent example of this is getting colored nvim to work in tmux. 
+
+Whether you use this as a resource for creating your own dotfiles or you use this configuration and make it your own, I hope that you find it helpful and will consider contributing.
 
 ## Installation
 
@@ -9,7 +13,7 @@ Installing is fairly straight forward, just clone the repo and place it anywhere
 git clone --recursive https://github.com/Serubin/dotfiles.git && cd dotfiles && ./install.sh
 ```
 To update run ``` ./install.sh -u```
-To install without interactivity run ``` ./install.sh -i <package1,package2> ```
+To install without interactivity run ``` ./install.sh -i <package1,package2> ``` (Still in progress)
 To list installed packages run ``` ./install.sh -l```
 In order to change the location of the installation you will have to re-run the install script with ``` ./install.sh ```
 
@@ -28,16 +32,15 @@ For all *linux* distributions
 
 In OS X the script will install brew and all needed components. 
 
-## What does this set up do?
-
-This setup creates a clean bash envirnment with several other applications. Below is each application created and the features added. Of course I encourage you to look through the files to get a better picture of what this will set up for you.
+## General overview
 
 Settings in `~/.dotfiles.info`
 
 #### Bash/ZSH
-*   Aliases (listed in bash/.alias)
-*   Custom PS1 prompt with git integration
-*   Functions to make life easy (listed in bash/.function) 
+* Custom Themeing
+ * Set in dotfiles.info
+*   Aliases (listed in packages/shell/common/run/.alias)
+*   Functions to make life easy (listed in packages/shell/common/run/.function) 
 
 #### ZSH
 * Custom Themeing
@@ -46,7 +49,8 @@ Settings in `~/.dotfiles.info`
 * dynamic syntax highlighting
 
 #### git
-* Global ignore for mac os x
+* Up to date! (Mostly looking at debian/ubuntu)
+* Global ignore
 * Git Aliases (listed in packages/cli/git/config/.gitconfig)
 
 #### Vim
@@ -60,7 +64,7 @@ Settings in `~/.dotfiles.info`
 * Presistent undo
 * Various completion packages
 
-#### Sublime (x server/Desktop Environment) (not included on Arch, mostly replaced by Vim at this point)
+#### Sublime (x server/Desktop Environment) (not included on Arch, mostly replaced by nVim at this point)
 * Custom Theme - Monkia
 * Packages
  * All Autocomplete
@@ -69,4 +73,21 @@ Settings in `~/.dotfiles.info`
  * CodeFormatter
  * SideBarEnhancements
  * Various Completion packages
+
+## Design overview
+
+```
+/
++-- README.md
++-- LICENSE
++-- install.sh          <-- Main script
++-- common/             <-- Common files - shared and third party
+|    +-- .custom        <-- Custom input file (copied to ~)
+|    +-- <third-party-repos>/ 
++-- packages/
+     +-- shell/
+     +-- cli/
+     +-- desktop/
++-- util/
+```
 
