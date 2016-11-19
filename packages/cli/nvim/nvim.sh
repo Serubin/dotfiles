@@ -44,11 +44,7 @@ echo "Compiling ycm"
 # Compile YouCompleteMe
 cd "${BUNDLE_DIR}/YouCompleteMe"
 
-if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    python install.py --clang-completer
-else
-    python3 install.py --clang-completer
-fi
+/usr/bin/env python2 install.py
 
 cd -
 

@@ -1,1 +1,1 @@
-let g:python2_host_prog = '%python-path%'
+let g:python2_host_prog = '/usr/bin/env python2'
