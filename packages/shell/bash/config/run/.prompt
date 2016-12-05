@@ -33,7 +33,7 @@ BWhite="\[\033[1;37m\]"       # White
 
 # Various variables you might want for your PS1 prompt instead
 User="$USER" #Capitalize username
-if [ "$prompt_ucfUser" != "" ]; then
+if [ "$PROMPT_UCFUSER" != "" ]; then
     User="$(tr '[:lower:]' '[:upper:]' <<< ${User:0:1})${User:1}"
 fi
 
