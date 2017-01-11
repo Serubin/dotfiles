@@ -25,9 +25,9 @@ ln -sfv "${PACKAGE_INSTALL}/config/nvim/init.vim" ~/.config/nvim/
 cp "${PACKAGE_INSTALL}/config/nvim/python.vim" ~/.config/nvim/
 
 if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    python2_path=`which python2`
-else
     python2_path=`which python`
+else
+    python2_path=`which python3`
 fi
 sed -i -e 's#%python-path%#'${python2_path}'#g' ~/.config/nvim/python.vim
 
@@ -44,11 +44,7 @@ echo "Compiling ycm"
 # Compile YouCompleteMe
 cd "${BUNDLE_DIR}/YouCompleteMe"
 
-if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    python2 install.py
-else
-    python install.py
-fi
+/usr/bin/env python2 install.py
 
 cd -
 

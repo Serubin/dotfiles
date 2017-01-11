@@ -7,7 +7,7 @@
 
 
 # vim
-brew install python
+brew install python python3
 
 sudo easy_install pip
 

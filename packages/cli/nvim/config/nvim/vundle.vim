@@ -32,6 +32,7 @@ Plugin 'honza/vim-snippets'
 " Syntax
 Plugin 'alisdair/vim-armasm'
 Bundle "pangloss/vim-javascript"
+Plugin 'mxw/vim-jsx'
 Plugin 'othree/html5.vim'
 Plugin 'hail2u/vim-css3-syntax'
 Plugin 'cakebaker/scss-syntax.vim'
