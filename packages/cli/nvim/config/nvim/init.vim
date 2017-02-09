@@ -1,7 +1,7 @@
 set nocompatible
 set number                      "Line numbers are good
 highlight LineNr ctermfg=grey   "Colored line numbers are better
-set cursorline          " highlight current line
+set cursorline                  "highlight current line
 set title                       "Titles are cool
 set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>            "Paste without being smart
@@ -29,6 +29,7 @@ set inccommand=nosplit          "In place substitution preview
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 " netrw
 let g:netrw_liststyle=3         "List styles for file explorer
 let g:netrw_altv=1
