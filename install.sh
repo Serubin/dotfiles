@@ -1,5 +1,10 @@
 #!/bin/bash
 
+###
+# Installer for Serubin's Dotfiles
+# @Serubin
+# MIT License
+###
 echo "-------- Setting up Serubin's Dotfiles --------"
 
 source ${HOME}/.dotfiles.info
