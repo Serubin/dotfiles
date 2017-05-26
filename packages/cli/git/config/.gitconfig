@@ -14,7 +14,8 @@
 	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	lg = log -p
 	ll = log --pretty=oneline --graph --abbrev-commit
-	lm = log --pretty=format:'* %s (%h)'
+    lm = log --pretty=format:'* %s (%h)'
+    su = log --since='1 day ago' --author='%git-name%' --oneline
 [push]
 	default = simple
 [diff]

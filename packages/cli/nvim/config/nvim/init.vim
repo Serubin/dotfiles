@@ -1,7 +1,7 @@
 set nocompatible
 set number                      "Line numbers are good
 highlight LineNr ctermfg=grey   "Colored line numbers are better
-set cursorline          " highlight current line
+set cursorline                  "highlight current line
 set title                       "Titles are cool
 set hidden                      "Hide buffer instead of closing it - stop buffering of empty files
 set pastetoggle=<F2>            "Paste without being smart
@@ -29,6 +29,7 @@ set inccommand=nosplit          "In place substitution preview
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 " netrw
 let g:netrw_liststyle=3         "List styles for file explorer
 let g:netrw_altv=1
@@ -104,14 +105,65 @@ set laststatus=2 " no display fix
 set noshowmode
 
 let g:lightline = {
-    \ 'colorscheme': 'powerline',
-	\ 'component': {
-    \   'readonly': '%{&readonly?"":""}',
-    \ },
-    \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '', 'right': '' }
-  \ }
+      \ 'colorscheme': 'powerline',
+      \ 'mode_map': { 'c': 'NORMAL' },
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ]
+      \ },
+      \ 'component_function': {
+      \   'modified': 'LightlineModified',
+      \   'readonly': 'LightlineReadonly',
+      \   'fugitive': 'LightlineFugitive',
+      \   'filename': 'LightlineFilename',
+      \   'fileformat': 'LightlineFileformat',
+      \   'filetype': 'LightlineFiletype',
+      \   'fileencoding': 'LightlineFileencoding',
+      \   'mode': 'LightlineMode',
+      \ },
+      \ 'separator': { 'left': '', 'right': '' },
+      \ 'subseparator': { 'left': '', 'right': '' }
+      \ }
 
+function! LightlineModified()
+  return &ft =~ 'help\|vimfiler\|gundo\|NERD' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightlineReadonly()
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? '' : ''
+endfunction
+
+function! LightlineFilename()
+  return ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft == 'unite' ? unite#get_status_string() :
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+        \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
+endfunction
+
+function! LightlineFugitive()
+  if &ft !~? 'vimfiler\|gundo\|NERD' && exists("*fugitive#head")
+    let branch = fugitive#head()
+    return branch !=# '' ? ''.branch : ''
+  endif
+  return ''
+endfunction
+
+function! LightlineFileformat()
+  return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! LightlineFiletype()
+  return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightlineFileencoding()
+  return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+endfunction
+
+function! LightlineMode()
+  return winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
 
 if !has('gui_running') " no color fix
     set t_Co=256
