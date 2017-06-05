@@ -34,7 +34,7 @@ alias vi="vim"
 # calls the server function
 [[ -f "${HOME}/.latexmkrc" ]] && alias vim='vim_with_servername'
 
-[[ "$DISTRO" != "Darwin" ]] && alias open="xdg-open"
+[[ "$DISTRO" != "Darwin" ]] && alias open="xdg-open &> /dev/null"
 
 # listing cd
 alias cd="cdls"
