@@ -15,7 +15,7 @@
 	lg = log -p
 	ll = log --pretty=oneline --graph --abbrev-commit
     lm = log --pretty=format:'* %s (%h)'
-    su = log --since='1 day ago' --author='%git-name%' --oneline
+    su = log -n 8 --author='%git-name%' --oneline
 [push]
 	default = simple
 [diff]
