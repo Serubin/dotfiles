@@ -37,6 +37,7 @@ Plugin 'othree/html5.vim'
 Plugin 'hail2u/vim-css3-syntax'
 Plugin 'cakebaker/scss-syntax.vim'
 Plugin 'Valloric/MatchTagAlways'
+Plugin 'posva/vim-vue'
 
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
