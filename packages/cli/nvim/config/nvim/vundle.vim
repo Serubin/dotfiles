@@ -58,9 +58,8 @@ endif
 
 if filereadable(expand("~/.config/nvim/vhdl.vim"))
     " Vimtex plugin
-    Plugin 'JPR75/VIP'
-    Plugin 'hdl_plugin'
-    Plugin 'salinasv/vim-vhdl'
+    Plugin 'JPR75/VIP' " Copy/paste entity/component/instance
+    Plugin 'hdl_plugin' " For testbench generation
     source ~/.config/nvim/vhdl.vim
 endif
 

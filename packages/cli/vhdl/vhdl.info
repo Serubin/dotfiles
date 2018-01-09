@@ -4,7 +4,7 @@
 # VHDL Info file
 #
 
-export package_support="Debian Ubuntu Darwin Arch Fedora"
+export package_support="Arch"
 
 echo "VHDL: Very hard description language"
 
