@@ -10,7 +10,7 @@
 " Filetype off is required by vundle
 filetype off
 
-set rtp+=$HOME/.config/nvim/bundle/vundle/
+set rtp+=$HOME/.config/nvim/bundle/Vundle.vim/
 call vundle#begin("$HOME/.config/nvim/bundle")
 
 " let Vundle manage Vundle (required)
