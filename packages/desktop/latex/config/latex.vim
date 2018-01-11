@@ -1,10 +1,16 @@
+" Only do this when not done yet for this buffer
+if exists("b:did_ftplugin")
+    finish
+endif
+
 " Useful to move around in long blocks of text
 map j gj
 map k gk
 
+setlocal spell spelllang=en_us
+
 augroup latex
     autocmd!
-    autocmd FileType tex setlocal spell spelllang=en_us
     autocmd BufWinEnter *.tex :VimtexCompile 
 augroup END
 let g:tex_flavor='latex'

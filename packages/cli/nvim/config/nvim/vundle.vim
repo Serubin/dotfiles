@@ -50,10 +50,9 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
 
 " Load LaTeX if installed
-if filereadable(expand("~/.config/nvim/latex.vim"))
+if filereadable(expand("~/.config/nvim/ftplugin/tex.vim"))
     " Vimtex plugin
     Plugin 'lervag/vimtex'
-    source ~/.config/nvim/latex.vim
 endif
 
 if filereadable(expand("~/.config/nvim/ftplugin/vhdl.vim"))
