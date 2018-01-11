@@ -9,13 +9,15 @@ if [ ! -d "${HOME}/.config/nvim/UltiSnips/" ]; then
     mkdir ${HOME}/.config/nvim/UltiSnips/
 fi
 
-ln -sfv "${PACKAGE_INSTALL}/config/vhdl.vim" ~/.config/nvim/
-ln -sfv "${PACKAGE_INSTALL}/config/vhdl.snippets" ~/.config/nvim/UltiSnips/
-mkdir -p ~/.config/nvim/ftplugin/
-ln -sfv ~/.config/nvim/bundle/hdl_plugin/ftplugin/hdl_plugin.vim ~/.config/nvim/ftplugin/vhdl.vim # Fix hdl plugin naming issue
+mkdir -p ${HOME}/.config/nvim/ftplugin/
+ln -sfv "${PACKAGE_INSTALL}/config/vhdl.vim" ${HOME}/.config/nvim/ftplugin/
+ln -sfv "${PACKAGE_INSTALL}/config/vhdl.snippets" ${HOME}/.config/nvim/UltiSnips/
 
 echo "Consider installing https://github.com/ghdl/ghdl"
 
 # Reinstall plugins for vhdl
 nvim +PluginInstall +qall
 
+# Fix VIP plugin so it only loads for VHDL files
+mv ${HOME}/.config/nvim/bundle/VIP/plugin ${HOME}/.config/nvim/bundle/VIP/ftplugin
+mv ${HOME}/.config/nvim/bundle/VIP/ftplugin/vip.vim ${HOME}/.config/nvim/bundle/VIP/ftplugin/vhdl.vim

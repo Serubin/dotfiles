@@ -56,11 +56,9 @@ if filereadable(expand("~/.config/nvim/latex.vim"))
     source ~/.config/nvim/latex.vim
 endif
 
-if filereadable(expand("~/.config/nvim/vhdl.vim"))
+if filereadable(expand("~/.config/nvim/ftplugin/vhdl.vim"))
     " Vimtex plugin
     Plugin 'JPR75/VIP' " Copy/paste entity/component/instance
-    Plugin 'hdl_plugin' " For testbench generation
-    source ~/.config/nvim/vhdl.vim
 endif
 
 " Tags
