@@ -123,7 +123,6 @@ if [[ ${flag_update} != "1" ]]; then # if update, don't prompt
     registerPackage "shell" "zsh"
 
     registerPackage "cli" "git"
-    registerPackage "cli" "vim"
     registerPackage "cli" "nvim"
     registerPackage "cli" "tmux"
     registerPackage "cli" "htop"

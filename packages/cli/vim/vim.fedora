@@ -1,8 +1,0 @@
-#!/bin/bash
-
-########################################
-# Fedora install of vim
-# ViImproved
-########################################
-
-sudo dnf install vim -y
