@@ -10,7 +10,7 @@
 " Filetype off is required by vundle
 filetype off
 
-set rtp+=$HOME/.config/nvim/bundle/vundle/
+set rtp+=$HOME/.config/nvim/bundle/Vundle.vim/
 call vundle#begin("$HOME/.config/nvim/bundle")
 
 " let Vundle manage Vundle (required)
@@ -50,18 +50,14 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
 
 " Load LaTeX if installed
-if filereadable(expand("~/.config/nvim/latex.vim"))
+if filereadable(expand("~/.config/nvim/ftplugin/tex.vim"))
     " Vimtex plugin
     Plugin 'lervag/vimtex'
-    source ~/.config/nvim/latex.vim
 endif
 
-if filereadable(expand("~/.config/nvim/vhdl.vim"))
+if filereadable(expand("~/.config/nvim/ftplugin/vhdl.vim"))
     " Vimtex plugin
-    Plugin 'JPR75/VIP'
-    Plugin 'hdl_plugin'
-    Plugin 'salinasv/vim-vhdl'
-    source ~/.config/nvim/vhdl.vim
+    Plugin 'JPR75/VIP' " Copy/paste entity/component/instance
 endif
 
 " Tags

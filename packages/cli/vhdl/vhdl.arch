@@ -6,3 +6,8 @@
 ########################################
 
 # Put some cool stuff here later
+sudo pacman --noconfirm -S gtkwave
+cp /usr/share/gtkwave/examples/gtkwaverc ~/.gtkwaverc
+sed -i 's/ <Alt>Z$/ I/' ~/.gtkwaverc # Change zoom in to I
+sed -i 's/ O$/ (null)/' ~/.gtkwaverc # Remove O mapping
+sed -i 's/ <Shift><Alt>Z$/ O/' ~/.gtkwaverc # Change Zoom out to O
