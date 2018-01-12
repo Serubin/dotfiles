@@ -14,3 +14,5 @@ fi
 #config install
 ln -sfv "${PACKAGE_INSTALL}/config/.tmux.conf" ~
 
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+tmux source ~/.tmux.conf

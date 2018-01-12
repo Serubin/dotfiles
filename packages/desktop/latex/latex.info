@@ -4,7 +4,7 @@
 # LaTeX Info file
 #
 
-export package_support="Debian Ubuntu Arch Darwin"
+export package_support="Arch"
 
 echo "LaTeX: A markup language"
 
