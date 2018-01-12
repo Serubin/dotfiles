@@ -6,16 +6,6 @@
 ########################################
 
 # ##############################
-#           gVim               #
-# ##############################
-# Needed for reverse search in latex
-
-echo "Installing gVim"
-sudo pacman -Rs --noconfirm --needed vim
-sudo pacman -S --noconfirm --needed gvim
-
-
-# ##############################
 #           LaTeX              #
 # ##############################
 
