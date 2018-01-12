@@ -1,8 +1,0 @@
-#!/bin/bash
-
-########################################
-# Arch install of vim
-# ViImproved
-########################################
-
-sudo pacman -S --noconfirm --needed vim clang
