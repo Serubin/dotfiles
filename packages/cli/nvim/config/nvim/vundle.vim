@@ -16,7 +16,7 @@ call vundle#begin("$HOME/.config/nvim/bundle")
 " let Vundle manage Vundle (required)
 Plugin 'VundleVim/Vundle.vim'
 
-" Keeping vim rather simple
+" Keeping vim rather simple (Except HTML)
 
 " Generic
 Bundle "itchyny/lightline.vim"
@@ -31,13 +31,6 @@ Plugin 'honza/vim-snippets'
 
 " Syntax
 Plugin 'alisdair/vim-armasm'
-Bundle "pangloss/vim-javascript"
-Plugin 'mxw/vim-jsx'
-Plugin 'othree/html5.vim'
-Plugin 'hail2u/vim-css3-syntax'
-Plugin 'cakebaker/scss-syntax.vim'
-Plugin 'Valloric/MatchTagAlways'
-Plugin 'posva/vim-vue'
 
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
@@ -48,6 +41,28 @@ Bundle 'scrooloose/syntastic'
 " File exploring
 Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
+
+
+if filereadable(expand("~/.config/nvim/webdev.vim"))
+    let g:syntastic_jslint_checkers=['jslint']
+
+    " JS Base
+    Bundle "pangloss/vim-javascript"
+
+    " Tag matching for XML
+    Plugin 'Valloric/MatchTagAlways'
+    
+    " Html/css 
+    Plugin 'othree/html5.vim'
+    Plugin 'hail2u/vim-css3-syntax'
+    Plugin 'cakebaker/scss-syntax.vim'
+
+    " Various libraries
+    Plugin 'posva/vim-vue'
+    Plugin 'leafgarland/typescript-vim'
+    Plugin 'mxw/vim-jsx'
+
+endif
 
 " Load LaTeX if installed
 if filereadable(expand("~/.config/nvim/ftplugin/tex.vim"))

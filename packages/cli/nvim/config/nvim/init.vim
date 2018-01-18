@@ -42,13 +42,18 @@ let g:netrw_use_noswf=0
 " nerdtree
 let NERDTreeShowHidden=1
 let NERDTreeSortOrder=['[\/]$', '*']
-let NERDTreeIgnore=['.*\.swp$', '.*\.swo$',]
+let NERDTreeIgnore=['.*\.swp$', '.*\.swo$', '.*\.pyc$']
 
 " Syntastic
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+
+" Jslint
+if filereadable(expand("~/.config/nvim/webdev.vim"))
+    let g:syntastic_jslint_checkers=['jslint']
+endif
 
 function! ToggleErrors()
     let old_last_winnr = winnr('$')
