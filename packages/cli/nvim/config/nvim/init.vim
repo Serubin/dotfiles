@@ -49,6 +49,10 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "active_filetypes": [],
+    \ "passive_filetypes": ["tex"] }
 
 let asmsyntax='armasm'
 let filetype_inc='armasm'
@@ -84,6 +88,9 @@ if filereadable(expand("~/.config/nvim/vundle.vim"))
   source ~/.config/nvim/vundle.vim
 endif
 
+if filereadable(expand("~/.config/nvim/pass.vim"))
+  source ~/.config/nvim/pass.vim
+endif
 " better key bindings for UltiSnipsExpandTrigger
 let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
