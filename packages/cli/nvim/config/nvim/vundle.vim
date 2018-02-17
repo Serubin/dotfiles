@@ -21,6 +21,7 @@ Plugin 'VundleVim/Vundle.vim'
 " Generic
 Bundle "itchyny/lightline.vim"
 Bundle "tpope/vim-fugitive"
+Bundle "tpope/vim-abolish"
 Plugin 'unblevable/quick-scope'
 
 " Completion & snippets
