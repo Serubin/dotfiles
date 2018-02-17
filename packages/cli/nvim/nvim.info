@@ -9,6 +9,15 @@ export package_support="Debian Ubuntu Darwin Arch Fedora"
 echo "NeoVim: An better extensive text editor"
 
 PRE_INSTALL_OPTIONS() {
-    echo ""
+    web_dev=`getInputBoolean "Do you want to install WebDev nvim plugins?"`
+    if [[ "$web_dev" == "1" ]]; then # Add web_dev
+        mkdir -p ${HOME}/.config/nvim/ &> /dev/null
+        touch ${HOME}/.config/nvim/webdev.vim &> /dev/null
+    else
+        rm ${HOME}/.config/nvim/webdev.vim &> /dev/null
+    fi
+
+    unset web_dev
+
 }
 
