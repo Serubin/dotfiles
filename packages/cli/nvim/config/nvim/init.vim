@@ -26,7 +26,7 @@ set udf                         "Persistant undo across sessions
 set scrolloff=8                 "Makes cursor stay 8 lines away from the top or bottom
 set mouse=""                    "Turns off mouse interaction
 set inccommand=nosplit          "In place substitution preview
-set wildmode=longest:full
+set wildmode=longest:full,full
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 
@@ -49,6 +49,10 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "active_filetypes": [],
+    \ "passive_filetypes": ["tex"] }
 
 " Jslint
 if filereadable(expand("~/.config/nvim/webdev.vim"))
@@ -99,6 +103,9 @@ if filereadable(expand("~/.config/nvim/vundle.vim"))
   source ~/.config/nvim/vundle.vim
 endif
 
+if filereadable(expand("~/.config/nvim/pass.vim"))
+  source ~/.config/nvim/pass.vim
+endif
 " better key bindings for UltiSnipsExpandTrigger
 let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
