@@ -7,6 +7,11 @@
 
 echo "Backing up previous nvim config"
 
+webdev=0
+if [ -f "${HOME}/.config/nvim/webdev.vim" ]; then
+    webdev=1
+fi
+
 # TODO not working for sum reason.
 if [ -r "${HOME}/.config/nvim" ]; then
     if [ -r "${HOME}/.dotfiles-bak/.nvim" ]; then
@@ -14,6 +19,10 @@ if [ -r "${HOME}/.config/nvim" ]; then
     fi
 
 	mv -f ${HOME}/.config/nvim ${HOME}/.dotfiles-bak/ 2> /dev/null
+fi
+
+if [ $webdev -eq 11 ]; then
+    touch ${HOME}/.config/nvim/webdev.vim
 fi
 
 # config install
