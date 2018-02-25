@@ -10,7 +10,7 @@
 # ##############################
 
 echo "Installing LaTeX"
-sudo pacman -S --noconfirm --needed texlive-core
+sudo pacman -S --noconfirm --needed texlive-core texlive-science texlive-latexextra
 
 
 # ##############################
@@ -20,3 +20,5 @@ sudo pacman -S --noconfirm --needed texlive-core
 echo "Installing zathura"
 sudo pacman -S --noconfirm --needed zathura zathura-pdf-mupdf xdotool
 
+# Vimtex needs --remote in vim, so this puts it back for neovim
+pip install --user neovim-remote
