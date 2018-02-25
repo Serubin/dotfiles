@@ -49,6 +49,8 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_ignore_files = ['\m\c\.tex$']
 
 let asmsyntax='armasm'
 let filetype_inc='armasm'
@@ -227,4 +229,3 @@ autocmd ColorScheme * call <SID>SetHighlightings()
 
 " Spell check
 autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us 
-
