@@ -26,7 +26,7 @@ set udf                         "Persistant undo across sessions
 set scrolloff=8                 "Makes cursor stay 8 lines away from the top or bottom
 set mouse=""                    "Turns off mouse interaction
 set inccommand=nosplit          "In place substitution preview
-set wildmode=longest:full
+set wildmode=longest:full,full
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 
@@ -42,15 +42,31 @@ let g:netrw_use_noswf=0
 " nerdtree
 let NERDTreeShowHidden=1
 let NERDTreeSortOrder=['[\/]$', '*']
-let NERDTreeIgnore=['.*\.swp$', '.*\.swo$',]
+let NERDTreeIgnore=['.*\.swp$', '.*\.swo$', '.*\.pyc$']
 
 " Syntastic
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
+let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_ignore_files = ['\m\c\.tex$']
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "active_filetypes": [],
+    \ "passive_filetypes": ["tex"] }
+
+" Jslint
+if filereadable(expand("~/.config/nvim/webdev.vim"))
+    let g:syntastic_jslint_checkers=['jslint']
+endif
+
+function! ToggleErrors()
+    let old_last_winnr = winnr('$')
+    lclose
+    if old_last_winnr == winnr('$')
+        " Nothing was closed, open syntastic error location panel
+        Errors
+    endif
+endfunction
 
 let asmsyntax='armasm'
 let filetype_inc='armasm'
@@ -64,6 +80,7 @@ nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :NERDTreeTabsToggle<CR>
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
+nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 map j gj
@@ -86,6 +103,9 @@ if filereadable(expand("~/.config/nvim/vundle.vim"))
   source ~/.config/nvim/vundle.vim
 endif
 
+if filereadable(expand("~/.config/nvim/pass.vim"))
+  source ~/.config/nvim/pass.vim
+endif
 " better key bindings for UltiSnipsExpandTrigger
 let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
@@ -117,7 +137,10 @@ let g:lightline = {
       \ 'colorscheme': 'powerline',
       \ 'mode_map': { 'c': 'NORMAL' },
       \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ]
+      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ],
+      \   'right': [ [ 'lineinfo', 'syntasticstatus' ],
+      \              [ 'percent' ],
+      \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
       \ 'component_function': {
       \   'modified': 'LightlineModified',
@@ -128,6 +151,7 @@ let g:lightline = {
       \   'filetype': 'LightlineFiletype',
       \   'fileencoding': 'LightlineFileencoding',
       \   'mode': 'LightlineMode',
+      \   'syntasticstatus': 'SyntasticStatuslineFlag',
       \ },
       \ 'separator': { 'left': '', 'right': '' },
       \ 'subseparator': { 'left': '', 'right': '' }
@@ -229,3 +253,4 @@ autocmd ColorScheme * call <SID>SetHighlightings()
 
 " Spell check
 autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us 
+
