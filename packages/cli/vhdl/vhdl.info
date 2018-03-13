@@ -4,7 +4,7 @@
 # VHDL Info file
 #
 
-export package_support="Arch"
+export package_support="arch"
 
 echo "VHDL: Very hard description language"
 
