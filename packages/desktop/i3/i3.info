@@ -4,7 +4,7 @@
 # i3 Info file
 #
 
-export package_support="Debian Ubuntu Arch Fedora"
+export package_support="debian ubuntu arch fedora"
 
 echo "I3: A tiled windows manager"
 printf "I3 is being \033[0;31m deprecated \033[0m due to lack of use.\n" # lol priantf. I wanted colors
