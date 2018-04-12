@@ -11,7 +11,7 @@ setlocal spell spelllang=en_us
 
 augroup latex
     autocmd!
-    autocmd BufWinEnter *.tex :VimtexCompile 
+    autocmd BufWinEnter *.tex :VimtexCompile
 augroup END
 let g:tex_flavor='latex'
 let g:vimtex_fold_enabled = '1'
