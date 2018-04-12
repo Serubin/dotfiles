@@ -4,7 +4,7 @@
 # Required Info file
 #
 
-export package_support="Debian Ubuntu Darwin Arch Fedora"
+export package_support="debian ubuntu darwin arch fedora"
 
 echo "Required Packages are required!: Not installing these may cause issues - you have been warned."
 

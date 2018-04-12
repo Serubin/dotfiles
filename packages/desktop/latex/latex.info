@@ -4,7 +4,7 @@
 # LaTeX Info file
 #
 
-export package_support="Arch"
+export package_support="arch"
 
 echo "LaTeX: A markup language"
 
