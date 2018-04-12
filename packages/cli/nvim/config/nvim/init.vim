@@ -93,6 +93,9 @@ map k gk
 " Trigger a highlight in the appropriate direction when pressing these keys:
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
+let g:better_whitespace_enabled=1
+let g:strip_whitespace_on_save=1
+
 augroup spell_check
 	autocmd!
 	autocmd FileType no ft setlocal spell spelllang-en_us
@@ -219,6 +222,7 @@ endif
 " use the previous window to
 
 set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
+set wildignore=*.pdf
 set wildignore+=*vim/backups*
 set wildignore+=*sass-cache*
 set wildignore+=*DS_Store*

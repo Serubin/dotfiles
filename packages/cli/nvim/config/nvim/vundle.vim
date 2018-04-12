@@ -33,6 +33,9 @@ Plugin 'honza/vim-snippets'
 " Syntax
 Plugin 'alisdair/vim-armasm'
 
+" Whitespace
+Plugin 'ntpeters/vim-better-whitespace'
+
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
 

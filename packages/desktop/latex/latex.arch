@@ -21,4 +21,5 @@ echo "Installing zathura"
 sudo pacman -S --noconfirm --needed zathura zathura-pdf-mupdf xdotool
 
 # Vimtex needs --remote in vim, so this puts it back for neovim
+# TODO pip install doesn't appear to work. Need to use AUR
 pip install --user neovim-remote

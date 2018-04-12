@@ -13,6 +13,9 @@ nnoremap <leader>C <Plug>SpecialVHDLPasteComponent
 nnoremap <leader>I <Plug>SpecialVHDLPasteInstance
 nnoremap <leader>E <Plug>SpecialVHDLPasteEntity
 
+setlocal comments=:--
+setlocal formatoptions+=cro
+
 " Simple shortcuts from https://github.com/salinasv/vim-vhdl/
 iabbrev <buffer> dt downto
 iabbrev <buffer> sig signal
