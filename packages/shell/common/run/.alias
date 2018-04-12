@@ -8,7 +8,7 @@ alias ....="cd ../../.."
 
 
 # ls aliases
-if [ "$DISTRO" = "Darwin" ]; then
+if [ "$DISTRO" = "darwin" ]; then
 	alias ls="gls --color=auto"
 else
 	alias ls="ls --color=auto -N"
@@ -32,7 +32,7 @@ alias "#"="echo #"
 alias vim="nvim"
 alias vi="vim"
 
-[[ "$DISTRO" != "Darwin" ]] && alias open="xdg-open &> /dev/null"
+[[ "$DISTRO" != "darwin" ]] && alias open="xdg-open &> /dev/null"
 
 # listing cd
 alias cd="cdls"

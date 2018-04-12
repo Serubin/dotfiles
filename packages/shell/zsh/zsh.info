@@ -4,7 +4,7 @@
 # Zsh Info file
 #
 
-export package_support="Debian Ubuntu Darwin Arch Fedora"
+export package_support="debian ubuntu darwin arch fedora"
 
 echo "Zsh: Z Shell"
 

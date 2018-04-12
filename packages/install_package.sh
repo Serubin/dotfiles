@@ -101,17 +101,17 @@ installPackage() {
 
         echo "Attempting to install ${NAME}..."
         # Os specific
-        if [[ "$DISTRO" == "Debian" ]] || [[ "$DISTRO" == "Ubuntu" ]]; then
+        if [[ "$DISTRO" == "debian" ]] || [[ "$DISTRO" == "ubuntu" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.debian"
-        elif [[ "$DISTRO" == "Darwin" ]]; then
+        elif [[ "$DISTRO" == "darwin" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.osx"
-        elif [[ "$DISTRO" == "Arch" ]]; then
+        elif [[ "$DISTRO" == "arch" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.arch"
-        elif [[ "$DISTRO" == "Fedora" ]]; then
+        elif [[ "$DISTRO" == "fedora" ]]; then
             source "${PACKAGE_INSTALL}/${NAME}.fedora"
         else
             # FYI: This shouldn't ever happen - make an issue if it does?
-            echo "ERROR: This os doesn't support ${NAME} installations."a
+            echo "ERROR: This os doesn't support ${NAME} installations."
             continue
         fi
         
