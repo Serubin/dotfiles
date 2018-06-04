@@ -16,6 +16,8 @@ set smartindent                 "Smart indentation
 set smartcase                   "Smart casing
 set smarttab                    "Smart tab
 set hlsearch                    "Highlights search results
+set list                        " Show trailing whitespace with a <
+set listchars=tab:>.,trail:<
 set incsearch                   "Includes partial searches
 set showmatch                   "Shows matching braces
 set ignorecase                  "Ignores case in searches
