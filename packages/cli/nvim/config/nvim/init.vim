@@ -59,6 +59,8 @@ let g:syntastic_mode_map = {
 " Jslint
 if filereadable(expand("~/.config/nvim/webdev.vim"))
     let g:syntastic_jslint_checkers=['jslint']
+    autocmd FileType vue syntax sync fromstart
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.javascript.css
 endif
 
 function! ToggleErrors()

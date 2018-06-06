@@ -52,8 +52,8 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
 
     " Tag matching for XML
     Plugin 'Valloric/MatchTagAlways'
-    
-    " Html/css 
+
+    " Html/css
     Plugin 'othree/html5.vim'
     Plugin 'hail2u/vim-css3-syntax'
     Plugin 'cakebaker/scss-syntax.vim'
