@@ -32,6 +32,7 @@ Plugin 'honza/vim-snippets'
 
 " Syntax
 Plugin 'alisdair/vim-armasm'
+Plugin 'fatih/vim-go'
 
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
