@@ -19,7 +19,7 @@ function pre_cmd() {
     if [ "$EUID" -ne 0 ]; then
         PromptSymbol="$"
     fi
-    
+
     local git=`git_stat`
     [[ "$git" != "" ]] && git=$git" "
 

@@ -65,20 +65,20 @@ export DOTFILES_DIR="$( \cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p ${HOME}/.dotfiles-bak 2> /dev/null
 
 if [ ! -r "${HOME}/.dotfiles.info" ]; then
-	echo "-------- Git Author Info --------"
-	echo "Please enter your git author information. (name and email)."
-	echo "If you want to change this later you can edit '~/dotfiles.info'"
+    echo "-------- Git Author Info --------"
+    echo "Please enter your git author information. (name and email)."
+    echo "If you want to change this later you can edit '~/dotfiles.info'"
 
-	cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
-	read -p "Name: " git_name
+    cp ${DOTFILES_DIR}/util/dotfiles.info-template ${HOME}/.dotfiles.info
+    read -p "Name: " git_name
     export git_name
     perl -p -i -e 's/git_name=".*"/git_name="$ENV{git_name}"/g;' ${HOME}/.dotfiles.info
 
-	read -p "Email: " git_email
-	git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
+    read -p "Email: " git_email
+    git_email=$(echo ${git_email} | sed -e 's/[@&]/\\&/g') # escapes @ sign
     export git_email
     perl -p -i -e 's/git_email=".*"/git_email="$ENV{git_email}"/g;' ${HOME}/.dotfiles.info
-	echo "---------------------------------"
+    echo "---------------------------------"
 fi
 
 # saves dotfile location
@@ -105,11 +105,11 @@ echo ""
 
 # Give Arch users a chance to abort
 if [[ ${DISTRO} == "Arch" ]]; then
-	echo "====> WARNING <===="
-	echo "This script will perform a full system upgrade"
-	if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
-		return;
-	fi
+    echo "====> WARNING <===="
+    echo "This script will perform a full system upgrade"
+    if [ `getInputBoolean "Do you wish to continue?"` == "0" ]; then
+        return;
+    fi
 fi
 
 ln -sfv "${DOTFILES_DIR}/common/dircolors-solarized/dircolors.256dark" ~/.dir_colors

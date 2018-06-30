@@ -1,17 +1,17 @@
 [submodule "common/dircolors-solarized"]
-	path = common/dircolors-solarized
-	url = https://github.com/seebi/dircolors-solarized.git
+    path = common/dircolors-solarized
+    url = https://github.com/seebi/dircolors-solarized.git
 
 [submodule "packages/shell/zsh/config/autosuggest"]
-	path = packages/shell/zsh/config/autosuggest
-	url = https://github.com/Serubin/zsh-autosuggestions.git
+    path = packages/shell/zsh/config/autosuggest
+    url = https://github.com/Serubin/zsh-autosuggestions.git
 [submodule "common/powerline-shell"]
-	path = common/powerline-shell
-	url = https://github.com/Serubin/powerline-shell.git
+    path = common/powerline-shell
+    url = https://github.com/Serubin/powerline-shell.git
 [submodule "packages/shell/zsh/config/highlighting"]
-	path = packages/shell/zsh/config/highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+    path = packages/shell/zsh/config/highlighting
+    url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 
 [submodule "packages/shell/zsh/config/jump-target"]
-	path = packages/shell/zsh/config/jump-target
-	url = https://github.com/scfrazer/zsh-jump-target.git
+    path = packages/shell/zsh/config/jump-target
+    url = https://github.com/scfrazer/zsh-jump-target.git

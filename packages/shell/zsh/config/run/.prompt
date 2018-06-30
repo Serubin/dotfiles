@@ -4,8 +4,8 @@
 # color constants
 
 if [[ $PROMPT_POWERLINE != "" ]]; then # TODO. Move to theme
-	source $DOTFILES_DIR/common/powerline-shell.zsh
-	return;
+    source $DOTFILES_DIR/common/powerline-shell.zsh
+    return;
 fi
 
 # Reset

@@ -4,8 +4,8 @@
 # color constants
 
 if [[ $PROMPT_POWERLINE != "" ]]; then #TODO move to theme
-	source $DOTFILES_DIR/common/powerline-shell.sh
-	return;
+    source $DOTFILES_DIR/common/powerline-shell.sh
+    return;
 fi
 
 # Reset
@@ -43,7 +43,7 @@ PathFull="\W"
 PromptSymbol="#"
 
 if [ "$EUID" -ne 0 ]; then
-	PromptSymbol="$"
+    PromptSymbol="$"
 fi
 
 Title="\[\033]0;$User@$HostName: $PathShort\007\]"
