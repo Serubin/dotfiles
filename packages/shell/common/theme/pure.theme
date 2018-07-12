@@ -40,7 +40,7 @@ function pre_cmd() {
 
     # iTerm Touch Bar
     local iterm_message=$(git rev-parse --abbrev-ref HEAD 2> /dev/null; [[ $? -ne 0 ]] && echo "No Repo")
-    it2setkeylabel set status $iterm_message
+    it2setkeylabel set status $iterm_message 2> /dev/null
 
     # Bash prompt
     if [[ "$DOTFILES_SHELL" == "bash" ]]; then
