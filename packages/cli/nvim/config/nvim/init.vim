@@ -58,6 +58,12 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
     let g:syntastic_jslint_checkers=['jslint']
 endif
 
+augroup blahblahbalh
+	autocmd!
+    autocmd FileType tex vnoremap <Leader>b s\textbf{<ESC>pa}<ESC>
+    autocmd FileType tex vnoremap <Leader>t s\texttt{<ESC>pa}<ESC>
+augroup END
+
 augroup skip_error_buffer
 	autocmd!
 	autocmd FileType qf setlocal nobuflisted
@@ -78,7 +84,7 @@ let filetype_inc='armasm'
 " Key mappings
 let mapleader = "\<Space>"
 let maplocalleader = "\\"
-nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
+nnoremap <leader>c :noh<cr>
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :NERDTreeTabsToggle<CR>
@@ -243,7 +249,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'file': '\v\.(exe|so|dll)$',
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
- 
+
 augroup makefile
      autocmd!
      autocmd FileType make setlocal noexpandtab
@@ -260,5 +266,5 @@ call s:SetHighlightings()
 autocmd ColorScheme * call <SID>SetHighlightings()
 
 " Spell check
-autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us 
+autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us
 

@@ -23,6 +23,7 @@ Bundle "itchyny/lightline.vim"
 Bundle "tpope/vim-fugitive"
 Bundle "tpope/vim-abolish"
 Plugin 'unblevable/quick-scope'
+Plugin 'salsifis/vim-transpose'
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
@@ -46,6 +47,10 @@ Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
 
+" Writing style
+Bundle 'reedes/vim-wordy'
+Bundle 'dbmrq/vim-ditto'
+
 
 if filereadable(expand("~/.config/nvim/webdev.vim"))
     let g:syntastic_jslint_checkers=['jslint']
@@ -55,8 +60,8 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
 
     " Tag matching for XML
     Plugin 'Valloric/MatchTagAlways'
-    
-    " Html/css 
+
+    " Html/css
     Plugin 'othree/html5.vim'
     Plugin 'hail2u/vim-css3-syntax'
     Plugin 'cakebaker/scss-syntax.vim'

@@ -7,6 +7,8 @@ endif
 map j gj
 map k gk
 
+nnoremap <Leader>f :%s#\\include#%\0#<CR>
+
 setlocal spell spelllang=en_us
 
 augroup latex
