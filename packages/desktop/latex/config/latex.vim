@@ -7,11 +7,13 @@ endif
 map j gj
 map k gk
 
+nnoremap <Leader>f :%s#\\include#%\0#<CR>
+
 setlocal spell spelllang=en_us
 
 augroup latex
     autocmd!
-    autocmd BufWinEnter *.tex :VimtexCompile 
+    autocmd BufWinEnter *.tex :VimtexCompile
 augroup END
 let g:tex_flavor='latex'
 let g:vimtex_fold_enabled = '1'

@@ -30,7 +30,7 @@ alias ipdns="dig +short myip.opendns.com @resolver1.opendns.com"
 alias ipl="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
 alias "#"="echo #"
 
-# vim 
+# vim
 alias vim="nvim"
 alias vi="vim"
 
@@ -40,5 +40,7 @@ alias vi="vim"
 alias cd="cdls"
 
 alias py="python"
+
+alias extract="aunpack"
 
 [[ "$DOTFILES_SHELL" == "zsh" ]] && bindkey '^R' history-incremental-search-backward

@@ -22,7 +22,6 @@ set incsearch                   "Includes partial searches
 set showmatch                   "Shows matching braces
 set ignorecase                  "Ignores case in searches
 set shiftround                  "Move word to word with shift navigation
-set history=1000                "Command history
 set undolevels=1000             "Undo history
 set udf                         "Persistant undo across sessions
 set scrolloff=8                 "Makes cursor stay 8 lines away from the top or bottom
@@ -63,6 +62,17 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
     autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.javascript.css
 endif
 
+augroup blahblahbalh
+	autocmd!
+    autocmd FileType tex vnoremap <Leader>b s\textbf{<ESC>pa}<ESC>
+    autocmd FileType tex vnoremap <Leader>t s\texttt{<ESC>pa}<ESC>
+augroup END
+
+augroup skip_error_buffer
+	autocmd!
+	autocmd FileType qf setlocal nobuflisted
+augroup END
+
 function! ToggleErrors()
     let old_last_winnr = winnr('$')
     lclose
@@ -78,7 +88,7 @@ let filetype_inc='armasm'
 " Key mappings
 let mapleader = "\<Space>"
 let maplocalleader = "\\"
-nnoremap <leader>c :noh<cr>         " Clear search highlighting with <space>c
+nnoremap <leader>c :noh<cr>
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :NERDTreeTabsToggle<CR>
@@ -92,6 +102,9 @@ map k gk
 
 " Trigger a highlight in the appropriate direction when pressing these keys:
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+
+let g:better_whitespace_enabled=1
+let g:strip_whitespace_on_save=1
 
 augroup spell_check
 	autocmd!
@@ -219,6 +232,7 @@ endif
 " use the previous window to
 
 set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
+set wildignore=*.pdf
 set wildignore+=*vim/backups*
 set wildignore+=*sass-cache*
 set wildignore+=*DS_Store*
@@ -239,7 +253,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
  " \ 'file': '\v\.(exe|so|dll)$',
  " \ 'link': 'some_bad_symbolic_links',
  " \ }
- 
+
 augroup makefile
      autocmd!
      autocmd FileType make setlocal noexpandtab
@@ -256,5 +270,5 @@ call s:SetHighlightings()
 autocmd ColorScheme * call <SID>SetHighlightings()
 
 " Spell check
-autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us 
+autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us
 

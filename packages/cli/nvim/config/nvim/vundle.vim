@@ -23,6 +23,7 @@ Bundle "itchyny/lightline.vim"
 Bundle "tpope/vim-fugitive"
 Bundle "tpope/vim-abolish"
 Plugin 'unblevable/quick-scope'
+Plugin 'salsifis/vim-transpose'
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'
@@ -34,6 +35,9 @@ Plugin 'honza/vim-snippets'
 Plugin 'alisdair/vim-armasm'
 Plugin 'fatih/vim-go'
 
+" Whitespace
+Plugin 'ntpeters/vim-better-whitespace'
+
 " Colorscheme
 Plugin 'altercation/vim-colors-solarized'
 
@@ -43,6 +47,10 @@ Bundle 'scrooloose/syntastic'
 " File exploring
 Bundle 'scrooloose/nerdtree'
 Bundle 'jistr/vim-nerdtree-tabs'
+
+" Writing style
+Bundle 'reedes/vim-wordy'
+Bundle 'dbmrq/vim-ditto'
 
 
 if filereadable(expand("~/.config/nvim/webdev.vim"))

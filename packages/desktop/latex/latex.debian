@@ -10,9 +10,7 @@
 #           gVim               #
 # ##############################
 
-echo "Installing gVim"
-sudo apt-get remove -y vim
-sudo apt-get install -y vim-gtk
+echo "Be sure you have installed NeoVim"
 
    
 # ##############################
@@ -20,7 +18,11 @@ sudo apt-get install -y vim-gtk
 # ##############################
 
 echo "Installing LaTeX"
-sudo apt-get install -y texlive
+sudo apt-get install -y texlive-full
+
+sudo apt-get install -y python3-pip # for neovim-remote
+# Vimtex needs --remote in vim, so this puts it back for neovim
+pip3 install --user neovim-remote
 
 
 # ##############################
