@@ -4,7 +4,7 @@
 # Create a new directory and enter it
 
 mk() {
-	mkdir -p "$@" && cd "$@"
+    mkdir -p "$@" && cd "$@"
 }
 
 function pdfpextr()
@@ -20,7 +20,6 @@ function pdfpextr()
          -sOutputFile=${3%.pdf}_p${1}-p${2}.pdf \
          ${3}
 }
-
 
 # Automatically calls ls after moving to new directory
 function cdls()

@@ -16,6 +16,8 @@ set smartindent                 "Smart indentation
 set smartcase                   "Smart casing
 set smarttab                    "Smart tab
 set hlsearch                    "Highlights search results
+set list                        " Show trailing whitespace with a <
+set listchars=tab:>.,trail:<
 set incsearch                   "Includes partial searches
 set showmatch                   "Shows matching braces
 set ignorecase                  "Ignores case in searches
@@ -56,6 +58,8 @@ let g:syntastic_mode_map = {
 " Jslint
 if filereadable(expand("~/.config/nvim/webdev.vim"))
     let g:syntastic_jslint_checkers=['jslint']
+    autocmd FileType vue syntax sync fromstart
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.javascript.css
 endif
 
 augroup blahblahbalh

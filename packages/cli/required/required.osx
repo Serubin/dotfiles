@@ -25,7 +25,7 @@ apps=(
     grep --default-names
     htop-osx
     perl
-    python
+    python2
     wget
 )
 

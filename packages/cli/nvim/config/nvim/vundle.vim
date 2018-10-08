@@ -33,6 +33,7 @@ Plugin 'honza/vim-snippets'
 
 " Syntax
 Plugin 'alisdair/vim-armasm'
+Plugin 'fatih/vim-go'
 
 " Whitespace
 Plugin 'ntpeters/vim-better-whitespace'

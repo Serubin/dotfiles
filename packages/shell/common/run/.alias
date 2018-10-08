@@ -9,10 +9,12 @@ alias ....="cd ../../.."
 
 # ls aliases
 if [ "$DISTRO" = "darwin" ]; then
-	alias ls="gls --color=auto"
+    alias ls="gls --color=auto"
 else
-	alias ls="ls --color=auto -N"
+    alias ls="ls --color=auto -N"
 fi
+
+[[ "$DISTRO" = "darwin" ]] && alias dircolors="gdircolors"
 
 alias la="ls -A"
 alias ll="ls -lhAr"
