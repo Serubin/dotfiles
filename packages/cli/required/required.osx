@@ -27,6 +27,7 @@ apps=(
     perl
     python2
     wget
+    atool
 )
 
 brew install ${apps[@]}
