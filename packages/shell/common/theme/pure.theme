@@ -37,15 +37,20 @@ function pre_cmd() {
     # ZSH - So simple!
     [[ "$DOTFILES_SHELL" == "zsh" ]] && print -P $preprompt_format
 
+
+    # iTerm Touch Bar
+    local iterm_message=$(git rev-parse --abbrev-ref HEAD 2> /dev/null; [[ $? -ne 0 ]] && echo "No Repo")
+    it2setkeylabel set status $iterm_message
+
     # Bash prompt
     if [[ "$DOTFILES_SHELL" == "bash" ]]; then
         # Exit status color
         prompt_color=$Purple
-        [[ $exit != 0 ]] && prompt_color=$Red 
+        [[ $exit != 0 ]] && prompt_color=$Red
 
         # Formatting for bash
         prompt_format="$prompt_color$PromptSymbol $BWhite"
-        export PS1="$preprompt_format \n$prompt_format"
+        export PS1="$preprompt_format \n$prompt_format$iterm_prompt"
     fi
 
 
