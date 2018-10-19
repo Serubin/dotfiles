@@ -63,14 +63,14 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
 endif
 
 augroup blahblahbalh
-	autocmd!
+    autocmd!
     autocmd FileType tex vnoremap <Leader>b s\textbf{<ESC>pa}<ESC>
     autocmd FileType tex vnoremap <Leader>t s\texttt{<ESC>pa}<ESC>
 augroup END
 
 augroup skip_error_buffer
-	autocmd!
-	autocmd FileType qf setlocal nobuflisted
+    autocmd!
+    autocmd FileType qf setlocal nobuflisted
 augroup END
 
 function! ToggleErrors()
@@ -107,8 +107,8 @@ let g:better_whitespace_enabled=1
 let g:strip_whitespace_on_save=1
 
 augroup spell_check
-	autocmd!
-	autocmd FileType no ft setlocal spell spelllang-en_us
+    autocmd!
+    autocmd FileType no ft setlocal spell spelllang-en_us
 augroup END
 
 if filereadable(expand("~/.config/nvim/python.vim"))
