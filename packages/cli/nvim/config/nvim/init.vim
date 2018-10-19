@@ -31,6 +31,9 @@ set wildmode=longest:full,full
 "Tabs to spaces
 set tabstop=4 shiftwidth=4 expandtab
 
+" Set yaml to 2 spaces
+au FileType yaml setl sw=2 sts=2 et
+
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 " netrw
 let g:netrw_liststyle=3         "List styles for file explorer
@@ -95,6 +98,7 @@ noremap <Leader><tab> :NERDTreeTabsToggle<CR>
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
+noremap <Leader>q :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 map j gj
