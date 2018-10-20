@@ -34,6 +34,7 @@ Plugin 'honza/vim-snippets'
 " Syntax
 Plugin 'alisdair/vim-armasm'
 Plugin 'fatih/vim-go'
+Bundle 'nfnty/vim-nftables'
 
 " Whitespace
 Plugin 'ntpeters/vim-better-whitespace'
