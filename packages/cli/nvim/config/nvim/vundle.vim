@@ -20,10 +20,12 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Generic
 Bundle "itchyny/lightline.vim"
+Plugin 'mengelbrecht/lightline-bufferline'
 Bundle "tpope/vim-fugitive"
 Bundle "tpope/vim-abolish"
 Plugin 'unblevable/quick-scope'
 Plugin 'salsifis/vim-transpose'
+Plugin 'airblade/vim-gitgutter'
 
 " Completion & snippets
 Plugin 'Valloric/YouCompleteMe'

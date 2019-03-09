@@ -61,5 +61,7 @@ fi
 
 cd -
 
+cp "${PACKAGE_INSTALL}/config/nvim/powerline.vim" "${BUNDLE_DIR}/lightline.vim/autoload/lightline/colorscheme/"
+
 # Removing variables
 unset BUNDLE_DIR

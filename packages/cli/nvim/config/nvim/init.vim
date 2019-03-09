@@ -164,6 +164,7 @@ let g:lightline = {
       \              [ 'percent' ],
       \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
+      \ 'tabline': {'left': [['buffers']]},
       \ 'component_function': {
       \   'modified': 'LightlineModified',
       \   'readonly': 'LightlineReadonly',
@@ -175,9 +176,19 @@ let g:lightline = {
       \   'mode': 'LightlineMode',
       \   'syntasticstatus': 'SyntasticStatuslineFlag',
       \ },
+      \ 'component_expand': {
+      \   'buffers': 'lightline#bufferline#buffers',
+      \ },
+      \ 'component_type': {
+      \   'buffers': 'tabsel',
+      \ },
       \ 'separator': { 'left': '', 'right': '' },
       \ 'subseparator': { 'left': '', 'right': '' }
       \ }
+
+let g:lightline#bufferline#show_number = 1
+let g:lightline#bufferline#filename_modifier = ':t'
+set showtabline=2
 
 function! LightlineModified()
   return &ft =~ 'help\|vimfiler\|gundo\|NERD' ? '' : &modified ? '+' : &modifiable ? '' : '-'
