@@ -16,8 +16,8 @@ set smartindent                 "Smart indentation
 set smartcase                   "Smart casing
 set smarttab                    "Smart tab
 set hlsearch                    "Highlights search results
-set list                        " Show trailing whitespace with a <
-set listchars=tab:>.,trail:<
+set list                        "Show trailing whitespace with a <
+set listchars=tab:>.,trail:<    "Set trailing listchars
 set incsearch                   "Includes partial searches
 set showmatch                   "Shows matching braces
 set ignorecase                  "Ignores case in searches
@@ -33,6 +33,14 @@ set tabstop=4 shiftwidth=4 expandtab
 
 " Set yaml to 2 spaces
 au FileType yaml setl sw=2 sts=2 et
+
+" Go
+au FileType go set noexpandtab
+au FileType go set shiftwidth=4
+au FileType go set softtabstop=4
+au FileType go set tabstop=4
+autocmd BufNewFile,BufRead *.go set listchars& " Unset listchars
+autocmd BufNewFile,BufRead *.go set list! " Unset listchars
 
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
 " netrw
