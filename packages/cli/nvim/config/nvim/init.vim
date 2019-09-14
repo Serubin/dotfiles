@@ -107,7 +107,8 @@ noremap <Leader><tab> :NERDTreeTabsToggle<CR>
 noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
-noremap <Leader>q :hide<CR>
+nnoremap <silent> <Leader>q :bp\|bd #<CR>
+noremap <Leader>w :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 
 map j gj
