@@ -72,8 +72,9 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
 
     " Various libraries
     Plugin 'posva/vim-vue'
-    Plugin 'leafgarland/typescript-vim'
+    Plugin 'HerringtonDarkholme/yats.vim'
     Plugin 'mxw/vim-jsx'
+    Plugin 'maxmellon/vim-jsx-pretty'
 
 endif
 
