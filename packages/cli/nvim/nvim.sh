@@ -32,6 +32,7 @@ ln -sfv "${PACKAGE_INSTALL}/config/nvim/vundle.vim" ~/.config/nvim/
 ln -sfv "${PACKAGE_INSTALL}/config/nvim/init.vim" ~/.config/nvim/
 
 cp "${PACKAGE_INSTALL}/config/nvim/python.vim" ~/.config/nvim/
+cp "${PACKAGE_INSTALL}/config/nvim/custom.vim" ~/.config/nvim/
 
 if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
     python2_path=`which python`

@@ -299,3 +299,8 @@ autocmd ColorScheme * call <SID>SetHighlightings()
 " Spell check
 autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us
 
+" Load Custom
+if filereadable(expand("~/.config/nvim/custom.vim"))
+  source ~/.config/nvim/custom.vim
+endif
+
