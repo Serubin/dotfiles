@@ -65,14 +65,6 @@ let g:ale_set_highlights = 1
 highlight ALEError ctermbg=234
 highlight ALEWarning ctermbg=234
 
-if filereadable(expand("~/.config/nvim/webdev.vim"))
-    let g:vue_disable_pre_processors=1
-    autocmd FileType vue syntax sync fromstart
-    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css.less.pug
-    autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
-    autocmd FileType *.tsx,*.jsx setlocal shiftwidth=2 softtabstop=2 expandtab
-endif
-
 augroup blahblahbalh
     autocmd!
     autocmd FileType tex vnoremap <Leader>b s\textbf{<ESC>pa}<ESC>
@@ -136,6 +128,17 @@ endif
 if filereadable(expand("~/.config/nvim/pass.vim"))
   source ~/.config/nvim/pass.vim
 endif
+
+" WebDev Stuff
+if filereadable(expand("~/.config/nvim/webdev.vim"))
+    let g:vue_disable_pre_processors=1
+    autocmd FileType vue syntax sync fromstart
+    autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css.less.pug
+    autocmd BufRead,BufNewFile *.js,*.ts,*.tsx,*.jsx set filetype=typescript.tsx
+    autocmd FileType *.tsx,*.jsx setlocal shiftwidth=2 softtabstop=2 expandtab
+endif
+
+
 " better key bindings for UltiSnipsExpandTrigger
 let g:UltiSnipsExpandTrigger = "<C-j>"
 let g:UltiSnipsJumpForwardTrigger = "<C-j>"
