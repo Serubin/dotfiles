@@ -56,19 +56,16 @@ let NERDTreeShowHidden=1
 let NERDTreeSortOrder=['[\/]$', '*']
 let NERDTreeIgnore=['.*\.swp$', '.*\.swo$', '.*\.pyc$']
 
-" Syntastic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_mode_map = {
-    \ "mode": "active",
-    \ "active_filetypes": [],
-    \ "passive_filetypes": ["tex"] }
+" Syntax Checking
+let b:ale_linters = {'javascript': ['eslint']}
+let g:ale_lint_on_insert_leave = 1
+nnoremap <leader>d :ALEGoToDefinition<cr>
+" Remove underlines in favor of gutter inidcations
+let g:ale_set_highlights = 1
+highlight ALEError ctermbg=234
+highlight ALEWarning ctermbg=234
 
-" Jslint
 if filereadable(expand("~/.config/nvim/webdev.vim"))
-    let g:syntastic_jslint_checkers=['jslint']
     let g:vue_disable_pre_processors=1
     autocmd FileType vue syntax sync fromstart
     autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css.less.pug

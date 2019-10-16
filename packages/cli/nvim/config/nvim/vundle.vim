@@ -45,7 +45,7 @@ Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'altercation/vim-colors-solarized'
 
 " Linting
-Bundle 'scrooloose/syntastic'
+Plugin 'dense-analysis/ale'
 
 " File exploring
 Bundle 'scrooloose/nerdtree'
