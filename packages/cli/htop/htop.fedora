@@ -5,6 +5,6 @@
 # Top for humans
 ########################################
 
-sudo dnf install htop -y 
+sudo dnf install htop -y
 
 ln -sfv "${PACKAGE_INSTALL}/config/htoprc" ~/.config/htop/

@@ -5,5 +5,5 @@
 # Top for bash shell
 ########################################
 
-sudo dnf install bash -y 
+sudo dnf install bash -y
 

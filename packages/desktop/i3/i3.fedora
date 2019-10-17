@@ -11,4 +11,4 @@ sudo dnf install i3 i3lock scrot libxcb-devel xcb-util-keysyms-devel xcb-util-de
 
 echo "Installing xfce terminal"
 sudo dnf install xfce4-terminal -y
- 
+

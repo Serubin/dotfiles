@@ -26,6 +26,6 @@ fi
 
 echo ${PACKAGE_INSTALL}
 
-if [[ `getInputBoolean "Set as default shell?"` == "1" ]]; then 
+if [[ `getInputBoolean "Set as default shell?"` == "1" ]]; then
     chsh -s /bin/zsh
 fi

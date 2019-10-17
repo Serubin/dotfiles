@@ -5,4 +5,4 @@
 # Version Control
 ########################################
 
-sudo pacman -S --noconfirm --needed git 
+sudo pacman -S --noconfirm --needed git

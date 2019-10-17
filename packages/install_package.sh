@@ -8,7 +8,7 @@
 
 unset PACKAGE_INSTALL package_support package_supported packages_length packages
 
-declare -a packages # Package 
+declare -a packages # Package
 packages_length=0 # package length
 
 registerPackage() {
@@ -64,7 +64,7 @@ installPackage() {
         OLDIFS="$IFS"
 
         # Split
-        IFS=_ arr=($raw_name) 
+        IFS=_ arr=($raw_name)
         install_confirm=${arr[2]}
         NAME=${arr[1]}
         TYPE=${arr[0]}
@@ -93,7 +93,7 @@ installPackage() {
 
         package_supported=`echo $package_support | grep -o $DISTRO`
 
-        if [ "$package_supported" != "$DISTRO" ]; then 
+        if [ "$package_supported" != "$DISTRO" ]; then
             echo "${NAME} cannot be installed on ${DISTRO}."
             continue
         fi

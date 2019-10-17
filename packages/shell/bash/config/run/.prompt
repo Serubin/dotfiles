@@ -70,8 +70,8 @@ function git_stat() {
 export PROMPT_DIRTRIM=3
 
 function prompt_precmd() {
-    
-    
+
+
     pre_cmd
 
     #print -Pn "\e]0;$Title\a"

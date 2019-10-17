@@ -86,12 +86,12 @@ sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
 
 # Source install functions
 source ${DOTFILES_DIR}/util/inputFunc.sh
-source ${DOTFILES_DIR}/packages/install_package.sh 
+source ${DOTFILES_DIR}/packages/install_package.sh
 
 # Get *nix distro
 source ${DOTFILES_DIR}/util/detectos.sh
 
-# Update dotfiles itself first - 
+# Update dotfiles itself first -
 echo "Fetching latest from git:"
 [ -d "${DOTFILES_DIR}/.git" ] && git --work-tree="${DOTFILES_DIR}" --git-dir="${DOTFILES_DIR}/.git" pull --recurse-submodules=yes origin master && git submodule init && git submodule update
 

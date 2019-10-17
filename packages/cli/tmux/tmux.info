@@ -15,7 +15,7 @@ PRE_INSTALL_OPTIONS() {
         if [[ "$as_shell" == "1" ]]; then # Add as shell
             sed -i -e "s/TMUX_AS_SHELL=\".\" # Use tmux as shell/TMUX_AS_SHELL=\"1\" # Use tmux as shell/g" ${HOME}/.dotfiles.info
         fi
-    else # Remove 
+    else # Remove
         if [[ "$as_shell" != "1" ]]; then # Remove as shell
             sed -i -e "s/TMUX_AS_SHELL=\".\" # Use tmux as shell/TMUX_AS_SHELL=\"0\" # Use tmux as shell/g" ${HOME}/.dotfiles.info
         fi

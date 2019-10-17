@@ -5,5 +5,5 @@
 # Z Shell
 ########################################
 
-sudo dnf install zsh -y 
+sudo dnf install zsh -y
 
