@@ -43,13 +43,6 @@ autocmd BufNewFile,BufRead *.go set listchars& " Unset listchars
 autocmd BufNewFile,BufRead *.go set list! " Unset listchars
 
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
-" netrw
-let g:netrw_liststyle=3         "List styles for file explorer
-let g:netrw_altv=1
-let g:netrw_preview=1
-let g:netrw_sort_sequence='[\/]$,*' " sort is affecting only: directories on the top, files below
-let g:netrw_list_hide='.*\.swp$'
-let g:netrw_use_noswf=0
 
 " nerdtree
 let NERDTreeShowHidden=1
