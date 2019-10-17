@@ -88,7 +88,6 @@ nnoremap <leader>c :noh<cr>
 nnoremap <tab> :bnext<cr>           " Tab to next buffer
 nnoremap <s-tab> :bprevious<cr>     " Shift-tab to previous buffer
 noremap <Leader><tab> :NERDTreeTabsToggle<CR>
-noremap <Leader>` :call VexToggle("")<CR>
 noremap <Leader>i :exe "normal i".nr2char(getchar())<CR>
 nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
 nnoremap <silent> <Leader>q :bp\|bd #<CR>
@@ -164,7 +163,7 @@ let g:lightline = {
       \ 'mode_map': { 'c': 'NORMAL' },
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ],
-      \   'right': [ [ 'lineinfo', 'syntasticstatus' ],
+      \   'right': [ [ 'lineinfo', 'syntaxstatus' ],
       \              [ 'percent' ],
       \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
@@ -178,7 +177,7 @@ let g:lightline = {
       \   'filetype': 'LightlineFiletype',
       \   'fileencoding': 'LightlineFileencoding',
       \   'mode': 'LightlineMode',
-      \   'syntasticstatus': 'LinterStatus',
+      \   'syntaxstatus': 'LinterStatus',
       \ },
       \ 'component_expand': {
       \   'buffers': 'lightline#bufferline#buffers',

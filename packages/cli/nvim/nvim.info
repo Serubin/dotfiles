@@ -6,7 +6,7 @@
 
 export package_support="debian ubuntu darwin arch fedora"
 
-echo "NeoVim: An better extensive text editor"
+echo "NeoVim: A better extensive text editor"
 
 PRE_INSTALL_OPTIONS() {
     web_dev=`getInputBoolean "Do you want to install WebDev nvim plugins?"`
