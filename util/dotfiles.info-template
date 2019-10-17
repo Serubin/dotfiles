@@ -14,7 +14,6 @@ git_email="%git-email%"
 TMUX_AS_SHELL="" # Use tmux as shell
 
 # "Secret" Settings
-PROMPT_POWERLINE="" # Pretty powerline prompt
 PROMPT_UCFUSER="" # Uppercase first letter of username
 
 #Theme Path

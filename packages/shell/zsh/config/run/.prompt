@@ -3,11 +3,6 @@
 # original git bash prompt by Mike Stewart - http://MediaDoneRight.com
 # color constants
 
-if [[ $PROMPT_POWERLINE != "" ]]; then # TODO. Move to theme
-    source $DOTFILES_DIR/common/powerline-shell.zsh
-    return;
-fi
-
 # Reset
 Color_Off="%b%f"       # Text Reset
 
