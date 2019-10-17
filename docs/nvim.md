@@ -15,7 +15,7 @@ This configuration supports a lot of advanced features to enable vim as an IDE.
 Features supported:
 * **Leader is configured to `<space>`**
 * Will display trailing white space
-  * Will also ask to remote unnecessary whitespace
+  * Will also ask to remove unnecessary whitespace
 * Buffers
   * `<leader>q` - Close buffer without destroying pane
   * `<leader>w` - Close pane without destroying buffer
@@ -36,17 +36,17 @@ Features supported:
   * Upper lightline
     * Open buffers
 * Nerdtree file browser
-  * Open with `<leader>tab`
+  * `<leader>tab` to open
   * Standard Nerdtree use applies, will ignore swap and cache files
 * UtilSnips - Jump to letter
-  * Jump forward - `f`
-  * Jump back - `<shift>f`
+  * `f` - Jump forward
+  * `<shift>f` - Jump back
 * Buffers
-  * Next buffer - `tab`
-  * Previous buffer - `<shift>tab`
+  * `tab` - Next buffer
+  * `<shift>tab` - Previous buffer
 * Syntax & Linting with ALE
   * This will load automatically on open, save, and insert-exit
-  * Jump-to-definition is supported with `<space>d` when a LSP linter is present
+  * `<space>d` - Jump-to-definition is supported when a LSP linter is present
   * Errors/Warnings are shown at the bottom left of lightline
 * CtrlP - Fuzzy Search, Ctags
   * Expects tags to be stored in .git/tags (so it's hidden)
