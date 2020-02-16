@@ -88,8 +88,9 @@ if filereadable(expand("~/.config/nvim/ftplugin/vhdl.vim"))
     Plugin 'JPR75/VIP' " Copy/paste entity/component/instance
 endif
 
-" Tags
-Plugin 'ctrlpvim/ctrlp.vim'
+" Tags/Fuzzy Find
+Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/fzf', { 'dir': '~/config/nvim/bundle/.fzf', 'do': './install --all' }
 
 call vundle#end()
 

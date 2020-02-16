@@ -7,7 +7,7 @@
 
 
 # vim
-brew install python python3
+brew install python python3 the_silver_searcher
 
 sudo easy_install pip
 
@@ -16,5 +16,5 @@ sudo pip uninstall -y neovim
 brew tap neovim/neovim
 brew install neovim
 
-sudo pip install neovim
+sudo pip3 install neovim
 
