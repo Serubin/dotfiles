@@ -44,6 +44,9 @@ sed -i -e 's#%python-path%#'${python2_path}'#g' ~/.config/nvim/python.vim
 
 BUNDLE_DIR=${HOME}/.config/nvim/bundle
 
+# Install fzf
+git clone --depth 1 https://github.com/junegunn/fzf.git ${BUNDLE_DIR}/.fzf
+
 # Install/update Vundle
 mkdir -p "${BUNDLE_DIR}" && (git clone https://github.com/VundleVim/Vundle.vim.git "${BUNDLE_DIR}/vundle" || (cd "${BUNDLE_DIR}/vundle" && git pull origin master))
 
@@ -55,9 +58,9 @@ echo "Compiling ycm"
 cd "${BUNDLE_DIR}/YouCompleteMe"
 
 if [ "$DISTRO" == "Arch" ]; then # work around for arch, because smart python linking.
-    /usr/bin/env python2 install.py --clang-completer --system-libclang
+    /usr/bin/env python install.py --clang-completer --system-libclang
 else
-    /usr/bin/env python2 install.py
+    /usr/bin/env python3 install.py
 fi
 
 cd -

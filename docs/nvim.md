@@ -48,8 +48,9 @@ Features supported:
   * This will load automatically on open, save, and insert-exit
   * `<space>d` - Jump-to-definition is supported when a LSP linter is present
   * Errors/Warnings are shown at the bottom left of lightline
-* CtrlP - Fuzzy Search, Ctags
-  * Expects tags to be stored in .git/tags (so it's hidden)
+* Fzf + Ag - Fuzzy Search
+  * <C-p> Opens fuzzy file search
+  * <S-p> Opens fuzzy content search
   * `<leader>p` for fuzzy buffer search
 
 ## Extras

@@ -92,6 +92,8 @@ nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
 nnoremap <silent> <Leader>q :bp\|bd #<CR>
 noremap <Leader>w :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
+nnoremap <C-p> :Files<cr>
+nnoremap <S-p> :Ag<cr>
 
 map j gj
 map k gk

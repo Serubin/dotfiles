@@ -6,6 +6,6 @@
 ########################################
 
 sudo dnf -y copr enable dperson/neovim
-sudo dnf -y install automake gcc gcc-c++ kernel-devel cmake python-devel python3-devel
+sudo dnf -y install automake gcc gcc-c++ kernel-devel cmake python-devel python3-devel the_silver_searcher
 
 yes | sudo pip install neovim
