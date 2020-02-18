@@ -92,7 +92,7 @@ nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
 nnoremap <silent> <Leader>q :bp\|bd #<CR>
 noremap <Leader>w :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
-nnoremap <C-p> :Files<cr>
+nnoremap <C-p> :GFiles --cached --others --exclude-standard<cr>
 nnoremap <S-p> :Ag<cr>
 
 map j gj
@@ -154,6 +154,26 @@ if has('persistent_undo')
   set undodir=~/.config/nvim/undo
   set undofile
 endif
+
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
 
 " lightline
 set laststatus=2 " no display fix
