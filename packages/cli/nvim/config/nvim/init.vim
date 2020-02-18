@@ -92,8 +92,8 @@ nnoremap <silent> <C-e> :<C-u>call ToggleErrors()<CR>
 nnoremap <silent> <Leader>q :bp\|bd #<CR>
 noremap <Leader>w :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
-nnoremap <C-p> :GFiles --cached --others --exclude-standard<cr>
-nnoremap <S-p> :Ag<cr>
+nnoremap <silent> <C-p> :GFiles --cached --others --exclude-standard<cr>
+nnoremap <silent> <S-p> :Ag<cr>
 
 map j gj
 map k gk
