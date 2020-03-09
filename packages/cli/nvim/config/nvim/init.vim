@@ -93,7 +93,7 @@ nnoremap <silent> <Leader>q :bp\|bd #<CR>
 noremap <Leader>w :hide<CR>
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
 nnoremap <silent> <C-p> :GFiles --cached --others --exclude-standard<cr>
-nnoremap <silent> <S-p> :Ag<cr>
+nnoremap <Leader>p :Ag<cr>
 
 map j gj
 map k gk

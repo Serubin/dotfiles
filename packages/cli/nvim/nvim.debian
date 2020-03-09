@@ -10,11 +10,11 @@ sudo apt-get -y install build-essential libtool libtool-bin autoconf automake cm
 
 curl https://bootstrap.pypa.io/get-pip.py | sudo python
 
-sudo pip uninstall -y neovim
+sudo pip uninstall -y pynvim
 
 source $PACKAGE_INSTALL/nvim.build.sh
 
-yes | sudo pip install neovim
+yes | sudo pip install pynvim
 
 sudo update-alternatives --install /usr/bin/vi vi `which nvim` 60
 sudo update-alternatives --config vi
