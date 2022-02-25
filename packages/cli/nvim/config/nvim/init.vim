@@ -29,7 +29,7 @@ set mouse=""                    "Turns off mouse interaction
 set inccommand=nosplit          "In place substitution preview
 set wildmode=longest:full,full
 "Tabs to spaces
-set tabstop=4 shiftwidth=4 expandtab
+set tabstop=2 shiftwidth=2 expandtab
 
 " Set yaml to 2 spaces
 au FileType yaml setl sw=2 sts=2 et
