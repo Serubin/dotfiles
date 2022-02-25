@@ -71,7 +71,7 @@ if filereadable(expand("~/.config/nvim/webdev.vim"))
     Plugin 'cakebaker/scss-syntax.vim'
 
     " Various libraries
-    Plugin 'posva/vim-vue'
+    Plugin 'leafOfTree/vim-vue-plugin'
     Plugin 'HerringtonDarkholme/yats.vim'
     Plugin 'mxw/vim-jsx'
 
