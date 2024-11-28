@@ -1,4 +1,6 @@
 # Serubin's DotFiles
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSerubin%2Fdotfiles.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSerubin%2Fdotfiles?ref=badge_shield)
+
 
 The purpose of this dotfiles configuration is to create a lightweight and easy to understand configuration. This was largely created as a multi-platform alternative to OhMyZsh. Personally - I found OhMyZsh to be very overwhelming and more focused on using other's configuration than customizing things to be my own. Thus, I created a framework that allows for two things: Easy management of dotfiles and a simple configuration that anyone could fork and modify to their liking.
 
@@ -91,3 +93,7 @@ Settings in `~/.dotfiles.info`
 +-- util/
 ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSerubin%2Fdotfiles.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSerubin%2Fdotfiles?ref=badge_large)
