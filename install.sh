@@ -1,10 +1,12 @@
 #!/bin/bash
 
+source ./zsh/.zsh/01-os
+
 bash ./setup/$DISTRO
 
 stowOptions="-t $HOME --ignore setup -R"
 
-tools=("git")
+tools=("git", "zsh")
 
 for tool in "${tools[@]}"; do
     echo " ==== Setting up $tool ==== "

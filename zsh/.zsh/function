@@ -1,0 +1,19 @@
+# Helpful functions
+#
+
+# Create a new directory and enter it
+
+mk() {
+    mkdir -p "$@" && cd "$@"
+}
+
+
+# Automatically calls ls after moving to new directory
+function cdls()
+{
+  if [ $# -eq 0 ]; then # if no arguments
+    \cd && ls
+  else # if arguments
+    \cd "$@" && ls
+  fi
+}
