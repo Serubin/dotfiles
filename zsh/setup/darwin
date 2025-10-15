@@ -1,2 +1,2 @@
-brew install zsh
+brew install zsh atool
 brew install zsh-syntax-highlighting

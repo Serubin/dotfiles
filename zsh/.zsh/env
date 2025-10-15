@@ -1,0 +1,163 @@
+#!/bin/zsh
+# Zsh Env set up
+#
+
+# Fix Comp Audit from returning false
+compaudit () {
+    return 0
+}
+
+# Local fpath
+export fpath=($HOME/.zsh/fpath $fpath)
+
+# Completion
+
+zstyle ':completion:*' _expand _complete _ignored
+
+# Matching priorities
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'l:|=* r:|=*'
+
+# Max errors to correct
+zstyle ':completion:*:approximate:::' max-errors 2 numeric
+
+# Group results by category
+zstyle ':completion:*' group-name ''
+
+# Keep directories and files separated
+zstyle ':completion:*' list-dirs-first true
+
+# Don't try parent path completion if the directories exist
+zstyle ':completion:*' accept-exact-dirs true
+
+# Interactive menu select
+zstyle ':completion:*' menu select
+
+# Pretty messages during pagination
+zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+
+# Nicer format for completion messages
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:corrections' format '%U%F{green}%d (errors: %e)%f%u'
+zstyle ':completion:*:warnings' format '%F{202}%BSorry, no matches for: %F{214}%d%b'
+
+# Use ls-colors for path completions
+function _set-list-colors() {
+    zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+    unfunction _set-list-colors
+}
+sched 0 _set-list-colors  # deferred since LC_COLORS might not be available yet
+
+zstyle :compinstall filename "${HOME}/.zshrc"
+
+autoload -Uz compinit zkbd
+compinit
+
+
+## Key correction
+#[[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
+#source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
+#
+#[[ -n ${key[Backspace]} ]] && bindkey "${key[Backspace]}" backward-delete-char
+#[[ -n ${key[Insert]} ]] && bindkey "${key[Insert]}" overwrite-mode
+#[[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
+#[[ -n ${key[PageUp]} ]] && bindkey "${key[PageUp]}" up-line-or-history
+#[[ -n ${key[Delete]} ]] && bindkey "${key[Delete]}" delete-char
+#[[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
+#[[ -n ${key[PageDown]} ]] && bindkey "${key[PageDown]}" down-line-or-history
+#[[ -n ${key[Up]} ]] && bindkey "${key[Up]}" up-line-or-search
+#[[ -n ${key[Left]} ]] && bindkey "${key[Left]}" backward-char
+#[[ -n ${key[Down]} ]] && bindkey "${key[Down]}" down-line-or-search
+#[[ -n ${key[Right]} ]] && bindkey "${key[Right]}" forward-char
+
+bindkey -e
+
+bindkey "\e[1~" beginning-of-line
+bindkey "\e[4~" end-of-line
+bindkey "\e[5~" beginning-of-history
+bindkey "\e[6~" end-of-history
+bindkey "\e[3~" delete-char
+bindkey "\e[2~" quoted-insert
+bindkey "\e[1;5C" forward-word
+bindkey "\e[1;5C" vi-forward-word
+bindkey "\eOc" emacs-forward-word
+bindkey "\e[1;5D" backward-word
+bindkey "\e[1;5D" vi-backward-word
+bindkey "\eOd" emacs-backward-word
+bindkey "\e\e[C" forward-word
+bindkey "\e\e[D" backward-word
+bindkey "\e[3;5~" delete-word
+bindkey "\e[8~" end-of-line
+bindkey "\e[7~" beginning-of-line
+bindkey "\eOH" beginning-of-line
+bindkey "\eOF" end-of-line
+bindkey "\e[H" beginning-of-line
+bindkey "\e[F" end-of-line
+
+# Case-sensitive globbing (used in pathname expansion)
+
+setopt case_glob
+setopt glob_dots
+
+# Append to the Bash history file, rather than overwriting it
+
+setopt append_history
+setopt share_history
+
+# Ensure the command is correct before exectuting
+
+setopt hist_verify
+
+# Avoid duplicates
+
+setopt hist_ignore_all_dups
+
+# Don't store commands starting with a space
+
+setopt hist_ignore_space
+
+# beep
+
+setopt beep notify
+
+# Interactive comments (allow comments in interactive shell)
+
+setopt interactivecomments
+
+# key bindings
+
+HISTFILE=~/.config/.histfile
+
+# Large history
+HISTSIZE=100000
+SAVEHIST=100000
+
+# Track history between virtual terms.
+# Save each command to history and reload file.
+
+#export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
+# misc: color and vim
+
+export CLICOLOR=1 # for ls colors
+export EDITOR=nvim # vim vim vim
+export VISUAL=nvim # vim vim vim
+
+# fixes for osx
+
+if [[ $DISTRO == "darwin" ]]; then
+    export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+    export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+fi
+
+
+# If not in tmux or screen, set TERM to xterm-256color so colors are pretty.
+
+if [[ $TMUX != "" || $STY != "" ]]; then
+    export TERM="screen-256color"
+else
+    export TERM="xterm-256color"
+fi
+
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
