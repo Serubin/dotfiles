@@ -1,1 +1,4 @@
+#!/bin/bash
+## Debian setup
+
 apt-get install -y zsh atool zsh-syntax-highlighting

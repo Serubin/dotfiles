@@ -1,3 +1,12 @@
+#!/bin/bash
+## Common setup
+# TODO @Solomon: Do we want to target specific revisions? Use gitsubmodules (annoying)? Or something else to prevent auto updates?
+
+# zsh-autosuggestions
 curl -L https://raw.githubusercontent.com/zsh-users/zsh-autosuggestions/refs/heads/master/zsh-autosuggestions.zsh > .zsh/includes/zsh-autosuggestions.zsh
+
+# zsh-jump-target
 curl -L https://raw.githubusercontent.com/scfrazer/zsh-jump-target/refs/heads/master/functions/jump-target > .zsh/fpath/jump-target
+
+# dircolors
 curl -L https://raw.githubusercontent.com/seebi/dircolors-solarized/refs/heads/master/dircolors.256dark > .zsh/dircolors/dircolors.256dark

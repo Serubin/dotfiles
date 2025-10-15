@@ -1,2 +1,5 @@
+#!/bin/bash
+## Darwin setup
+
 brew install zsh atool
 brew install zsh-syntax-highlighting
