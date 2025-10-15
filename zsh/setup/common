@@ -1,2 +1,2 @@
 curl -L https://raw.githubusercontent.com/zsh-users/zsh-autosuggestions/refs/heads/master/zsh-autosuggestions.zsh > .zsh/includes/zsh-autosuggestions.zsh
-curl -L https://raw.githubusercontent.com/scfrazer/zsh-jump-target/refs/heads/master/functions/jump-target > .zsh/includes/jump-target.zsh
+curl -L https://raw.githubusercontent.com/scfrazer/zsh-jump-target/refs/heads/master/functions/jump-target > .zsh/fpath/jump-target
