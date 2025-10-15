@@ -1,13 +1,13 @@
 [[ $- != *i* ]] && return
 
-for rc in ~/.zsh/includes/*; do
+for rc in $HOME/.zsh/includes/*; do
     source $rc
 done
 
-for rc in ~/.zsh/*; do
+for rc in $HOME/.zsh/*; do
     source $rc
 done
 
-if [ -r ~/.custom ]; then
-    source ~/.custom;
+if [ -r $HOME/.custom ]; then
+    source $HOME/.custom;
 fi
