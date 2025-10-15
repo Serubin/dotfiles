@@ -1,0 +1,29 @@
+[user]
+	name = Solomon 
+	email = serubin@serubin.net
+	signingkey = DF86054D5A3F9A15
+[core]
+	excludesfile = ~/.gitignore_global
+	editor = nvim
+[alias]
+	ap = add -p
+	s = status
+	ci = commit
+	co = checkout
+	contrib = shortlog --summary --numbered
+	br = branch
+	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	lg = log -p
+	ll = log --pretty=oneline --graph --abbrev-commit
+  lm = log --pretty=format:'* %s (%h)'
+  su = log -n 8 --author='Solomon' --oneline
+  reorder = "!GIT_SEQUENCE_EDITOR=\"sed -i -n 'h;1n;2p;g;p'\" git rebase -i HEAD~2"
+[push]
+	default = simple
+[diff]
+[merge]
+	tool = opendiff
+[help]
+	autocorrect = 1
+[commit]
+	gpgsign = true

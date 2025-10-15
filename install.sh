@@ -4,7 +4,7 @@ bash ./setup/$DISTRO
 
 stowOptions="-t $HOME --ignore setup -R"
 
-tools=()
+tools=("git")
 
 for tool in "${tools[@]}"; do
     echo " ==== Setting up $tool ==== "
