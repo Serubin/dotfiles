@@ -1,0 +1,8 @@
+
+if [[ "$DISTRO" == "darwin" ]]; then
+    highlight_path="$(brew --prefix)/share/zsh-syntax-highlighting"
+else
+    highlight_path="/usr/share/zsh-syntax-highlighting"
+fi
+
+source $highlight_path/zsh-syntax-highlighting.zsh

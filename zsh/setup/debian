@@ -1,3 +1,1 @@
 apt-get install -y zsh atool zsh-syntax-highlighting
-
-#cp /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh .zsh/zsh-syntax-highlighting.zsh 
