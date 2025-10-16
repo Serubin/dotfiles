@@ -1,3 +1,4 @@
 #!/bin/bash
 ## Darwin setup
-brew install git
+
+brew install tmux
