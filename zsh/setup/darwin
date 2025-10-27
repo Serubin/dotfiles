@@ -2,4 +2,5 @@
 ## Darwin setup
 
 brew install zsh atool
-brew install zsh-syntax-highlighting
+brew install antigen
+# brew install zsh-syntax-highlighting

@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+export ADOTDIR=$HOME/.zsh/antigen
+if [[ "$DISTRO" == "darwin" ]]; then
+    source $HOMEBREW_PREFIX/share/antigen/antigen.zsh
+else
+    source /usr/share/zsh-antigen/antigen.zsh
+fi
+
+antigen init $ADOTDIR
+
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle scfrazer/zsh-jump-target --branch=master
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle seebi/dircolors-solarized --branch=master
+
+antigen apply
+
+if [[ "$1" == "update" ]]; then
+    antigen update
+fi
