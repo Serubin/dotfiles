@@ -2,7 +2,8 @@
 
 ## Script options
 stowOptions="-t $HOME --ignore setup -R -v"
-tools=("git" "zsh" "tmux")
+tools=("git" "zsh" "tmux" "nvim")
+configTools=("nvim")
 
 ## Check for flags
 # Check for '-v' flag
@@ -28,7 +29,11 @@ sudo HOME=$HOME bash ./setup/$DISTRO > $redirect 2>&1
 for tool in "${tools[@]}"; do
     echo " ==== Setting up $tool ==== "
     echo -n "Stowing $tool... "
-    stow $tool $stowOptions
+
+    if [[ " ${configTools[@]} " =~ " $tool " ]]; then
+        configOption="-t $HOME/.config/"
+    fi
+    stow $tool $stowOptions $configOption
 
     cd $tool
 
