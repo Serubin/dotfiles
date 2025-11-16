@@ -2,3 +2,8 @@
 ## Common setup
 
 zsh -i -c ".zsh/02-antigen update"
+echo "Copying .custom to $HOME/.custom"
+echo "Custom file: $(dirname "$0")/.custom"
+if [ ! -f "$HOME/.custom" ]; then
+    cp "$(dirname "$0")/.custom" "$HOME/.custom"
+fi

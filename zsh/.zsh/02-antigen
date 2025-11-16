@@ -2,7 +2,7 @@
 
 export ADOTDIR=$HOME/.zsh/antigen
 if [[ "$DISTRO" == "darwin" ]]; then
-    source $HOMEBREW_PREFIX/share/antigen/antigen.zsh
+    source /opt/homebrew/share/antigen/antigen.zsh
 else
     source /usr/share/zsh-antigen/antigen.zsh
 fi
