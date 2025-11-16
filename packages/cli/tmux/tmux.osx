@@ -1,9 +1,0 @@
-#!/bin/bash
-
-########################################
-# Darwin install of tmux
-# Terminal Multiplexer
-########################################
-
-# vim
-brew install tmux

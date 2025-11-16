@@ -1,8 +1,0 @@
-#!/bin/bash
-
-########################################
-# Arch install of Tmux
-# terminal multiplexer
-########################################
-
-sudo pacman -S --noconfirm --needed tmux

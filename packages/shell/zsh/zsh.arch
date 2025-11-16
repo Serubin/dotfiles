@@ -1,9 +1,0 @@
-#/bin/bash
-
-########################################
-# Arch install of zsh
-# Z shell
-########################################
-
-sudo pacman -S --noconfirm --needed zsh
-

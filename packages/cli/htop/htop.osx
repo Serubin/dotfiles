@@ -1,8 +1,0 @@
-#/bin/bash
-
-########################################
-# Darwin install of htop
-# Top for humans
-########################################
-
-brew install htop

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-########################################
-# Debian install of zsh
-# Z Shell
-########################################
-
-sudo apt-get install -y zsh
-

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-########################################
-# Arch install of vim
-# A better Vi Improved
-########################################
-
-sudo pacman -S --noconfirm --needed neovim python2-neovim clang xsel the_silver_searcher
