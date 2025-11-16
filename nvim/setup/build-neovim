@@ -1,12 +1,26 @@
 #!/bin/bash
 ## Build neovim from source
 
-echo "Building neovim from source"
+latestNvimVersion=$(curl -sL https://api.github.com/repos/neovim/neovim/tags | grep -m1 '"name":' | sed -E 's/.*"name": *"([^"]+)".*/\1/')
+nvimVersion=$(nvim --version | head -n 1 | awk '{print $2}')
+
+echo "Latest Neovim version: $latestNvimVersion"
+echo "Current Neovim version: $nvimVersion"
+
+if [ "$latestNvimVersion" = "$nvimVersion" ]; then
+  echo "Neovim is already up to date ($nvimVersion)"
+  exit 0
+fi
+
+echo "Building Neovim from source $latestNvimVersion"
 
 sudo apt-get install -y ninja-build gettext cmake curl build-essential git
-git clone --depth 1 --branch stable https://github.com/neovim/neovim /tmp/neovim
+git clone --depth 1 --branch $latestNvimVersion https://github.com/neovim/neovim /tmp/neovim
+
 cd /tmp/neovim
+
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install
+
 cd -
 rm -rf /tmp/neovim
