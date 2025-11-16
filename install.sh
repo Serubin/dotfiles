@@ -28,7 +28,7 @@ _HOME=$HOME
 source ./zsh/.zsh/01-os
 
 echo "Setting up $DISTRO..."
-sudo HOME=$HOME bash ./setup/$DISTRO >$redirect 2>&1
+bash ./setup/$DISTRO >$redirect 2>&1
 
 function install_tool() {
   local tool=$1
@@ -53,7 +53,7 @@ function install_tool() {
 function remove_tool() {
   local tool=$1
   echo " ==== Removing $tool ==== "
-  echo -n "Removing $tool... "
+  echo -n "Removing $tool... (unstowing)"
 
   stow -D $tool $stowOptions $configOption
 
