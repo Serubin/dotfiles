@@ -18,7 +18,7 @@ export installed=""
 export installed_len+=0
 
 # process arguments
-set -- $(getopt "huli:" "$@")
+set -- $(getopt "huli:R" "$@")
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -26,6 +26,7 @@ while [ $# -gt 0 ]; do
         (-u) flag_update=1                          ;;
         (-l) flag_list=1                            ;;
         (-i) flag_install="$flag_install $2"; shift ;;
+        (-R) flag_uninstall=1              ;;
         (--) shift; break                           ;;
         (*)  break                                  ;;
     esac
@@ -39,14 +40,28 @@ if [[ ${flag_help} == "1" ]]; then
     echo "    -u                        Update all currently installed packages"
     echo "    -l                        List all currently installed packages"
     echo "    -i <package,package2>     Installs given packages"
-
+    echo "    -R                       Uninstalls all packages"
     exit
 fi
 
+# Source install functions
+source ${DOTFILES_DIR}/util/inputFunc.sh
+source ${DOTFILES_DIR}/packages/install_package.sh
+
+
+
 # Update flag
-if [[ ${flag_update} == "1" ]]; then
+if [[ ${flag_update} == "1" || ${flag_uninstall} == "1" ]]; then
     export installed=(${DOTFILES_INSTALLED})
     export installed_len=${DOTFILES_INSTALLED_LEN}
+fi
+
+if [[ ${flag_uninstall} == "1" ]]; then # if uninstall, don't prompt
+    echo "------------ Removing packages "
+    export DOTFILES_UNINSTALL=1
+
+    installPackage ${installed_len} ${installed[@]}
+    exit
 fi
 
 # List flag
@@ -83,10 +98,6 @@ fi
 
 # saves dotfile location
 sed -i -e 's#%location%#'${DOTFILES_DIR}'#g' ${HOME}/.dotfiles.info
-
-# Source install functions
-source ${DOTFILES_DIR}/util/inputFunc.sh
-source ${DOTFILES_DIR}/packages/install_package.sh
 
 # Get *nix distro
 source ${DOTFILES_DIR}/util/detectos.sh

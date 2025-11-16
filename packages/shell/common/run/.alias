@@ -38,6 +38,8 @@ alias vi="vim"
 
 # listing cd
 alias cd="cdls"
+alias cd..="cd .."
+alias cd.="cd ."
 
 alias py="python"
 

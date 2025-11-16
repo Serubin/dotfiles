@@ -74,6 +74,12 @@ installPackage() {
         # Install location
         PACKAGE_INSTALL="${DOTFILES_DIR}/packages/${TYPE}/${NAME}"
 
+        if [[ ${DOTFILES_UNINSTALL} == "1" ]]; then
+            echo "------------ ${NAME} ------------"
+            source "${PACKAGE_INSTALL}/${NAME}.uninstall.sh"
+            echo "Removed ${NAME}."
+            continue
+        fi
 
         #If user doesn't wish to install - skip
         if [[ "$install_confirm" == "0" ]]; then
@@ -121,5 +127,5 @@ installPackage() {
         fi
     done
 
-    unset PACKAGE_INSTALL package_support package_supported packages_length packages
+    unset PACKAGE_INSTALL package_support package_supported packages_length packages DOTFILES_UNINSTALL
 }
