@@ -1,4 +1,4 @@
 #!/bin/bash
 ## Debian setup
 
-apt-get install -y stow
+sudo apt-get install -y stow

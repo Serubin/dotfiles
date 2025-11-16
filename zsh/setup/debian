@@ -1,4 +1,4 @@
 #!/bin/bash
 ## Debian setup
 
-apt-get install -y zsh atool zsh-antigen
+sudo apt-get install -y zsh atool zsh-antigen
