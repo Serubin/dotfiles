@@ -1,0 +1,4 @@
+#!/bin/bash
+## Darwin setup
+
+brew install nvim

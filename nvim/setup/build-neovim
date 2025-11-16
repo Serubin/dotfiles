@@ -1,0 +1,12 @@
+#!/bin/bash
+## Build neovim from source
+
+echo "Building neovim from source"
+
+sudo apt-get install -y ninja-build gettext cmake curl build-essential git
+git clone --depth 1 --branch stable https://github.com/neovim/neovim /tmp/neovim
+cd /tmp/neovim
+make CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make install
+cd -
+rm -rf /tmp/neovim

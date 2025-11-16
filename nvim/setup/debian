@@ -1,0 +1,15 @@
+#!/bin/bash
+## Debian setup
+
+if command -v brew >/dev/null 2>&1; then
+  brew install neovim
+else
+  bash ./setup/build-neovim
+fi
+
+sudo update-alternatives --install /usr/bin/vi vi `which nvim` 60
+sudo update-alternatives --config vi
+sudo update-alternatives --install /usr/bin/vim vim `which nvim` 60
+sudo update-alternatives --config vim
+sudo update-alternatives --install /usr/bin/editor editor `which nvim` 60
+sudo update-alternatives --config editor
