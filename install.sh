@@ -13,6 +13,10 @@ for arg in "$@"; do
     verbose=true
     break
   fi
+  if [ "$arg" == "--uninstall" ]; then
+    remove=true
+    break
+  fi
 done
 
 redirect=/dev/stdout
@@ -26,7 +30,8 @@ source ./zsh/.zsh/01-os
 echo "Setting up $DISTRO..."
 sudo HOME=$HOME bash ./setup/$DISTRO >$redirect 2>&1
 
-for tool in "${tools[@]}"; do
+function install_tool() {
+  local tool=$1
   echo " ==== Setting up $tool ==== "
   echo -n "Stowing $tool... "
 
@@ -43,6 +48,29 @@ for tool in "${tools[@]}"; do
   cd $dotfilesDir
 
   echo "Done"
+}
+
+function remove_tool() {
+  local tool=$1
+  echo " ==== Removing $tool ==== "
+  echo -n "Removing $tool... "
+
+  stow -D $tool $stowOptions $configOption
+
+  echo "Done"
+}
+
+for tool in "${tools[@]}"; do
+  if [ "$remove" = true ]; then
+    remove_tool $tool
+  else
+    install_tool $tool
+  fi
 done
 
-echo "All tools installed"
+
+if [ "$remove" = true ]; then
+  echo "All tools removed"
+else
+  echo "All tools installed"
+fi
