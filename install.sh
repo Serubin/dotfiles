@@ -23,8 +23,12 @@ redirect=/dev/stdout
 [ "$verbose" = false ] && redirect=/dev/null
 
 ## Install logic
-dotfilesDir=$(pwd)
+dotfilesDir=$(pwd)/$(dirname "$0")
 _HOME=$HOME
+
+# Set current directory the dotfiles directory
+cd $dotfilesDir
+
 source ./zsh/.zsh/01-os
 
 echo "Setting up $DISTRO..."
@@ -67,7 +71,6 @@ for tool in "${tools[@]}"; do
     install_tool $tool
   fi
 done
-
 
 if [ "$remove" = true ]; then
   echo "All tools removed"

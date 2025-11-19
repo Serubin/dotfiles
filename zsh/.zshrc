@@ -8,8 +8,9 @@ for rc in $HOME/.zsh/*~*.zwc; do
     source $rc
 done
 
-if [ -r $ADOTDIR/seebi/dircolors-solarized/dircolors.256dark ]; then
-    eval $(dircolors ADOTDIR/seebi/dircolors-solarized/dircolors.256dark);
+dirColorsSolarizedDir="bundles/seebi/dircolors-solarized-master/dircolors.256dark"
+if [ -r $ADOTDIR/$dirColorsSolarizedDir ]; then
+    eval $(dircolors $ADOTDIR/$dirColorsSolarizedDir);
 fi
 
 if [ -r $HOME/.custom ]; then
