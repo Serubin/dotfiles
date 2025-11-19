@@ -1,13 +1,15 @@
 #!/bin/zsh
 
 export ADOTDIR=$HOME/.zsh/antigen
+if [[ ! -d $ADOTDIR ]]; then
+  mkdir $ADOTDIR
+fi
+
 if [[ "$DISTRO" == "darwin" ]]; then
     source /opt/homebrew/share/antigen/antigen.zsh
 else
     source /usr/share/zsh-antigen/antigen.zsh
 fi
-
-antigen init $ADOTDIR
 
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle scfrazer/zsh-jump-target --branch=master
