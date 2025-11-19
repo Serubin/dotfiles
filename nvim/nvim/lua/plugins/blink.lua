@@ -1,6 +1,5 @@
 local disabled_filetypes = {
   "gitcommit",
-  "jjdescription",
   "markdown",
 }
 
