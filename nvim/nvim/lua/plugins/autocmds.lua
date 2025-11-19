@@ -18,13 +18,10 @@ return {
             vim.api.nvim_buf_set_lines(0, 0, 0, false, {"", ""})
           end
 
-          -- Add space before ## or ###
-          vim.cmd([[silent! %s/^\(##\+\)/ \1/e]])
-
           -- Set cursor to top left position (line 1, column 0)
           vim.api.nvim_win_set_cursor(0, {1, 0})
         end,
-        desc = "Add space before ## or ### and add blank lines if needed"
+        desc = "Add two lines in front of a git commit template"
       })
     end,
   },
