@@ -23,7 +23,7 @@ redirect=/dev/stdout
 [ "$verbose" = false ] && redirect=/dev/null
 
 ## Install logic
-dotfilesDir=$(pwd)/$(dirname "$0")
+dotfilesDir=$(dirname "$0")
 _HOME=$HOME
 
 # Set current directory the dotfiles directory
