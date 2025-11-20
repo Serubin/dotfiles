@@ -44,6 +44,12 @@ function install_tool() {
   fi
   stow $tool $stowOptions $configOption
 
+  if [ $? -ne 0 ]; then
+    echo "Failed!"
+    echo ">>>>> $tool was not installed <<<<<"
+    return
+  fi;
+
   cd $tool
 
   echo -n "Running install for $tool... "
