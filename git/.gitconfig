@@ -30,4 +30,3 @@
   rebase = true
 [commit]
   gpgsign = true
-
