@@ -23,13 +23,13 @@ redirect=/dev/stdout
 [ "$verbose" = false ] && redirect=/dev/null
 
 ## Install logic
-dotfilesDir=$(dirname "$0")
+dotfilesDir="$(cd "$(dirname "$0")" && pwd)"
 _HOME=$HOME
 
 # Set current directory the dotfiles directory
 cd $dotfilesDir
 
-source ./zsh/.zsh/01-os
+source ./zsh/.zsh/00-os
 
 echo "Setting up $DISTRO..."
 bash ./setup/$DISTRO >$redirect 2>&1
@@ -44,8 +44,8 @@ function install_tool() {
   fi
 
   # Unstow the tool to clean up any old config before stowing
-  stow -D $tool $stowOptions $configOption
-  stow $tool $stowOptions $configOption
+  stow -D $tool $stowOptions $configOption >$redirect 2>&1
+  stow $tool $stowOptions $configOption >$redirect 2>&1
 
   if [ $? -ne 0 ]; then
     echo "Failed!"
