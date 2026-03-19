@@ -2,5 +2,5 @@
 ## Darwin setup
 
 brew install zsh atool gsed coreutils
-brew install antigen
+brew install antigen romkatv/gitstatus/gitstatus
 # brew install zsh-syntax-highlighting
