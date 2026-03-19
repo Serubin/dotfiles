@@ -50,8 +50,30 @@ sched 0 _set-list-colors  # deferred since LC_COLORS might not be available yet
 zstyle :compinstall filename "${HOME}/.zshrc"
 
 autoload -Uz compinit zkbd
-compinit
+if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
+# Async cleanup: purge stale caches and compile .zcompdump for faster loading.
+# Runs in a disowned background subshell so it never blocks startup.
+{
+  setopt local_options extended_glob
+
+  # Compile .zcompdump -> .zwc if source is newer
+  if [[ -s "$HOME/.zcompdump" && (! -s "$HOME/.zcompdump.zwc" || "$HOME/.zcompdump" -nt "$HOME/.zcompdump.zwc") ]]; then
+    zcompile "$HOME/.zcompdump"
+  fi
+
+  # Purge cache files older than 24 hours (forces regeneration on next startup)
+  local cache_dir="$HOME/.zsh/cache"
+  if [[ -d "$cache_dir" ]]; then
+    for f in "$cache_dir"/*(N.mh+24); do
+      rm -f "$f"
+    done
+  fi
+} &!
 
 ## Key correction
 #[[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
