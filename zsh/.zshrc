@@ -8,7 +8,12 @@ for rc in $HOME/.zsh/*~*.zwc; do
 done
 
 if [ -r $HOME/.zsh/dircolors/dircolors.256dark ]; then
-    eval $(gdircolors $HOME/.zsh/dircolors/dircolors.256dark);
+    local dircolors_dir=$HOME/.zsh/dircolors/dircolors.256dark
+    if [ "$DISTRO" = "darwin" ]; then
+      eval $(gdircolors $dircolors_dir);
+    else
+      eval $(dircolors $dircolors_dir);
+    fi
 fi
 
 if [ -r $HOME/.custom ]; then

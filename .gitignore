@@ -3,4 +3,5 @@ zsh/.zsh/cache
 **/*.zwc
 nvim/nvim/lazy-lock.json
 nvim/nvim/lazyvim.json
+zsh/.zsh/gitstatus/
 
