@@ -17,3 +17,19 @@ function cdls()
     \cd "$@" && ls
   fi
 }
+
+# Cache a CLI completion to a file, regenerate when binary changes
+_cache_completion() {
+  local cmd="$1"
+  local cache_dir="${HOME}/.zsh/cache"
+  local cache_file="${cache_dir}/${cmd}.zsh"
+  local bin_path="$(command -v $cmd 2>/dev/null)"
+
+  [ -z "$bin_path" ] && return
+
+  mkdir -p "$cache_dir"
+  if [ ! -f "$cache_file" ] || [ "$bin_path" -nt "$cache_file" ]; then
+    $cmd completion zsh > "$cache_file" 2>/dev/null
+  fi
+  source "$cache_file"
+}
