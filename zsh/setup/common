@@ -1,7 +1,13 @@
 #!/bin/bash
 ## Common setup
 
-zsh -i -c ".zsh/02-antigen update"
+ZINIT_HOME="${HOME}/.zsh/zinit"
+if [[ ! -d "${ZINIT_HOME}" ]]; then
+    mkdir -p "${ZINIT_HOME}"
+    git clone https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}"
+fi
+
+zsh -i -c ".zsh/02-zinit update"
 echo "Copying .custom to $HOME/.custom"
 echo "Custom file: $(dirname "$0")/.custom"
 if [ ! -f "$HOME/.custom" ]; then

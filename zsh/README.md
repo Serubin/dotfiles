@@ -7,7 +7,7 @@ The `.zshrc` sources all files in `~/.zsh/` (excluding `.zwc` compiled files) in
 | File | Purpose |
 |---|---|
 | `01-os` | Detects the OS/distro and exports `$DISTRO` |
-| `02-antigen` | Initializes antigen and loads plugins |
+| `02-zinit` | Initializes zinit and loads plugins |
 | `alias` | Shell aliases and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |
 | `function` | General-purpose helper functions |
@@ -107,9 +107,10 @@ Reads the contents of a file into a variable. Used internally by `__git_ps1` to 
 | `ipdns` | Public IP via OpenDNS |
 | `ipl` | Local IP addresses |
 
-## Plugins (antigen)
+## Plugins (zinit)
 
 - **zsh-syntax-highlighting** — real-time command highlighting
-- **zsh-jump-target** — quick cursor jumping (`^F`)
 - **zsh-autosuggestions** — fish-style autosuggestions
-- **dircolors-solarized** — solarized color scheme for `ls`
+- **zsh-jump-target** — quick cursor jumping (`^F`)
+
+Dircolors-solarized is vendored locally in `dircolors/dircolors.256dark`.
