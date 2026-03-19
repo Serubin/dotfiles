@@ -1,5 +1,12 @@
 # Zsh Configuration
 
+## Performance
+
+| Metric | Time |
+|---|---|
+| Shell startup | ~60ms |
+| Prompt render (in git repo) | ~0.5ms |
+
 ## Structure
 
 The `.zshrc` sources all files in `~/.zsh/` (excluding `.zwc` compiled files) in lexicographic order. Files prefixed with numbers (e.g., `01-os`) load first to establish dependencies for later files.
