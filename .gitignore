@@ -1,4 +1,4 @@
-zsh/.zsh/antigen
+zsh/.zsh/zinit
 zsh/.zsh/cache
 **/*.zwc
 nvim/nvim/lazy-lock.json

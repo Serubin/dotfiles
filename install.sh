@@ -42,6 +42,9 @@ function install_tool() {
   if [[ " ${configTools[@]} " =~ " $tool " ]]; then
     configOption="-t $HOME/.config/"
   fi
+
+  # Unstow the tool to clean up any old config before stowing
+  stow -D $tool $stowOptions $configOption
   stow $tool $stowOptions $configOption
 
   if [ $? -ne 0 ]; then

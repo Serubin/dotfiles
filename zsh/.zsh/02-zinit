@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+ZINIT_HOME="${HOME}/.zsh/zinit"
+source "${ZINIT_HOME}/zinit.zsh"
+
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-autosuggestions
+zinit light scfrazer/zsh-jump-target
+
+zinit ice as"null" atload'eval $(gdircolors ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark 2>/dev/null)'
+zinit light seebi/dircolors-solarized
+
+if [[ "$1" == "update" ]]; then
+    zinit self-update
+    zinit update --all
+fi
