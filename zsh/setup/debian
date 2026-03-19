@@ -2,3 +2,7 @@
 ## Debian setup
 
 sudo apt-get install -y zsh atool zsh-antigen
+
+if [[ ! -d "$HOME/.zsh/gitstatus" ]]; then
+    git clone --depth=1 https://github.com/romkatv/gitstatus.git "$HOME/.zsh/gitstatus"
+fi
