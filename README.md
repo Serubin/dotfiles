@@ -57,7 +57,6 @@ docker compose up -d && docker compose exec debian bash
 │   │   ├── alias              # Shell aliases
 │   │   ├── env                # Environment, keybindings, completion, history
 │   │   ├── function           # Helper functions (mk, cdls, _cache_completion)
-│   │   ├── jump-target        # Jump target config
 │   │   ├── promptrc           # Prompt loader
 │   │   └── prompt/            # Custom prompt theme
 │   └── setup/

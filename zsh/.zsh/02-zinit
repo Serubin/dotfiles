@@ -5,9 +5,10 @@ source "${ZINIT_HOME}/zinit.zsh"
 
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
+zinit ice pick"/dev/null" atload'ZSH_JUMP_TARGET_STYLE="fg=blue,bold,underline"; fpath+=(${ZINIT[PLUGINS_DIR]}/scfrazer---zsh-jump-target/functions); autoload -Uz jump-target; zle -N jump-target; bindkey "^F" jump-target'
 zinit light scfrazer/zsh-jump-target
 
-zinit ice as"null" atload'eval $(gdircolors ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark 2>/dev/null)'
+zinit ice as"null" atload'local dc=dircolors; [[ "$DISTRO" == "darwin" ]] && dc=gdircolors; eval $($dc ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark 2>/dev/null)'
 zinit light seebi/dircolors-solarized
 
 if [[ "$1" == "update" ]]; then

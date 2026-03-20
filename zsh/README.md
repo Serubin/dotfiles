@@ -18,7 +18,6 @@ The `.zshrc` sources all files in `~/.zsh/` (excluding `.zwc` compiled files) in
 | `alias` | Shell aliases and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |
 | `function` | General-purpose helper functions |
-| `jump-target` | Configures the zsh-jump-target widget (bound to `^F`) |
 | `promptrc` | Prompt precmd hooks and PS1 setup |
 | `prompt/prompt-git` | Git status integration for the prompt |
 | `prompt/prompt-theme` | Prompt theme (Pure-inspired) with color definitions |
@@ -120,4 +119,4 @@ Reads the contents of a file into a variable. Used internally by `__git_ps1` to 
 - **zsh-autosuggestions** — fish-style autosuggestions
 - **zsh-jump-target** — quick cursor jumping (`^F`)
 
-Dircolors-solarized is vendored locally in `dircolors/dircolors.256dark`.
+- **dircolors-solarized** — solarized color scheme for `ls` (auto-selects `gdircolors` on macOS, `dircolors` on Linux)
