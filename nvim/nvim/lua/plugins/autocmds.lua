@@ -11,9 +11,9 @@ return {
         group = augroup,
         pattern = "gitcommit",
         callback = function()
-          -- Check if first line starts with ## or ###
+          -- Check if first line starts with # or ##
           local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
-          if first_line and first_line:match("^##") then
+          if first_line and first_line:match("^#") then
             -- Add two blank lines at the top
             vim.api.nvim_buf_set_lines(0, 0, 0, false, {"", ""})
           end
