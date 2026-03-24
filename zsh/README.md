@@ -50,6 +50,19 @@ _cache_completion <cmd>
 
 Cache a CLI tool's zsh completion to `~/.zsh/cache/<cmd>.zsh`. The cache is regenerated automatically when the tool's binary changes (by comparing modification times).
 
+#### `lazy_load_nvm`
+
+```zsh
+lazy_load_nvm [--auto-use]
+```
+
+Lazy-load nvm so it doesn't slow down shell startup. Stubs `nvm`, `node`, `npm`, and `npx` — the real nvm is sourced on first use. Pass `--auto-use` to also auto-switch node versions when entering a directory with a `.nvmrc` file. Intended to be called from `~/.custom`:
+
+```zsh
+export NVM_DIR="$HOME/.nvm"
+lazy_load_nvm --auto-use
+```
+
 ### Environment (`env`)
 
 #### `compaudit`

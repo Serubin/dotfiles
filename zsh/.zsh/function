@@ -33,3 +33,57 @@ _cache_completion() {
   fi
   source "$cache_file"
 }
+
+# Lazy-load nvm: defers sourcing nvm.sh until first use of nvm/node/npm/npx.
+# Call this from ~/.custom to enable. Optionally pass --auto-use to
+# automatically switch node versions when entering a directory with .nvmrc.
+#
+# Usage (in ~/.custom):
+#   export NVM_DIR="$HOME/.nvm"
+#   lazy_load_nvm            # basic lazy loading
+#   lazy_load_nvm --auto-use # also auto-switch on .nvmrc
+lazy_load_nvm() {
+  local auto_use=false
+  [[ "$1" == "--auto-use" ]] && auto_use=true
+
+  _nvm_lazy_load() {
+    unfunction nvm node npm npx 2>/dev/null
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \
+      . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+  }
+
+  nvm()  { _nvm_lazy_load; nvm "$@"; }
+  node() { _nvm_lazy_load; node "$@"; }
+  npm()  { _nvm_lazy_load; npm "$@"; }
+  npx()  { _nvm_lazy_load; npx "$@"; }
+
+  if $auto_use; then
+    load-nvmrc() {
+      local nvmrc_path
+      nvmrc_path="$(command -v nvm_find_nvmrc > /dev/null 2>&1 && nvm_find_nvmrc)"
+      if [ -z "$nvmrc_path" ]; then
+        if [ -f ".nvmrc" ]; then
+          _nvm_lazy_load
+          load-nvmrc
+        fi
+        return
+      fi
+      local node_version="$(nvm version)"
+      if [ -n "$nvmrc_path" ]; then
+        local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+        if [ "$nvmrc_node_version" = "N/A" ]; then
+          nvm install
+        elif [ "$nvmrc_node_version" != "$node_version" ]; then
+          nvm use
+        fi
+      elif [ "$node_version" != "$(nvm version default)" ]; then
+        echo "Reverting to nvm default version"
+        nvm use default
+      fi
+    }
+    autoload -U add-zsh-hook
+    add-zsh-hook chpwd load-nvmrc
+  fi
+}
