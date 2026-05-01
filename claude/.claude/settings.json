@@ -1,0 +1,13 @@
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "/Users/srubin/.claude/statusline-command.sh"
+  },
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": true
+}
