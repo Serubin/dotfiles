@@ -2,7 +2,7 @@
 
 ## Script options
 stowOptions="-t $HOME --ignore setup -R -v"
-tools=("git" "zsh" "tmux" "nvim")
+tools=("git" "zsh" "tmux" "nvim" "claude")
 configTools=("nvim")
 
 ## Check for flags

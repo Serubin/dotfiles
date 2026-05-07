@@ -4,4 +4,5 @@ zsh/.zsh/cache
 nvim/nvim/lazy-lock.json
 nvim/nvim/lazyvim.json
 zsh/.zsh/gitstatus/
-
+!claude/
+!claude/.claude
