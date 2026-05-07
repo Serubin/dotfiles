@@ -28,5 +28,9 @@
 	autocorrect = 1
 [pull]
   rebase = true
+[rebase]
+  autoStash = true
+[init]
+	defaultBranch = main
 [commit]
   gpgsign = true
