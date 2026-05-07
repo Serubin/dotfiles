@@ -170,7 +170,8 @@ if [[ $DISTRO == "darwin" ]]; then
     export PATH="$PATH:/opt/homebrew/bin"
     export PATH="$PATH:/usr/local/opt/coreutils/libexec/gnubin"
     export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
-    ulimit -n 10240
+    # FD soft limit is raised in ~/.zshenv (applies to all zsh invocations,
+    # not just interactive shells).
 fi
 
 
