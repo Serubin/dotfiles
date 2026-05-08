@@ -4,10 +4,56 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "model": "opus",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(pwd:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(tree:*)",
+      "Bash(less:*)",
+      "Bash(more:*)",
+      "Bash(git:*)",
+      "Bash(mktemp:*)",
+      "Bash(export AWS_PROFILE=devtest-admin)",
+      "Bash(bazel test:*)",
+      "Bash(go version:*)",
+      "Read(//usr/local/**)",
+      "Bash(bazel build:*)",
+      "Bash(gh:*)",
+      "Bash(gofmt -e:*)",
+      "Bash(read file:*)",
+      "Write(/tmp/**)"
+    ],
+    "defaultMode": "auto",
+    "additionalDirectories": [
+      "/home/coder/lwcode/services/.claude/skills",
+      "/home/coder/lwcode/services/vulnerability/.claude/skills"
+    ]
+  },
   "statusLine": {
     "type": "command",
-    "command": "/Users/srubin/.claude/statusline-command.sh"
+    "command": "bash $HOME/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-daltonized",
+  "verbose": true,
+  "skipAutoPermissionPrompt": true
 }
