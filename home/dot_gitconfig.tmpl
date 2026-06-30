@@ -1,7 +1,9 @@
 [user]
-	name = Solomon
-	email = serubin@serubin.net
-	signingkey = DF86054D5A3F9A15
+	name = {{ .git.name }}
+	email = {{ .git.email }}
+{{- if .git.signingkey }}
+	signingkey = {{ .git.signingkey }}
+{{- end }}
 [core]
 	excludesfile = ~/.gitignore_global
   editor = nvim
@@ -32,5 +34,7 @@
   autoStash = true
 [init]
 	defaultBranch = main
+{{- if .git.signingkey }}
 [commit]
-  gpgsign = true
+	gpgsign = true
+{{- end }}
