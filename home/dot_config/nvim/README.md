@@ -5,29 +5,25 @@ Lua-based Neovim config built on [LazyVim](https://www.lazyvim.org/) with the [l
 ## Structure
 
 ```
-nvim/
-├── nvim/
-│   ├── init.lua                 # Entry point — loads lazy_init
-│   └── lua/
-│       ├── lazy_init.lua        # Bootstraps lazy.nvim + LazyVim, sets leader keys
-│       ├── config/
-│       │   ├── options.lua      # Editor options (no autoformat, scrolloff, etc.)
-│       │   └── keymaps.lua      # Custom key mappings
-│       └── plugins/
-│           ├── autocmds.lua     # Git commit template formatting
-│           ├── blink.lua        # Completion (super-tab preset, disabled in markdown/comments)
-│           ├── betterwhitespace.lua  # Trailing whitespace highlighting + auto-strip
-│           ├── disabled.lua     # Explicitly disabled LazyVim defaults
-│           ├── neo-tree.lua     # File explorer
-│           ├── solarized.lua    # Solarized colorscheme
-│           └── snackes.lua      # Snacks picker (shows hidden + ignored files)
-└── setup/
-    ├── darwin                   # brew install nvim
-    ├── debian                   # brew or build from source; sets vi/vim/editor alternatives
-    └── build-neovim             # Builds latest Neovim from source on Debian
+home/dot_config/nvim/            # → ~/.config/nvim/
+├── init.lua                     # Entry point — loads lazy_init
+└── lua/
+    ├── lazy_init.lua            # Bootstraps lazy.nvim + LazyVim, sets leader keys
+    ├── config/
+    │   ├── options.lua          # Editor options (no autoformat, scrolloff, etc.)
+    │   └── keymaps.lua          # Custom key mappings
+    └── plugins/
+        ├── autocmds.lua         # Git commit template formatting
+        ├── blink.lua            # Completion (super-tab preset, disabled in markdown/comments)
+        ├── betterwhitespace.lua # Trailing whitespace highlighting + auto-strip
+        ├── disabled.lua         # Explicitly disabled LazyVim defaults
+        ├── lsp.lua              # LSP tweak — disables didChangeWatchedFiles dynamic registration
+        ├── neo-tree.lua         # File explorer
+        ├── solarized.lua        # Solarized colorscheme
+        └── snackes.lua          # Snacks picker (shows hidden + ignored files)
 ```
 
-Stowed into `~/.config/` so `nvim/nvim/` maps to `~/.config/nvim/`.
+Managed by chezmoi; deployed to `~/.config/nvim/`.
 
 ## Options
 
@@ -61,9 +57,14 @@ Stowed into `~/.config/` so `nvim/nvim/` maps to `~/.config/nvim/`.
 | [snacks.nvim](https://github.com/folke/snacks.nvim) | UI utilities / picker | Picker configured to show hidden and gitignored files |
 | [vim-better-whitespace](https://github.com/ntpeters/vim-better-whitespace) | Whitespace highlighting | Red highlight on trailing whitespace; auto-strips on save; disabled in dashboard/picker/lazy buffers |
 
+### LSP
+
+- `lsp.lua` extends `nvim-lspconfig` (from LazyVim) to disable dynamic registration
+  of `didChangeWatchedFiles` for all servers — avoids excessive file-watch churn.
+
 ### Autocommands
 
-- **Git commit template**: When a gitcommit buffer's first line starts with `##`, two blank lines are inserted at the top and the cursor is placed at line 1. This allows typing a commit message above the template.
+- **Git commit template**: When a gitcommit buffer's first line starts with `#`, two blank lines are inserted at the top and the cursor is placed at line 1. This allows typing a commit message above the template.
 
 ### Disabled
 
@@ -81,4 +82,8 @@ Plugin update checks run once per day (silently).
 
 ## Installation
 
-Handled automatically by the dotfiles install script. On Debian without Homebrew, Neovim is built from source using the latest tagged release. On macOS or Debian with Homebrew, it's installed via `brew`. On Debian, `vi`, `vim`, and `editor` alternatives are pointed to `nvim`.
+Handled automatically by chezmoi. On Debian without Homebrew, Neovim is built from
+source using the latest tagged release; on macOS or Debian with Homebrew it's installed
+via `brew`. On Debian, `vi`, `vim`, and `editor` alternatives are pointed to `nvim`.
+This is all done by the chezmoi `run_once_after` package script
+(`home/.chezmoiscripts/run_once_after_20-install-packages.sh.tmpl`).

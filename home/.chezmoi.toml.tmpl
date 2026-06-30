@@ -1,0 +1,12 @@
+{{- /* Rendered once on `chezmoi init` to create the chezmoi config.
+       Prompts for git identity so the public repo stays portable (work machine
+       can use a different email). Press Enter to accept the defaults; note that a
+       blank signingkey leaves commit signing disabled. */ -}}
+{{- $name := promptStringOnce . "git.name" "git user.name" "Solomon" -}}
+{{- $email := promptStringOnce . "git.email" "git user.email" "" -}}
+{{- $signingkey := promptStringOnce . "git.signingkey" "git signingkey (blank to disable commit signing)" "" -}}
+
+[data.git]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
+    signingkey = {{ $signingkey | quote }}

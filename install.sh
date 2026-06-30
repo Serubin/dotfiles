@@ -1,88 +1,49 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Bootstrap these dotfiles with chezmoi.
+#
+#   Fresh machine (one-liner):
+#     sh -c "$(curl -fsLS https://raw.githubusercontent.com/Serubin/dotfiles/main/install.sh)"
+#
+#   From a local clone:
+#     git clone https://github.com/Serubin/dotfiles.git && dotfiles/install.sh
+#
+# Installs chezmoi if needed, then runs `chezmoi init --apply`. When invoked from
+# inside a checkout of this repo, that checkout is used as the chezmoi source;
+# otherwise the repo is cloned from GitHub. chezmoi then prompts once for your git
+# identity, clears any legacy GNU Stow symlinks, installs packages for your OS,
+# and writes the managed files into $HOME.
+#
+# Override the repo with DOTFILES_REPO=owner/name.
+set -eu
 
-## Script options
-stowOptions="-t $HOME --ignore setup -R -v"
-tools=("git" "zsh" "tmux" "nvim" "claude")
-configTools=("nvim")
+GITHUB_REPO="${DOTFILES_REPO:-Serubin/dotfiles}"
 
-## Check for flags
-# Check for '-v' flag
-verbose=false
-for arg in "$@"; do
-  if [ "$arg" == "-v" ]; then
-    verbose=true
-    break
-  fi
-  if [ "$arg" == "--uninstall" ]; then
-    remove=true
-    break
-  fi
-done
+# 1. Ensure chezmoi is available.
+if ! command -v chezmoi >/dev/null 2>&1; then
+    echo "==> Installing chezmoi..."
+    if command -v brew >/dev/null 2>&1; then
+        brew install chezmoi
+    else
+        bindir="${HOME}/.local/bin"
+        sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "${bindir}"
+        PATH="${bindir}:${PATH}"
+    fi
+fi
 
-redirect=/dev/stdout
-[ "$verbose" = false ] && redirect=/dev/null
+# 2. Use this checkout as the source if we're running inside one; else clone from
+#    GitHub. (.chezmoiroot only exists at the root of this repo.)
+self="${0:-}"
+here=""
+case "$self" in
+    */*) here="$(cd "$(dirname "$self")" 2>/dev/null && pwd || true)" ;;
+    *)   [ -f "./.chezmoiroot" ] && here="$(pwd)" ;;
+esac
 
-## Install logic
-dotfilesDir="$(cd "$(dirname "$0")" && pwd)"
-_HOME=$HOME
-
-# Set current directory the dotfiles directory
-cd $dotfilesDir
-
-source ./zsh/.zsh/00-os
-
-echo "Setting up $DISTRO..."
-bash ./setup/$DISTRO >$redirect 2>&1
-
-function install_tool() {
-  local tool=$1
-  echo " ==== Setting up $tool ==== "
-  echo -n "Stowing $tool... "
-
-  if [[ " ${configTools[@]} " =~ " $tool " ]]; then
-    configOption="-t $HOME/.config/"
-  fi
-
-  # Unstow the tool to clean up any old config before stowing
-  stow -D $tool $stowOptions $configOption >$redirect 2>&1
-  stow $tool $stowOptions $configOption >$redirect 2>&1
-
-  if [ $? -ne 0 ]; then
-    echo "Failed!"
-    echo ">>>>> $tool was not installed <<<<<"
-    return
-  fi;
-
-  cd $tool
-
-  echo -n "Running install for $tool... "
-  [ -f "setup/$DISTRO" ] && bash setup/$DISTRO >$redirect 2>&1
-  [ -f "setup/common" ] && bash setup/common >$redirect 2>&1
-  cd $dotfilesDir
-
-  echo "Done"
-}
-
-function remove_tool() {
-  local tool=$1
-  echo " ==== Removing $tool ==== "
-  echo -n "Removing $tool... (unstowing)"
-
-  stow -D $tool $stowOptions $configOption
-
-  echo "Done"
-}
-
-for tool in "${tools[@]}"; do
-  if [ "$remove" = true ]; then
-    remove_tool $tool
-  else
-    install_tool $tool
-  fi
-done
-
-if [ "$remove" = true ]; then
-  echo "All tools removed"
+if [ -n "$here" ] && [ -f "${here}/.chezmoiroot" ]; then
+    echo "==> chezmoi init --apply (local source: ${here})"
+    exec chezmoi init --apply --source="${here}"
 else
-  echo "All tools installed"
+    echo "==> chezmoi init --apply ${GITHUB_REPO}"
+    exec chezmoi init --apply "${GITHUB_REPO}"
 fi
