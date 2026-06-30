@@ -9,11 +9,14 @@
 
 ## Structure
 
-The `.zshrc` sources all files in `~/.zsh/` (excluding `.zwc` compiled files) in lexicographic order. Files prefixed with numbers (e.g., `01-os`) load first to establish dependencies for later files.
+Managed by chezmoi (deployed to `~/.zsh/`). `.zshrc` sources all files in `~/.zsh/`
+(excluding `.zwc` compiled files) in lexicographic order. Files prefixed with numbers
+(e.g., `00-os`) load first to establish dependencies for later files.
 
 | File | Purpose |
 |---|---|
-| `01-os` | Detects the OS/distro and exports `$DISTRO` |
+| `00-os` | Detects the OS/distro and exports `$DISTRO` |
+| `01-brew` | Adds Homebrew to `PATH` on macOS |
 | `02-zinit` | Initializes zinit and loads plugins |
 | `alias` | Shell aliases and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |
@@ -89,23 +92,16 @@ Builds the pre-prompt line: optionally shows `user@host` for SSH sessions or roo
 
 #### `git_stat`
 
-Returns a colorized string with the current git branch and dirty/clean indicator. Used by `pre_cmd` to embed git info in the prompt.
+Returns a colorized string describing the current git repo via
+[gitstatus](https://github.com/romkatv/gitstatus): the branch name (or a short SHA /
+tag when detached), any in-progress action state (rebase/merge/cherry-pick/revert/am/
+bisect), and a single dirty indicator — a red `*` — shown whenever there are staged,
+unstaged, untracked, or conflicted changes (a clean tree renders with no marker). Used
+by `pre_cmd` to embed git info in the prompt.
 
-#### `__git_ps1`
-
-Core git-prompt function (from the official git-prompt.sh). Accepts 0-3 arguments and produces a formatted string with the branch name, rebase/merge state, dirty/staged/stash/untracked indicators, and upstream divergence.
-
-#### `__git_ps1_show_upstream`
-
-Computes ahead/behind counts relative to the upstream branch (git or SVN).
-
-#### `__git_ps1_colorize_gitstring`
-
-Applies color codes to the components of the git prompt string (branch, dirty, staged, stash, untracked).
-
-#### `__git_eread`
-
-Reads the contents of a file into a variable. Used internally by `__git_ps1` to inspect git state files.
+> **Dependency:** the prompt requires romkatv/gitstatus. `prompt-git` loads it and starts
+> a persistent background daemon; on Linux it's cloned via `.chezmoiexternal` to
+> `~/.zsh/gitstatus`, and on macOS it's provided by Homebrew.
 
 ## Aliases (quick reference)
 
@@ -131,5 +127,4 @@ Reads the contents of a file into a variable. Used internally by `__git_ps1` to 
 - **zsh-syntax-highlighting** — real-time command highlighting
 - **zsh-autosuggestions** — fish-style autosuggestions
 - **zsh-jump-target** — quick cursor jumping (`^F`)
-
 - **dircolors-solarized** — solarized color scheme for `ls` (auto-selects `gdircolors` on macOS, `dircolors` on Linux)
