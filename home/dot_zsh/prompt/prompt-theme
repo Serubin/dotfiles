@@ -36,12 +36,6 @@ function pre_cmd() {
 
     # ZSH - So simple!
     print -P $preprompt_format
-
-
-    # iTerm Touch Bar
-    # TODO @Solomon: Remove this, touch bars are deprecated
-    local iterm_message=$(git rev-parse --abbrev-ref HEAD 2> /dev/null; [[ $? -ne 0 ]] && echo "No Repo")
-    it2setkeylabel set status $iterm_message 2> /dev/null
 }
 
 # ZSH
