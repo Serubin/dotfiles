@@ -27,3 +27,23 @@
 # (.zsh/README.md would otherwise be sourced by .zshrc's `~/.zsh/*` loop.)
 .zsh/README.md
 .config/nvim/README.md
+
+# ----- machine-class gating (see README "Machine targeting" + feature matrix) -----
+# Gate by OS (.chezmoi.os), environment (.environment), or class (.class). Patterns
+# match TARGET paths. NOTE: never glob a path that would swallow a .chezmoiexternal
+# target (.zsh/zinit, .zsh/gitstatus, .tmux/plugins/tpm) — that suppresses its clone.
+
+# yabai + skhd are macOS window-manager configs — keep on ANY mac, skip elsewhere.
+{{ if ne .chezmoi.os "darwin" }}
+.config/yabai
+.config/skhd
+{{ end }}
+
+# Class-specific example scripts (replace with your own). A custom class (e.g.
+# homelab) matches neither, so both are ignored — add your own class gate for it.
+{{ if ne .class "work-mac" }}
+.local/bin/example-work-mac
+{{ end }}
+{{ if ne .class "work-devbox" }}
+.local/bin/example-work-devbox
+{{ end }}

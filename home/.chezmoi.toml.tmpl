@@ -1,10 +1,50 @@
 {{- /* Rendered once on `chezmoi init` to create the chezmoi config.
-       Prompts for git identity so the public repo stays portable (work machine
-       can use a different email). Press Enter to accept the defaults; note that a
-       blank signingkey leaves commit signing disabled. */ -}}
-{{- $name := promptStringOnce . "git.name" "git user.name" "Solomon" -}}
+
+       Resolves two machine facts and prompts for git identity, then persists
+       everything under [data]. Press Enter to accept a default; a blank
+       signingkey leaves commit signing disabled.
+
+       - environment: the trust boundary. Validated to personal|work.
+       - class: a free-form role tag (personal-mac, work-devbox, homelab, ...).
+         Defaults to a value derived from environment + OS; NOT validated, so any
+         custom string is allowed. Templates + .chezmoiignore gate on .class.
+
+       Non-interactive override (scripted/CI installs, no TTY):
+         DOTFILES_ENV=work DOTFILES_CLASS=work-ci chezmoi init --apply
+       To change later: edit ~/.config/chezmoi/chezmoi.toml [data], or re-init. */ -}}
+
+{{- /* environment: validated trust boundary. */ -}}
+{{- $env := env "DOTFILES_ENV" -}}
+{{- if not $env -}}
+{{-   $env = promptChoiceOnce . "environment" "environment [personal|work]" (list "personal" "work") "personal" -}}
+{{- end -}}
+{{- if not (has $env (list "personal" "work")) -}}
+{{-   fail (printf "invalid environment %q (want personal|work)" $env) -}}
+{{- end -}}
+
+{{- /* class: free-form role tag. Default = derived <env>-<mac|server|devbox>. */ -}}
+{{- $defaultClass := "" -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $defaultClass = printf "%s-mac" $env -}}
+{{- else if eq .chezmoi.os "linux" -}}
+{{-   $defaultClass = ternary "work-devbox" "personal-server" (eq $env "work") -}}
+{{- else -}}
+{{-   $defaultClass = printf "%s-%s" $env .chezmoi.os -}}
+{{- end -}}
+{{- $class := env "DOTFILES_CLASS" -}}
+{{- if not $class -}}
+{{-   $class = promptStringOnce . "class" "machine class (free-form; Enter for default)" $defaultClass -}}
+{{- end -}}
+
+{{- /* git identity: prompted once with no hardcoded defaults, so the public repo
+       carries no personal/work name or address. Values persist after first init. */ -}}
+{{- $name := promptStringOnce . "git.name" "git user.name" "" -}}
 {{- $email := promptStringOnce . "git.email" "git user.email" "" -}}
 {{- $signingkey := promptStringOnce . "git.signingkey" "git signingkey (blank to disable commit signing)" "" -}}
+
+[data]
+    environment = {{ $env | quote }}
+    class = {{ $class | quote }}
 
 [data.git]
     name = {{ $name | quote }}
