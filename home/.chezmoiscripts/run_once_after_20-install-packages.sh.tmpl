@@ -16,6 +16,10 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 brew install git zsh tmux neovim atool gsed coreutils
 brew install romkatv/gitstatus/gitstatus
+# Window management (all macs). After install, start them once with
+# `yabai --start-service` and `skhd --start-service`; some yabai features also
+# require SIP to be partially disabled (manual, out of scope here).
+brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}

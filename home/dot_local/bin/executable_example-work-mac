@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# EXAMPLE — delete or replace with a real script.
+#
+# Deployed to ~/.local/bin ONLY on the `work-mac` class. Gating lives in
+# home/.chezmoiignore:  {{ if ne .class "work-mac" }}.local/bin/example-work-mac{{ end }}
+# ~/.local/bin is on PATH (see home/dot_zshenv), so this is runnable as
+# `example-work-mac` on a work mac and absent everywhere else.
+set -euo pipefail
+echo "example-work-mac: hello from environment=${DOTFILES_ENV:-?} class=${DOTFILES_CLASS:-?}"
