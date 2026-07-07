@@ -1,0 +1,22 @@
+# Per-machine shell config, resolved at apply time by chezmoi (no runtime
+# detection). Sourced LAST by ~/.zshrc's `~/.zsh/*` loop (the `zz-` prefix sorts
+# after alias/env/function/promptrc), so it can override anything set earlier.
+#
+# This is machine-ROLE config committed to the repo. For machine-LOCAL, unmanaged
+# overrides and secrets use ~/.custom instead (sourced afterward, not tracked).
+#
+# environment={{ .environment }}  class={{ .class }}
+export DOTFILES_ENV={{ .environment | quote }}
+export DOTFILES_CLASS={{ .class | quote }}
+
+{{ if eq .class "work-mac" -}}
+# ===== work-mac =====
+{{ else if eq .class "work-devbox" -}}
+# ===== work-devbox =====
+{{ else if eq .class "personal-mac" -}}
+# ===== personal-mac =====
+{{ else if eq .class "personal-server" -}}
+# ===== personal-server =====
+{{ else -}}
+# ===== {{ .class }} =====  (custom or other class)
+{{ end -}}

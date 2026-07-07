@@ -14,3 +14,11 @@ if [ "$_cur_nofile" != "unlimited" ] && [ "$_cur_nofile" -lt 65536 ]; then
     ulimit -Sn 65536 2>/dev/null
 fi
 unset _cur_nofile
+
+# Put ~/.local/bin on PATH for ALL zsh invocations (interactive, scripts, and
+# GUI-launched tools) — chezmoi installs machine-specific executables there.
+# Appended (not prepended) so user scripts can never shadow system binaries.
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$PATH:$HOME/.local/bin" ;;
+esac

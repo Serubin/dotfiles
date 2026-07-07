@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Per-class package installs, kept SEPARATE from 20-install-packages so that
+# switching class (or editing these lists) re-runs only this script — never the
+# base install, which on Debian rebuilds Neovim from source. run_once_ re-runs
+# whenever this file's RENDERED content changes.
+set -euo pipefail
+
+{{ if eq .class "work-mac" -}}
+# ===== work-mac =====
+# TODO: work-mac-only tooling, e.g.:
+#   brew install <corp-tool>
+{{ else if eq .class "work-devbox" -}}
+# ===== work-devbox =====
+# TODO: work-devbox-only tooling, e.g.:
+#   sudo apt-get install -y <corp-tool>
+{{ else -}}
+# No class-specific packages for class={{ .class }}.
+{{ end -}}
