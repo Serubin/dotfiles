@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# EXAMPLE — delete or replace with a real script.
+#
+# Deployed to ~/.local/bin ONLY on the `work-devbox` class. Gating lives in
+# home/.chezmoiignore:  {{ if ne .class "work-devbox" }}.local/bin/example-work-devbox{{ end }}
+# ~/.local/bin is on PATH (see home/dot_zshenv), so this is runnable as
+# `example-work-devbox` on a work devbox and absent everywhere else.
+set -euo pipefail
+echo "example-work-devbox: hello from environment=${DOTFILES_ENV:-?} class=${DOTFILES_CLASS:-?}"

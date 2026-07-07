@@ -26,9 +26,10 @@ Or drive chezmoi directly without the wrapper:
 sh -c "$(curl -fsLS get.chezmoi.io)" && chezmoi init --apply Serubin/dotfiles
 ```
 
-`chezmoi init` prompts once for your git name/email/signingkey (press Enter to
-accept defaults), clones the plugin managers, installs packages for your OS, and
-writes the managed files into `$HOME`.
+`chezmoi init` prompts once for the machine environment/class (see
+[Machine targeting](#machine-targeting)) and your git name/email/signingkey
+(press Enter to accept defaults), clones the plugin managers, installs packages
+for your OS, and writes the managed files into `$HOME`.
 
 ### Migrating an existing machine from the old GNU Stow setup
 
@@ -56,6 +57,83 @@ You can also run it manually beforehand: [`scripts/uninstall-stow.sh`](scripts/u
 
 Package installs use `sudo` on Linux.
 
+## Machine targeting
+
+Every machine resolves two facts at `chezmoi init`, persisted in the local config
+(`~/.config/chezmoi/chezmoi.toml`) and used to gate config, scripts, and packages:
+
+- **`environment`** — the trust boundary, **validated** to `personal` or `work`.
+  The axis behind personal-only vs work-only gating.
+- **`class`** — a free-form role tag, **not validated**. Defaults to a value
+  derived from `environment` + OS, but you can override it with any string.
+
+The four default classes are the cross-product of `environment` and OS:
+
+|              | macOS            | Linux              |
+|--------------|------------------|--------------------|
+| **personal** | `personal-mac`   | `personal-server`  |
+| **work**     | `work-mac`       | `work-devbox`      |
+
+Custom classes (e.g. `homelab`, `work-ci`) are allowed — they just won't match the
+default-class gates, so add your own gate for them.
+
+### Setting it
+
+`chezmoi init` prompts once (press Enter to accept the derived class default). To
+answer non-interactively — scripted installs, CI, `curl | sh`:
+
+```bash
+DOTFILES_ENV=work chezmoi init --apply                          # environment only
+DOTFILES_ENV=work DOTFILES_CLASS=work-ci chezmoi init --apply   # custom class
+./install.sh --env work                                         # bootstrap wrapper
+./install.sh --env work --class work-ci                         # env + custom class
+```
+
+`install.sh` also accepts `--env`/`--class` as `--env=work`, and a bare
+`personal`/`work` positional still works as an `--env` shorthand.
+
+To change a machine later, edit `[data]` in `~/.config/chezmoi/chezmoi.toml`
+(`environment` / `class`) and `chezmoi apply`, or re-init. Both values are exported
+into your shell as `$DOTFILES_ENV` / `$DOTFILES_CLASS` (via `~/.zsh/zz-env`), so
+scripts and interactive config can branch on them.
+
+> **Existing machines:** a machine initialized before this feature has no
+> `environment`/`class` in its config. Run `chezmoi init` once (git identity is
+> remembered; you'll only be asked the new prompts) to populate them before the
+> next `chezmoi apply`.
+
+### Feature matrix
+
+Hand-maintained — keep in sync with the gating logic.
+
+| Feature | personal-mac | personal-server | work-mac | work-devbox |
+|---|:---:|:---:|:---:|:---:|
+| Core: zsh, git, tmux, Neovim | ✅ | ✅ | ✅ | ✅ |
+| Homebrew base packages | ✅ | — | ✅ | — |
+| yabai + skhd (config + install) | ✅ | — | ✅ | — |
+| `~/.local/bin` on PATH | ✅ | ✅ | ✅ | ✅ |
+| Per-class packages (`run_once_after_21`) | — | — | opt-in | opt-in |
+| `example-work-mac` script | — | — | ✅ | — |
+| `example-work-devbox` script | — | — | — | ✅ |
+
+### Adding a class-gated file or script
+
+Drop the file in the chezmoi source (e.g. `home/dot_local/bin/executable_foo`
+→ `~/.local/bin/foo`), then gate it in [`home/.chezmoiignore`](home/.chezmoiignore)
+at whichever level fits — patterns match target paths and can branch on any
+`[data]` value:
+
+```gotemplate
+{{ if ne .chezmoi.os "darwin" }}.config/yabai{{ end }}    # by OS  (any mac)
+{{ if ne .environment "work" }}.local/bin/vpn{{ end }}    # by environment
+{{ if ne .class "work-mac" }}.local/bin/foo{{ end }}      # by exact class tag
+```
+
+For per-machine *shell* config, add it to
+[`home/dot_zsh/zz-env.tmpl`](home/dot_zsh/zz-env.tmpl) (which branches on `.class`)
+rather than ignore-gating a sourced file: `.chezmoiignore` never removes an
+already-applied file, so a reclassified machine would keep sourcing a stale one.
+
 ## Day-to-day workflow
 
 chezmoi manages **copies**, not symlinks — editing `~/.zshrc` directly does *not*
@@ -79,6 +157,7 @@ chezmoi update               # git pull the source + apply
 | tmux | `~/.tmux.conf` | 256-color, TPM plugins, session restore |
 | Neovim | `~/.config/nvim/` | Lua config with lazy.nvim |
 | Claude Code | `~/.claude/` (curated) | CLAUDE.md, settings.json, statusline, skills, plugin config |
+| yabai + skhd | `~/.config/{yabai,skhd}` | macOS tiling WM + hotkey daemon (macs only) |
 
 ## Repository layout
 
@@ -86,16 +165,18 @@ chezmoi update               # git pull the source + apply
 .dotfiles/
 ├── .chezmoiroot                      # → home   (chezmoi source root)
 ├── home/
-│   ├── .chezmoi.toml.tmpl            # init prompts (git identity)
+│   ├── .chezmoi.toml.tmpl            # init prompts (environment/class + git identity)
 │   ├── .chezmoiignore                # runtime/secret paths chezmoi must not manage
 │   ├── .chezmoiexternal.toml.tmpl    # zinit, tpm, gitstatus (cloned & auto-updated)
 │   ├── .chezmoiscripts/
 │   │   ├── run_once_before_10-uninstall-stow.sh
-│   │   └── run_once_after_20-install-packages.sh.tmpl
+│   │   ├── run_once_after_20-install-packages.sh.tmpl
+│   │   └── run_once_after_21-install-env-packages.sh.tmpl  # per-class packages
 │   ├── dot_gitconfig.tmpl
 │   ├── dot_gitignore_global
 │   ├── dot_zshenv  dot_zshrc
-│   ├── dot_zsh/                      # 00-os 01-brew executable_02-zinit alias env function promptrc prompt/
+│   ├── dot_zsh/                      # 00-os 01-brew executable_02-zinit alias env function promptrc zz-env prompt/
+│   ├── dot_local/bin/               # → ~/.local/bin (on PATH); class-gated scripts
 │   ├── dot_tmux.conf
 │   ├── create_dot_custom             # ~/.custom (created once, never overwritten)
 │   ├── dot_config/nvim/
@@ -117,8 +198,11 @@ chezmoi update               # git pull the source + apply
   the managers:* zinit auto-installs its plugins on first interactive shell; for
   tmux run `prefix + I` once.
 - **Package installs.** `run_once_after_20-install-packages.sh.tmpl` installs
-  packages per-OS (Homebrew / apt). It re-runs only if its rendered content
-  changes.
+  base packages per-OS (Homebrew / apt); `run_once_after_21-install-env-packages`
+  adds per-class packages. Each re-runs only if its rendered content changes.
+- **Machine targeting.** `environment` (personal/work) and `class` are set at init
+  and gate templates, `.chezmoiignore`, and the package scripts — see
+  [Machine targeting](#machine-targeting).
 
 ## Tool details
 
@@ -127,7 +211,8 @@ chezmoi update               # git pull the source + apply
 - Aliases: `g s` (status), `g l` (pretty graph log), `g ap` (add -p), `g co`
   (checkout), `g br` (branch), plus `lg`, `ll`, `lm`, `su`, `reorder`, `contrib`.
 - Identity (name/email/signingkey) is templated and prompted once on
-  `chezmoi init` (press Enter to accept the defaults).
+  `chezmoi init`. No name or address is hardcoded in the repo, so fill them in when
+  prompted (values persist afterward).
 - **GPG commit signing** is enabled automatically when you provide a signingkey at
   init (`[commit] gpgsign = true`); leave the signingkey blank to keep it off.
 - `pull.rebase = true`, `rebase.autoStash = true`.
