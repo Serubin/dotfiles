@@ -1,0 +1,8 @@
+# OS/distro, resolved by chezmoi at apply time (no runtime detection).
+{{ if eq .chezmoi.os "darwin" -}}
+export DISTRO=darwin
+{{- else if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}
+export DISTRO=debian
+{{- else -}}
+export DISTRO={{ .chezmoi.osRelease.id }}
+{{- end }}
