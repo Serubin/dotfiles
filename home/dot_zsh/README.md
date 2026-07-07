@@ -4,8 +4,11 @@
 
 | Metric | Time |
 |---|---|
-| Shell startup | ~60ms |
-| Prompt render (in git repo) | ~0.5ms |
+| Shell startup | ~80ms |
+| Prompt render (in git repo) | ~2ms |
+
+Startup is dominated by eager zinit plugin loading; prompt render is mostly the
+gitstatus query. Re-measure anytime with `scripts/bench-zsh.sh`.
 
 ## Structure
 
