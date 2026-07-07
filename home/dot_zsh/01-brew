@@ -1,3 +1,0 @@
-if [ "$DISTRO" = "darwin" ]; then
-  export PATH="$PATH:/opt/homebrew/bin"
-fi
