@@ -8,13 +8,13 @@ alias ....="cd ../../.."
 
 
 # ls aliases
-if [ "$DISTRO" = "darwin" ]; then
-    alias ls="gls --color=auto"
-    alias sed="gsed"
-    alias dircolors="gdircolors"
-else
-    alias ls="ls --color=auto -N"
-fi
+{{ if eq .chezmoi.os "darwin" -}}
+alias ls="gls --color=auto"
+alias sed="gsed"
+alias dircolors="gdircolors"
+{{- else -}}
+alias ls="ls --color=auto -N"
+{{- end }}
 
 alias la="ls -A"
 alias ll="ls -lhAr"
@@ -34,7 +34,9 @@ alias "#"="echo #"
 alias vim="nvim"
 alias vi="vim"
 
-[[ "$DISTRO" != "darwin" ]] && alias open="xdg-open &> /dev/null"
+{{ if ne .chezmoi.os "darwin" -}}
+alias open="xdg-open &> /dev/null"
+{{ end -}}
 
 # listing cd
 alias cd="cdls"

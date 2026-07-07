@@ -15,7 +15,7 @@ Managed by chezmoi (deployed to `~/.zsh/`). `.zshrc` sources all files in `~/.zs
 
 | File | Purpose |
 |---|---|
-| `00-os` | Detects the OS/distro and exports `$DISTRO` |
+| `00-os` | Exports `$DISTRO` (resolved by a chezmoi template at apply time — no runtime OS detection) |
 | `01-brew` | Adds Homebrew to `PATH` on macOS |
 | `02-zinit` | Initializes zinit and loads plugins |
 | `alias` | Shell aliases and keybindings |
