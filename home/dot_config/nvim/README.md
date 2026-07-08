@@ -85,5 +85,5 @@ Plugin update checks run once per day (silently).
 Handled automatically by chezmoi. On Debian without Homebrew, Neovim is built from
 source using the latest tagged release; on macOS or Debian with Homebrew it's installed
 via `brew`. On Debian, `vi`, `vim`, and `editor` alternatives are pointed to `nvim`.
-This is all done by the chezmoi `run_once_after` package script
-(`home/.chezmoiscripts/run_once_after_20-install-packages.sh.tmpl`).
+This is all done by the chezmoi `run_once_before` package script
+(`home/.chezmoiscripts/run_once_before_20-install-packages.sh.tmpl`).
