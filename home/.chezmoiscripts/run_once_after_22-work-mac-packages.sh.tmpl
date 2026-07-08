@@ -1,0 +1,14 @@
+#!/bin/bash
+{{ if eq .class "work-mac" -}}
+# work-mac packages. sleepwatcher drives the ~/.config/sleepwatcher sleep/wake
+# hooks (agent: net.serubin.sleepwatcher). Isolated from the main installer so a
+# tap-trust hiccup there can't block it, and vice versa.
+set -euo pipefail
+if command -v brew >/dev/null 2>&1; then
+    brew install sleepwatcher
+else
+    echo "Homebrew not found — install sleepwatcher manually for net.serubin.sleepwatcher." >&2
+fi
+{{- else -}}
+exit 0
+{{- end }}
