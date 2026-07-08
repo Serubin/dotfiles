@@ -47,4 +47,16 @@ alias py="python"
 
 alias extract="aunpack"
 
+# Manually snapshot tmux session state via tmux-resurrect (on top of the cron
+# periodic save + client-detached hook). Unconditional — unlike the cron wrapper.
+alias tmux-save='$HOME/.tmux/plugins/tmux-resurrect/scripts/save.sh quiet && echo "✓ tmux session saved"'
+
 bindkey '^R' history-incremental-search-backward
+
+function tabname() {
+  if [ -z "$TMUX" ] ; then
+    printf "\e]1;%s\a" "$*"
+  else
+    tmux rename-window "$*"
+  fi
+}
