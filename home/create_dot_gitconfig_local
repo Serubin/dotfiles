@@ -1,0 +1,11 @@
+# Machine-local git config, included by ~/.config/git/config via [include].
+# chezmoi creates this file once and never overwrites it, so per-machine
+# identity/overrides live here and stay out of the public dotfiles repo.
+#
+# Edit with `git config --file ~/.gitconfig_local <key> <value>` (a plain
+# `git config --global` targets the chezmoi-managed ~/.config/git/config and is
+# reverted on the next `chezmoi apply`).
+#
+# Example:
+#   [user]
+#       email = you@work.example

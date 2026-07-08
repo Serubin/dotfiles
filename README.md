@@ -152,7 +152,7 @@ chezmoi update               # git pull the source + apply
 
 | Tool | Target | Description |
 |------|--------|-------------|
-| Git | `~/.gitconfig`, `~/.gitignore_global` | Aliases, templated identity, global ignore |
+| Git | `~/.config/git/{config,ignore}`, `~/.gitconfig_local` | Aliases, templated identity, global ignore, `gh` credential helper, machine-local overrides |
 | Zsh | `~/.zshrc`, `~/.zshenv`, `~/.zsh/` | Modular config, zinit plugins, custom prompt |
 | tmux | `~/.tmux.conf` | 256-color, TPM plugins, session restore |
 | Neovim | `~/.config/nvim/` | Lua config with lazy.nvim |
@@ -170,15 +170,16 @@ chezmoi update               # git pull the source + apply
 │   ├── .chezmoiexternal.toml.tmpl    # zinit, tpm, gitstatus (cloned & auto-updated)
 │   ├── .chezmoiscripts/
 │   │   ├── run_once_before_10-uninstall-stow.sh
-│   │   ├── run_once_after_20-install-packages.sh.tmpl
+│   │   ├── run_once_before_20-install-packages.sh.tmpl      # base tools (incl. gh) BEFORE configs render
+│   │   ├── run_once_after_15-migrate-git-xdg.sh            # one-time: drop legacy ~/.gitconfig
 │   │   └── run_once_after_21-install-env-packages.sh.tmpl  # per-class packages
-│   ├── dot_gitconfig.tmpl
-│   ├── dot_gitignore_global
 │   ├── dot_zshenv  dot_zshrc
 │   ├── dot_zsh/                      # 00-os 01-brew executable_02-zinit alias env function promptrc zz-env prompt/
 │   ├── dot_local/bin/               # → ~/.local/bin (on PATH); class-gated scripts
 │   ├── dot_tmux.conf
 │   ├── create_dot_custom             # ~/.custom (created once, never overwritten)
+│   ├── create_dot_gitconfig_local    # ~/.gitconfig_local (created once; machine-local git overrides)
+│   ├── dot_config/git/               # → ~/.config/git/{config.tmpl,ignore} (XDG git config)
 │   ├── dot_config/nvim/
 │   └── dot_claude/                   # CURATED: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
 ├── scripts/uninstall-stow.sh         # remove legacy Stow symlinks (manual)
@@ -197,9 +198,12 @@ chezmoi update               # git pull the source + apply
   keeps them updated. macOS gets gitstatus via Homebrew. *Cloning only installs
   the managers:* zinit auto-installs its plugins on first interactive shell; for
   tmux run `prefix + I` once.
-- **Package installs.** `run_once_after_20-install-packages.sh.tmpl` installs
+- **Package installs.** `run_once_before_20-install-packages.sh.tmpl` installs
   base packages per-OS (Homebrew / apt); `run_once_after_21-install-env-packages`
-  adds per-class packages. Each re-runs only if its rendered content changes.
+  adds per-class packages. Each re-runs only if its rendered content changes. The
+  base install is a `run_before_` hook so its tools exist before configs render —
+  e.g. gh must be present for the git template's `lookPath "gh"` credential-helper
+  block to render on the first apply, so a single apply converges.
 - **Machine targeting.** `environment` (personal/work) and `class` are set at init
   and gate templates, `.chezmoiignore`, and the package scripts — see
   [Machine targeting](#machine-targeting).

@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
-# Install packages for the detected OS. Replaces the old setup/{darwin,debian}
+# Install base packages for the detected OS. Replaces the old setup/{darwin,debian}
 # scripts. Plugin managers (zinit/tpm/gitstatus) are handled by
 # .chezmoiexternal, not here.
 #
+# run_BEFORE_ on purpose: base tooling must exist before any config file/template
+# renders, because chezmoi executes run_before_ scripts before it renders + writes
+# files. In particular ~/.config/git/config gates the gh credential helper on
+# `lookPath "gh"` (dot_config/git/config.tmpl) — installing gh here makes that
+# true on the FIRST apply, so a single `chezmoi apply` converges (no drift needing
+# a second pass). Do not "fix" this back to run_once_after_.
+#
 # run_once_ semantics: chezmoi re-runs this whenever the *rendered* content hash
-# changes — so editing this script re-triggers installs (and, on Debian without
-# Homebrew, a full Neovim source rebuild). Keep it stable.
+# changes — so editing this script re-triggers installs. On Debian a re-run does
+# NOT rebuild Neovim: the `command -v nvim` guard below short-circuits once nvim
+# exists. Keep it stable regardless.
 set -euo pipefail
 
 {{ if eq .chezmoi.os "darwin" -}}
@@ -14,7 +22,7 @@ if ! command -v brew >/dev/null 2>&1; then
     echo "Homebrew not found — install it from https://brew.sh and re-run 'chezmoi apply'." >&2
     exit 1
 fi
-brew install git zsh tmux neovim atool gsed coreutils
+brew install git gh zsh tmux neovim atool gsed coreutils
 brew install romkatv/gitstatus/gitstatus
 # Window management (all macs). After install, start them once with
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
@@ -27,7 +35,7 @@ brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd
 # ===== Debian / Ubuntu =====
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
-sudo apt-get install -y git zsh tmux atool
+sudo apt-get install -y git zsh tmux atool curl ca-certificates
 
 build_neovim() {
     sudo apt-get install -y ninja-build gettext cmake curl build-essential git
@@ -56,6 +64,23 @@ if command -v nvim >/dev/null 2>&1; then
     for alt in vi vim editor; do
         sudo update-alternatives --install "/usr/bin/$alt" "$alt" "$nvim_path" 60
     done
+fi
+
+# GitHub CLI (gh): backs the git credential helper. Not in Debian's default
+# repos, so prefer Homebrew if present, else add GitHub's signed apt repo.
+if command -v gh >/dev/null 2>&1; then
+    :  # already installed
+elif command -v brew >/dev/null 2>&1; then
+    brew install gh
+else
+    sudo mkdir -p -m 755 /etc/apt/keyrings
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+    sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+    sudo apt-get update
+    sudo apt-get install -y gh
 fi
 {{   else -}}
 echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim manually." >&2
