@@ -182,8 +182,10 @@ chezmoi update               # git pull the source + apply
 │   ├── dot_config/git/               # → ~/.config/git/{config.tmpl,ignore} (XDG git config)
 │   ├── dot_config/nvim/
 │   └── dot_claude/                   # CURATED: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
-├── scripts/uninstall-stow.sh         # remove legacy Stow symlinks (manual)
-├── Dockerfile  docker-compose.yml    # Debian test harness
+├── scripts/
+│   ├── uninstall-stow.sh             # remove legacy Stow symlinks (manual)
+│   └── docker-test.sh                # → `dotfiles-test` in the container: apply + login zsh
+├── Dockerfile  docker-compose.yml    # Debian test harness (non-root sudo user)
 ├── LICENSE  .spr.yml  README.md
 ```
 
@@ -295,12 +297,27 @@ credentials) is left untouched.
 
 ## Docker testing (Debian)
 
+Spins up a Debian container as a **non-root user with passwordless sudo** (so the
+`sudo` package installs are actually exercised) with the repo mounted read-only at
+`/workspace`.
+
 ```bash
 docker compose up -d --build
-docker compose exec debian bash
-# inside the container:
-chezmoi init --source=/workspace --apply
+docker compose exec debian dotfiles-test   # bootstrap (prompts) + drop into login zsh
+# or, without applying:
+docker compose exec debian zsh
 ```
+
+`dotfiles-test` runs `chezmoi init --apply` against the mounted source and drops
+you into the configured login zsh; it's idempotent, so re-running is a fast
+re-apply. Seed the env/class prompts non-interactively via the commented
+`environment:` block in `docker-compose.yml` (or `DOTFILES_ENV=… DOTFILES_CLASS=…
+docker compose exec debian dotfiles-test`).
+
+> **Neovim caveat:** the image pre-installs Debian's `nvim` so the harness skips
+> the multi-minute from-source build (`run_once_before_20`). That apt build is
+> older than what a real machine gets; it's fine for testing the dotfiles config,
+> but to exercise the source-build path, drop `neovim` from the `Dockerfile`.
 
 ## License
 
