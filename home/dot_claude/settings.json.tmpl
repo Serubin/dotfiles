@@ -40,8 +40,11 @@
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
+{{- if eq .class "work-devbox" }}
       "/home/coder/lwcode/services/.claude/skills",
-      "/home/coder/lwcode/services/vulnerability/.claude/skills"
+      "/home/coder/lwcode/services/vulnerability/.claude/skills",
+      "/home/coder/lwcode/services/vulnerability/vuln-feeds-manager/.claude/skills"
+{{- end }}
     ]
   },
   "statusLine": {
