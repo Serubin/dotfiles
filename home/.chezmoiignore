@@ -47,3 +47,9 @@
 {{ if ne .class "work-devbox" }}
 .local/bin/example-work-devbox
 {{ end }}
+
+# sleepwatcher sleep/wake feature (Coder iTerm2/tmux + fwd hygiene): work-mac only.
+{{ if ne .class "work-mac" }}
+.config/sleepwatcher
+Library/LaunchAgents/net.serubin.sleepwatcher.plist
+{{ end }}

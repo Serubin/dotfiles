@@ -1,0 +1,31 @@
+#!/bin/bash
+# sleepwatcher sleep hook (work-mac). Tear down the `fwd` SOCKS tunnel to the Coder
+# workspace so it can't linger as a half-open zombie across sleep. fwd runs in the
+# foreground of a terminal tab with no supervisor, so it will NOT auto-restart —
+# relaunch it yourself after wake. Narrow match: only the fwd supervisor and its
+# `ssh -T -D` SOCKS child; the tmux -CC ssh (ssh -tt) is untouched.
+# Set SLEEP_DRY_RUN=1 to log targets without killing (for testing).
+# Managed by chezmoi: home/dot_config/sleepwatcher/. coderHost from machine-local data.
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+log="$HOME/.config/sleepwatcher/events.log"
+host='{{ .coderHost | replace "." "\\." }}'   # coder ssh host, dots regex-escaped
+
+ts=$(date '+%Y-%m-%dT%H:%M:%S%z')
+targets=$( { pgrep -f "fwd ${host}"; pgrep -f "ssh -T -D [0-9]+ ${host}"; } | sort -un)
+
+{
+  echo "=== sleep $ts ==="
+  if [ -n "$targets" ]; then
+    echo "fwd targets:"
+    for p in $targets; do ps -o pid,etime,command= -p "$p" 2>/dev/null | sed 's/^/  /'; done
+  else
+    echo "no fwd/SOCKS ssh present (nothing to kill)"
+  fi
+} >> "$log" 2>&1
+
+if [ -n "$targets" ] && [ -z "$SLEEP_DRY_RUN" ]; then
+  echo "$targets" | xargs kill 2>>"$log"
+  echo "  killed." >> "$log"
+elif [ -n "$targets" ]; then
+  echo "  DRY_RUN: not killing." >> "$log"
+fi
