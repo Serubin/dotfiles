@@ -42,9 +42,16 @@
 {{- $email := promptStringOnce . "git.email" "git user.email" "" -}}
 {{- $signingkey := promptStringOnce . "git.signingkey" "git signingkey (blank to disable commit signing)" "" -}}
 
+{{- /* coderHost: coder ssh host for the work-mac sleepwatcher hooks; blank if N/A. */ -}}
+{{- $coderHost := env "DOTFILES_CODER_HOST" -}}
+{{- if not $coderHost -}}
+{{-   $coderHost = promptStringOnce . "coderHost" "coder ssh host for sleep/wake hooks (blank if none)" "" -}}
+{{- end -}}
+
 [data]
     environment = {{ $env | quote }}
     class = {{ $class | quote }}
+    coderHost = {{ $coderHost | quote }}
 
 [data.git]
     name = {{ $name | quote }}
