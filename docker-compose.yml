@@ -2,9 +2,19 @@ services:
   debian:
     build: .
     volumes:
-      - .:/workspace
-    entrypoint: ["tail", "-f", "/dev/null"]
-    command: "/bin/bash"
-    # Inside the container: chezmoi init --source=/workspace --apply
-    stdin_open: true # docker run -i
+      # Live source, read-only: edit on the host, re-apply in the container.
+      # chezmoi never writes into the source (its state lives in
+      # ~/.config/chezmoi), so read-only is safe and keeps the container from
+      # mutating your working tree.
+      - .:/workspace:ro
+    working_dir: /home/dev
+    # Seed the init prompts for a non-interactive apply (git identity then falls
+    # back to chezmoi's prompt defaults). Uncomment to skip the env/class prompts.
+    # environment:
+    #   DOTFILES_ENV: personal
+    #   DOTFILES_CLASS: personal-server
+    stdin_open: true # docker compose run/exec -i
     tty: true
+    # Bootstrap + drop into a login zsh:  docker compose exec debian dotfiles-test
+    # Plain shell without applying:        docker compose exec debian zsh
+    # The image CMD (sleep infinity) keeps the container alive for `exec`.
