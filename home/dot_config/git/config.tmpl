@@ -42,5 +42,9 @@
 [commit]
 	gpgsign = true
 {{- end }}
+{{ if eq .class "work-devbox" -}}
+[safe]
+	directory = /home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/homebrew/homebrew-core
+{{ end -}}
 [include]
 	path = ~/.gitconfig_local
