@@ -48,6 +48,14 @@
 .local/bin/example-work-devbox
 {{ end }}
 
+# tmux -CC (iTerm2 control-mode) devbox helpers: the periodic-save cron target
+# and the stale-client-clearing connect helper. work-devbox only — the mac side
+# of this workflow is the sleepwatcher feature below.
+{{ if ne .class "work-devbox" }}
+.local/bin/tmux-periodic-save.sh
+.local/bin/tmux-devel.sh
+{{ end }}
+
 # sleepwatcher sleep/wake feature (Coder iTerm2/tmux + fwd hygiene): work-mac only.
 {{ if ne .class "work-mac" }}
 .config/sleepwatcher
