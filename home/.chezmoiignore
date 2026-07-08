@@ -48,10 +48,13 @@
 .local/bin/example-work-devbox
 {{ end }}
 
-# tmux -CC (iTerm2 control-mode) devbox helpers: the periodic-save cron target
-# and the stale-client-clearing connect helper. work-devbox only — the mac side
-# of this workflow is the sleepwatcher feature below.
+# work-devbox bootstrap + helpers: the ~/personalize startup script, the sshd
+# keepalive re-apply helper it calls, and the tmux -CC (iTerm2 control-mode)
+# helpers (periodic-save cron target + stale-client-clearing connect helper).
+# work-devbox only — the mac side of this workflow is the sleepwatcher feature below.
 {{ if ne .class "work-devbox" }}
+personalize
+.local/bin/apply-sshd-keepalive.sh
 .local/bin/tmux-periodic-save.sh
 .local/bin/tmux-devel.sh
 {{ end }}
