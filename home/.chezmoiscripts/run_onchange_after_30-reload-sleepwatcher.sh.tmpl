@@ -1,0 +1,20 @@
+#!/bin/bash
+{{ if eq .class "work-mac" -}}
+# Reload the chezmoi-managed sleepwatcher agent when its plist changes; migrate off
+# brew's service and the old ~/.wakeup/~/.sleep layout. Idempotent.
+# plist-hash: {{ include "Library/LaunchAgents/net.serubin.sleepwatcher.plist.tmpl" | sha256sum }}
+set -euo pipefail
+export PATH="/opt/homebrew/bin:$PATH"
+label="net.serubin.sleepwatcher"
+plist="$HOME/Library/LaunchAgents/${label}.plist"
+domain="gui/$(id -u)"
+
+brew services stop sleepwatcher 2>/dev/null || true          # drop brew's competing agent
+rm -f "$HOME/.wakeup" "$HOME/.sleep" "$HOME/.wakeup-tmux.log" # remove pre-relocation files
+
+launchctl bootout "${domain}/${label}" 2>/dev/null || true
+launchctl bootstrap "${domain}" "${plist}"
+echo "sleepwatcher agent ${label} loaded."
+{{- else -}}
+exit 0
+{{- end }}

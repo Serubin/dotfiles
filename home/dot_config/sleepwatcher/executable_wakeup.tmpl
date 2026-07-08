@@ -1,0 +1,35 @@
+#!/bin/bash
+# sleepwatcher wake hook (work-mac). Reap the iTerm2 tmux -CC ssh that Coder's
+# roaming tunnel keeps alive across sleep, so iTerm2 releases the gateway and
+# offers a clean reconnect. Narrow match => the SOCKS `fwd` ssh is untouched; the
+# remote session is never killed (tmux new -A reattaches; continuum has state).
+# Set WAKEUP_DRY_RUN=1 to log the target without killing (for testing).
+# Managed by chezmoi: home/dot_config/sleepwatcher/. coderHost from machine-local data.
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+log="$HOME/.config/sleepwatcher/events.log"
+host='{{ .coderHost | replace "." "\\." }}'   # coder ssh host, dots regex-escaped
+
+# keep the log bounded
+if [ -f "$log" ] && [ "$(wc -c < "$log")" -gt 100000 ]; then
+  tail -n 200 "$log" > "$log.tmp" && mv "$log.tmp" "$log"
+fi
+
+ts=$(date '+%Y-%m-%dT%H:%M:%S%z')
+targets=$(pgrep -f "ssh -tt ${host}.*tmux-devel\.sh")
+
+{
+  echo "=== wake $ts ==="
+  if [ -n "$targets" ]; then
+    echo "target tmux -CC ssh:"
+    for p in $targets; do ps -o pid,etime,command= -p "$p" 2>/dev/null | sed 's/^/  /'; done
+  else
+    echo "no tmux-devel.sh ssh present (nothing to reap)"
+  fi
+} >> "$log" 2>&1
+
+if [ -n "$targets" ] && [ -z "$WAKEUP_DRY_RUN" ]; then
+  echo "$targets" | xargs kill 2>>"$log"
+  echo "  reaped." >> "$log"
+elif [ -n "$targets" ]; then
+  echo "  DRY_RUN: not killing." >> "$log"
+fi
