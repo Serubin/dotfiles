@@ -1,0 +1,21 @@
+#!/bin/bash
+{{ if eq .class "work-devbox" -}}
+# Install the attach-independent tmux-resurrect periodic-save cron (every 5 min),
+# the devbox replacement for tmux-continuum's timer: continuum's save rides
+# status-line #() interpolation, which tmux does NOT evaluate under iTerm2 control
+# mode (-CC), so its timer never fires in our workflow. run_onchange_ re-runs only
+# when this file's rendered content changes. Idempotent — the line is de-duped by
+# its marker comment, and other crontab entries are preserved.
+set -euo pipefail
+
+if ! command -v crontab >/dev/null 2>&1; then
+    echo "crontab not found — skipping tmux-periodic-save cron install." >&2
+    exit 0
+fi
+
+line="*/5 * * * * $HOME/.local/bin/tmux-periodic-save.sh >/dev/null 2>&1 # tmux-periodic-save"
+( crontab -l 2>/dev/null | grep -vF '# tmux-periodic-save'; echo "$line" ) | crontab -
+echo "tmux-periodic-save cron installed (*/5)."
+{{- else -}}
+exit 0
+{{- end }}
