@@ -6,11 +6,12 @@
 #     sh -c "$(curl -fsLS https://raw.githubusercontent.com/Serubin/dotfiles/main/install.sh)"
 #
 #   From a local clone:
-#     git clone https://github.com/Serubin/dotfiles.git && dotfiles/install.sh
+#     git clone https://github.com/Serubin/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh
 #
-# Installs chezmoi if needed, then runs `chezmoi init --apply`. When invoked from
-# inside a checkout of this repo, that checkout is used as the chezmoi source;
-# otherwise the repo is cloned from GitHub. chezmoi then prompts once for the
+# Installs chezmoi if needed, then runs `chezmoi init --apply`. The chezmoi source
+# directory is ~/.dotfiles (pinned via `sourceDir` in the config): run this from a
+# ~/.dotfiles checkout to use it in place, otherwise the repo is cloned from GitHub
+# into ~/.dotfiles. chezmoi then prompts once for the
 # machine environment/class + your git identity, clears any legacy GNU Stow
 # symlinks, installs packages for your OS, and writes the managed files into $HOME.
 #
@@ -91,6 +92,6 @@ if [ -n "$here" ] && [ -f "${here}/.chezmoiroot" ]; then
     echo "==> chezmoi init --apply (local source: ${here})"
     exec chezmoi init --apply ${init_flags} --source="${here}"
 else
-    echo "==> chezmoi init --apply ${GITHUB_REPO}"
-    exec chezmoi init --apply ${init_flags} "${GITHUB_REPO}"
+    echo "==> chezmoi init --apply --source ~/.dotfiles ${GITHUB_REPO}"
+    exec chezmoi init --apply ${init_flags} --source="${HOME}/.dotfiles" "${GITHUB_REPO}"
 fi

@@ -16,7 +16,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 # dependency, and it works before the migration lands on the default branch).
 # install.sh also runs the base-package chezmoiscript and deploys the helper
 # scripts this bootstrap calls below.
-DOTFILES_SRC="${DOTFILES_SRC:-$HOME/.local/share/chezmoi}"
+DOTFILES_SRC="${DOTFILES_SRC:-$HOME/.dotfiles}"
 if [ -x "$DOTFILES_SRC/install.sh" ]; then
     "$DOTFILES_SRC/install.sh" --env work --class work-devbox
 else
