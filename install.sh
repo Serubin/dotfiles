@@ -90,8 +90,17 @@ esac
 
 if [ -n "$here" ] && [ -f "${here}/.chezmoiroot" ]; then
     echo "==> chezmoi init --apply (local source: ${here})"
-    exec chezmoi init --apply ${init_flags} --source="${here}"
+    set -- chezmoi init --apply ${init_flags} --source="${here}"
 else
     echo "==> chezmoi init --apply --source ~/.dotfiles ${GITHUB_REPO}"
-    exec chezmoi init --apply ${init_flags} --source="${HOME}/.dotfiles" "${GITHUB_REPO}"
+    set -- chezmoi init --apply ${init_flags} --source="${HOME}/.dotfiles" "${GITHUB_REPO}"
+fi
+
+# git-repo externals (zinit/gitstatus/tpm) can flake on the first heavy
+# init --apply; retry once so a transient clone hiccup doesn't leave onboarding
+# half-done. The retry converges cheaply: cloned externals are cached, run_once
+# scripts are already recorded, and nothing re-installs.
+if ! "$@"; then
+    echo "==> first apply failed; retrying once (transient external clone?)..." >&2
+    "$@"
 fi
