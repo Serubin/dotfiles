@@ -48,6 +48,11 @@
 {{-   $coderHost = promptStringOnce . "coderHost" "coder ssh host for sleep/wake hooks (blank if none)" "" -}}
 {{- end -}}
 
+{{- /* Keep the chezmoi source at ~/.dotfiles on every machine (vs the default
+       ~/.local/share/chezmoi). The first `chezmoi init` still needs --source to
+       clone there; persisting it here makes every later bare command use it. */ -}}
+sourceDir = {{ (joinPath .chezmoi.homeDir ".dotfiles") | quote }}
+
 [data]
     environment = {{ $env | quote }}
     class = {{ $class | quote }}
