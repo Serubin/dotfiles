@@ -1,0 +1,29 @@
+# Paths chezmoi must never manage (matched against target paths under $HOME).
+#
+# IMPORTANT: do NOT list external targets (.zsh/zinit, .zsh/gitstatus,
+# .tmux/plugins) here. .chezmoiignore removes entries from the target state,
+# including .chezmoiexternal entries — ignoring them would silently prevent the
+# plugin-manager clones.
+
+# zsh runtime / compiled caches
+.zsh/cache
+*.zwc
+.zcompdump*
+
+# nvim runtime: shell history + lazy.nvim lock/state (unpinned, like today)
+.config/.histfile
+.config/nvim/lazy-lock.json
+.config/nvim/lazyvim.json
+.config/nvim/lazy
+
+# Claude Code: only the curated config (settings.json, CLAUDE.md, skills/,
+# plugins/{known_marketplaces,blocklist}.json) is managed. Guard the
+# machine-local override, secrets, and the cloned marketplace repos.
+.claude/settings.local.json
+.claude/.credentials.json
+.claude/plugins/marketplaces
+
+# Repo docs kept next to the config they document, but NOT deployed to $HOME.
+# (.zsh/README.md would otherwise be sourced by .zshrc's `~/.zsh/*` loop.)
+.zsh/README.md
+.config/nvim/README.md

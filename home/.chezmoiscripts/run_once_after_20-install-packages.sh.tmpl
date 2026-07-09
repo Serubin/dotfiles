@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Install packages for the detected OS. Replaces the old setup/{darwin,debian}
+# scripts. Plugin managers (zinit/tpm/gitstatus) are handled by
+# .chezmoiexternal, not here.
+#
+# run_once_ semantics: chezmoi re-runs this whenever the *rendered* content hash
+# changes — so editing this script re-triggers installs (and, on Debian without
+# Homebrew, a full Neovim source rebuild). Keep it stable.
+set -euo pipefail
+
+{{ if eq .chezmoi.os "darwin" -}}
+# ===== macOS / Homebrew =====
+if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew not found — install it from https://brew.sh and re-run 'chezmoi apply'." >&2
+    exit 1
+fi
+brew install git zsh tmux neovim atool gsed coreutils
+brew install romkatv/gitstatus/gitstatus
+
+{{ else if eq .chezmoi.os "linux" -}}
+{{   $id := .chezmoi.osRelease.id -}}
+{{   if or (eq $id "debian") (eq $id "ubuntu") -}}
+# ===== Debian / Ubuntu =====
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+sudo apt-get install -y git zsh tmux atool
+
+build_neovim() {
+    sudo apt-get install -y ninja-build gettext cmake curl build-essential git
+    local latest
+    latest=$(curl -sL https://api.github.com/repos/neovim/neovim/tags \
+        | grep -m1 '"name":' | sed -E 's/.*"name": *"([^"]+)".*/\1/')
+    echo "Building Neovim ${latest} from source..."
+    rm -rf /tmp/neovim
+    git clone --depth 1 --branch "$latest" https://github.com/neovim/neovim /tmp/neovim
+    ( cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install )
+    rm -rf /tmp/neovim
+}
+
+# Prefer Homebrew's neovim if brew is present (newer than apt); else build from
+# source only when nvim is missing.
+if command -v brew >/dev/null 2>&1; then
+    brew install neovim
+elif ! command -v nvim >/dev/null 2>&1; then
+    build_neovim
+fi
+
+# Register nvim as the system vi/vim/editor (non-interactive; the old script used
+# the blocking `--config` form, which we drop).
+if command -v nvim >/dev/null 2>&1; then
+    nvim_path=$(command -v nvim)
+    for alt in vi vim editor; do
+        sudo update-alternatives --install "/usr/bin/$alt" "$alt" "$nvim_path" 60
+    done
+fi
+{{   else -}}
+echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim manually." >&2
+{{   end -}}
+{{ end -}}
