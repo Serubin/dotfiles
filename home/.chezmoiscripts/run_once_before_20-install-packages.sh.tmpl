@@ -27,7 +27,7 @@ brew install romkatv/gitstatus/gitstatus
 # Window management (all macs). After install, start them once with
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
 # require SIP to be partially disabled (manual, out of scope here).
-brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd
+brew install asmvik/formulae/yabai asmvik/formulae/skhd
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
