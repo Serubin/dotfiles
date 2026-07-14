@@ -1,0 +1,312 @@
+{{- $ticketRequired := eq .environment "work" -}}
+---
+name: commit
+description: Describe a git or jj change OR draft a GitHub PR title/description, conforming to a commit style guide. Mines the session for the real "why", asks for missing inputs (ticket link, motivation), drafts a body proportional to the change, and self-reviews against the style guide with a fresh-context agent before applying. Use when the user says "commit", "/commit", "describe this change", "write a commit message", "write/draft/generate a PR description or body" (also "write PR", "draft PR", "generate PR"), or wants to finalize the current staged git diff / jj working copy / GitHub PR.
+---
+
+# Commit Skill
+
+Describe a change with a message that conforms to the bundled style guide,
+[`references/style-commits.md`](references/style-commits.md). The same guide governs **commit
+messages and PR descriptions** — same audience, same rules. The point of this skill is to
+**stop AI commit/PR anti-patterns at the source**: fabricated "why"s, section ceremony, tours
+of the diff, and verification theater.
+
+**Defer to the repo.** If the current repo ships its own commit-style guide (e.g.
+`docs/style-commits.md`, `CONTRIBUTING.md`) or a `.github/pull_request_template.md`, read it
+and let it win over the bundled guide on any conflict — repo conventions (ticket format,
+scopes, required sections) take precedence. The bundled guide is the default when the repo
+says nothing.
+
+## Modes
+
+Pick the mode from the user's ask. If ambiguous, ask.
+
+| Mode | What you're producing | Source of truth for the diff |
+|---|---|---|
+| **commit** (default) | Subject + body for the *current* staged git diff or jj working-copy change | Diff from the resolved base to the change being described — see "Resolve the base ref" |
+| **pr** | PR title + body for the current branch's PR (existing or new) | `git diff $(resolve_base)...HEAD` — see "Resolve the base ref" |
+
+The steps below are shared. Notes labelled **(pr)** apply only to PR mode, **(followup)** to
+follow-up commits, and **(lead)** to lead commits or PRs.
+
+### Resolve the base ref
+
+The base is the comparison point for both the diff to describe and the lead-vs-follow-up
+classification.
+
+For **commit** mode, walk back from `HEAD` (git) / `@` (jj) along ancestors and stop at the
+**first** match. Whichever stops you first is the base:
+
+1. A **substantive** commit on this line of work — subject does **not** start with `fixup:` /
+   `cleanup:` / `review-response:`. When a repo squash-merges PRs, these prefixes collapse
+   into their parent, so the change being described is measured against the last *real*
+   commit, not against an in-progress fixup chain. → **follow-up** of that commit.
+2. The tip of the **closest ancestor branch / bookmark** that isn't the current one (a
+   stacked-PR parent, an unmerged feature branch you forked from, etc.). → **lead** on top of
+   that branch.
+3. The **merge-base with the trunk** (`origin/main` in git, `trunk()` in jj). → **lead**.
+
+Don't shell out to `gh` for this; local refs are enough. If the user is doing stacked work and
+the local resolution is wrong, they'll tell you.
+
+To enumerate candidates, list ancestors of `HEAD` / `@-` not yet in the trunk with their
+refs/bookmarks and subject lines — e.g. `git log --decorate --oneline $(git merge-base HEAD origin/main)..HEAD~`
+for git, or `jj log -r 'ancestors(@-) & ~ancestors(trunk())' --no-graph -T 'change_id.shortest() ++ " [" ++ bookmarks ++ "] " ++ description.first_line() ++ "\n"'`
+for jj. Walk newest first; the first row matching any criterion above is the base.
+
+For **pr** mode, the base is the PR's `baseRefName`, which is **not always `origin/main`** in
+stacked-PR workflows (graphite, ghstack, spr, `gh pr create --base <other-branch>`):
+
+1. `gh pr view --json baseRefName --jq .baseRefName` for the current branch. If it returns a
+   ref, that is the base.
+2. No PR exists → fall back to `origin/main`.
+
+The other PR-mode `gh` call this skill uses (reading the existing PR title/body in "Before you
+draft anything") is also fine — PR mode is user-initiated. Outside PR mode and the stacked-PR
+coordination at the end of a PR body, **do not invoke `gh pr *`** unless the user explicitly
+asks.
+
+### Lead vs follow-up: workflow detection
+
+The base resolution above answers this implicitly. Case 1 (base is a substantive commit on
+this line of work) → **follow-up** of that commit. Cases 2–3 (base is a branch/bookmark tip or
+trunk) → **lead**.
+
+The style guide's "Commits within a PR" section is authoritative on what each variant should
+look like (including the `review-response:` / `fixup:` / `cleanup:` prefixes). False positives
+toward "lead" (real follow-up → flagged as lead → full review) are cheap, so when in doubt,
+treat as lead.
+
+## Before you draft anything
+
+1. **Read the bundled `references/style-commits.md` in full this turn** (plus the repo's own
+   guide if it has one — see "Defer to the repo"). It's short. Going from memory will get you
+   a draft that fails the self-review in Step 4.
+2. **Detect the VCS.** `.jj/` present → Jujutsu; otherwise → git. See Step 5 for the exact
+   apply commands — always pass the message via a file (`git commit -F file`,
+   `jj describe --stdin < file`, `gh ... --body-file file`), never via shell-escaped `-m`
+   strings or heredocs.
+3. **Look at the diff.** Use the resolved base. Commit mode: `git diff <base>` (git — includes
+   staged and unstaged work) or `jj diff -r '<base>..@'` (jj). When the base walked back
+   through a `fixup:` / `cleanup:` chain, this diff naturally includes those squash-away
+   commits along with the current staged / working-copy changes. **(pr)** PR mode: the base is
+   the PR's `baseRefName`, *not* always `origin/main`. Run
+   `git diff $(git merge-base HEAD <base>)...HEAD` plus
+   `git log --oneline $(git merge-base HEAD <base>)..HEAD` to see the commits the PR bundles.
+   The size and nature of the diff caps the size of the description — see Step 3.
+
+If nothing is staged / the working copy is empty / the branch is at the base (PR mode), stop
+and tell the user.
+
+**(pr)** If a PR already exists for the branch (`gh pr view --json number,title,body` doesn't
+error), read its current title and body before drafting. The user may want to refine the
+existing one, not start from scratch.
+
+## Step 1 — Mine the session first
+
+Before asking the user anything, scan the conversation so far for:
+
+- **A real "why"** — did the user explain motivation earlier ("we keep getting paged when X",
+  "legal flagged Y", "this was blocking the Z migration")? That is your *Why*. Quote it almost
+  verbatim.
+- **A ticket link or key** — was one mentioned, pasted, or implied?
+- **A scope** — what subdirectory / project / component does this change touch?
+
+Only ask for what you couldn't find.
+
+## Step 2 — Gather missing inputs
+
+Use `AskUserQuestion` to collect what's still missing. Keep questions short and only ask what
+you need.
+
+**Subject line** — `<type>(<scope>): <imperative sentence-case summary>`, ≤ 70 chars, no
+period. Concrete summaries only. "fix bug" / "update X" / "various changes" will be rejected by
+the review step; spend the effort up front.
+
+**(followup)** Subject is the only required input — the lead commit already carries the
+{{ if $ticketRequired }}ticket and the {{ end }}why. The style guide's "Commits within a PR" section defines the preferred prefixes;
+offer the user one when it fits:
+
+- `review-response: <what>` — addressing review feedback
+- `fixup: <what>` — small fix to an earlier commit on this branch
+- `cleanup: <what>` — incidental polish
+
+Conventional Commits (`fix(scope): …`) is still fine when the follow-up is a self-contained
+logical change. Add a body only if the change is non-trivial. Skip to Step 5.
+
+**(lead / pr)** The rest of Step 2 applies:
+
+{{ if $ticketRequired -}}
+**Ticket line** — required. The bundled guide uses a `Jira:` line; a repo may use a different
+convention (`Refs:`, `Closes #`, an issue URL) — follow the repo's. Acceptable forms for the
+default:
+
+- `Jira: <ticket URL>`
+- `Jira: This commit only touches documentation` (or another non-production justification)
+- `Jira: TODO` — placeholder only, must be replaced before the PR opens
+
+If the user hasn't supplied a ticket, ask. **Do not invent a ticket key.** Offer the `TODO`
+placeholder as a fallback.
+{{- else -}}
+**Ticket line** — not used on this machine. Don't ask for a ticket, don't add a `Jira:` /
+`Refs:` line, and don't treat a missing one as a defect. (Exception: if the current repo's own
+guide or its commit history clearly uses ticket references, defer to the repo and include one.)
+{{- end }}
+
+**The "why"** — if session mining didn't surface one and the change isn't a self-evident chore
+(dep bump, formatting, generated-file update), **ask the user**. A made-up why that paraphrases
+the *what* ("This change improves the loader by adding retries") is the exact failure mode this
+skill exists to prevent. Better to ask one short question than to fabricate.
+
+## Step 3 — Draft proportional to the diff
+
+Pick the size by reviewer risk, not LOC:
+
+| Diff shape | Description size | Sections |
+|---|---|---|
+| Docs / typo / one-line / mechanical rename / dep bump | **Brief** | Usually none. Subject + {{ if $ticketRequired }}ticket + {{ end }}one or two sentences. |
+| Behavior change with non-obvious tradeoff or evidence | **Medium** | Why + one of {Verification, Implementation} if genuinely needed |
+| Schema-touching, cross-cutting, behavior-change-not-provable-in-CI | **Detailed** | Why + Implementation + Verification (with links) + Risks if real |
+
+A docs rewrite touching a hundred files is still **Brief**. A 20-line schema change can be
+**Detailed**. Size follows risk, not byte count.
+
+**Lead with the effect of the change** (what is now different about the running system), not
+the implementation. Exception: chore/refactor/docs commits where the implementation *is* the
+effect.
+
+**Sections are a menu, not a checklist.** Default to *Why* only. The style guide lists possible
+sections — pick one only if the commit cannot be understood without it.
+
+**(pr)** When PRs squash-and-merge, the PR title and body **are** the eventual single commit
+message. Treat them at the same level as a lead commit body — not a tour of the branch's
+commits.
+
+- **Do not aggregate the branch's commits into the PR body.** No `## Changes` lists, no
+  "Commit 1 did X, commit 2 did Y" recaps. The commits don't survive the merge; their messages
+  are scratch notes. The PR body (and lead commit) describes the merged result.
+- If the repo has a `.github/pull_request_template.md`, structure the body around its required
+  sections and fill them with real, effect-first content; strip the template's instruction
+  lines (`>` blockquote hints and `<!-- -->` comments). Still omit a section that would only
+  hold filler — don't invent content to satisfy a heading.
+- If this PR builds on another, add `---\nStacked PR:\n\n- #<num>` (or `Builds on #<num>`) at
+  the end of the body, not the title.
+- The PR title follows commit-subject rules: Conventional Commits, imperative sentence case,
+  ≤ 70 chars, no period.
+- If a single lead commit on the branch already has a style-guide-adherent message, the PR body
+  can be that message (minus the subject line, which goes in the title field). For multi-commit
+  branches, draft the PR body fresh against the merged diff — don't mechanically concatenate
+  commit messages.
+
+## Sanity-check the diff before you finalize (all modes)
+
+While drafting, if any part of the change looks **wrong, half-finished, or inconsistent** —
+not a deliberate caveat — **stop and ask the user** (`AskUserQuestion`) instead of writing a
+hedged "Note: …" into the message. Signals:
+
+- a config/manifest references a file, path, or symbol that isn't part of this change and you
+  can't confirm exists;
+- a symbol was removed but still appears referenced elsewhere in the diff or repo;
+- the change looks unfinished — a leftover `TODO`, an empty body where logic was expected, an
+  import added but unused;
+- a renamed/moved file gained or lost content beyond what the rename should produce.
+
+A deliberate, already-understood caveat (e.g. "the matching server change ships in a separate
+PR") is not an anomaly — it just goes in the body. The rule: if you're tempted to hedge, that
+hedge is a signal to ask, not to ship. If the user confirms it's intentional, carry on; if they
+want to fix it first, stop here.
+
+## Step 4 — Self-review with a fresh-context agent
+
+Mandatory for **lead** and **pr** modes. **Skip for follow-up commits** — running a full
+conformance review on "review-response: fix typo in BarDao" is overkill. For follow-ups, do a
+quick local sanity check: subject is concrete (not "fix things"), uses one of the accepted
+prefixes (`review-response:` / `fixup:` / `cleanup:` / Conventional Commits), is imperative,
+and has no AI-fingerprint trailers (`Co-Authored-By: Claude …`, `🤖 Generated with …`). Then go
+to Step 5.
+
+First, write the draft to a temp file (e.g. `mktemp -t commit-msg` with a `.md` suffix) —
+subject + blank line + body for `commit` mode, body only for `pr` mode. **This is the file
+Step 5 will apply**, so what the reviewer sees is byte-for-byte what gets committed. Don't
+paste the draft inline into the agent prompt; pass the path.
+
+Spawn an `Agent` (subagent_type `general-purpose`) with no conversation context — it judges
+only against the guide. Pass:
+
+- The absolute path to this skill's bundled `references/style-commits.md` (the copy alongside
+  this SKILL.md — resolve it relative to this SKILL.md's own directory), **and** the repo's own
+  style guide if one exists — tell the agent the repo's guide wins on any conflict.
+- Which artifact is being reviewed: **lead commit message** or **PR description** (if the repo
+  squash-merges, say so, so the agent doesn't expect the PR body to recap commits).
+- A one-line summary of the **actual** diff shape (e.g., "docs-only, +12 / -3 in one file" or
+  "behavior change: added retry to two functions in ingest.go"). **(pr)** Note the PR's branch
+  commit count for context but make clear the description must stand on the merged diff, not
+  the branch history.
+- The absolute path to the draft file.
+
+Tell the agent to return a numbered list of concrete fixes, or the literal line `LOOKS GOOD` if
+it conforms. Have it check specifically:
+
+- Subject line: Conventional Commits format, imperative sentence case, no period, ≤ 70 chars,
+  concrete (not "fix bug")
+{{ if $ticketRequired -}}
+- Ticket line present and well-formed
+{{ end -}}
+- Body opens with the effect of the change, unless this is a chore/docs exception
+- Description size is proportional to the diff shape passed in — flag any section the diff
+  doesn't justify
+- **Why** describes motivation distinct from the *what* — a "why" that paraphrases the
+  implementation is a hard fail
+- No AI co-author trailers (`Co-Authored-By: Claude …`, `🤖 Generated with …`, etc.)
+- No restating the diff (file-by-file lists), no re-explaining the project, no "tested locally
+  / tests pass" verification theater
+
+**Apply the agent's feedback by editing the draft file in place.** Do not argue with the agent.
+If a fix requires more info from the user, ask. Re-run the review only if you made substantive
+content changes; small wording tweaks don't need a second pass.
+
+## Step 5 — Confirm and apply
+
+Show the final message to the user (`cat` the temp file). Ask for confirmation.
+
+**Apply the same temp file from Step 4 — don't retype the message into a `-m` flag or a
+heredoc.** Commit bodies routinely contain backticks, backslashes, code spans, and quotes;
+shell-escaped `-m "..."` and `$(cat <<'EOF' ... EOF)` patterns mangle them silently (e.g.,
+escaping backticks inside a single-quoted heredoc leaves literal `` \` `` in the description).
+File-based input avoids every layer of shell quoting and guarantees that what was reviewed is
+what gets applied.
+
+Run **exactly one** of:
+
+- **commit + git**: `git commit -F <file>`
+- **commit + jj**: `jj describe -r <change> --stdin < <file>`
+- **pr, existing PR**: **show the user this command but do not run it unless they ask you to:**
+  `gh pr edit <num> --title "<title>" --body-file <file>`
+- **pr, no PR yet**: **show but don't run unless asked:**
+  `gh pr create --title "<title>" --body-file <file> --base <base>`
+
+Do **not** push, do **not** run `jj new` to start the next change, do **not** create/merge a PR
+on your own, and do **not** add `Co-Authored-By:` or any co-author trailer. Those are separate
+user-initiated actions. For PR mode, also do not request reviewers, add labels, or change the
+PR's draft state unless asked.
+
+## Anti-patterns this skill exists to stop
+
+Read these before drafting. If you catch yourself doing any of them, restart that section.
+
+1. **Fabricated "why"s.** "This change improves observability by adding metrics" is the *what*
+   with "improves" glued on. A real why names a prior problem: "On-call had no way to alert on
+   dropped rows because the existing counter incremented only on success."
+2. **Section ceremony.** Three headed sections on a five-line diff. If you reach for
+   `## Why / ## Implementation / ## Notes for reviewer` on a docs PR, you are filling out a
+   form, not communicating.
+3. **Tours of the diff.** "## Changes — BarDao now has a doc comment. The package Javadoc has
+   been updated. The README points back to BarDao." `git show` already says all of this.
+4. **Verification theater.** "Tested locally. All tests pass." CI runs the tests. Mention
+   verification only when CI cannot run it, and link to evidence.
+5. **AI fingerprints.** `Co-Authored-By: Claude …`, `🤖 Generated with …`, "As an AI…" — none of
+   these belong in a commit body. The style guide explicitly forbids them.
+
+If the review agent comes back `LOOKS GOOD` and you're tempted to "add one more clarifying
+sentence" — stop. Brevity is the goal.

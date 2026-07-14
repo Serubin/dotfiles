@@ -1,0 +1,355 @@
+{{- $ticketRequired := eq .environment "work" -}}
+# Commit Style
+
+Conventions for commit messages and commit structure. Tooling-agnostic — applies whether
+you're using `git`, `jj`, or anything else. This is the default guide bundled with the
+`commit` skill; if the repo you're working in ships its own commit-style guide or PR template,
+that takes precedence.
+
+A commit is a message to two audiences:
+
+1. **The reviewer today**, who needs to understand intent before reading the diff.
+2. **You in three years at 2 am**, diagnosing a regression and trying to understand whether the
+   change in this commit is supposed to interact with the change just deployed yesterday.
+
+For both audiences clarity, rationale, and brevity are the most important properties.
+
+---
+
+## High-level structure
+
+Every commit **must** have:
+
+- a subject line in Conventional Commits format
+{{ if $ticketRequired -}}
+- a ticket line in the body that either links to a tracking issue or explains why this commit
+  doesn't touch production code (this guide writes it as `Jira:`; use your repo's convention)
+{{ end -}}
+- a body describing the **effect** of the change.
+
+---
+
+## Subject line
+
+```
+<type>(<scope>): <imperative summary>
+```
+
+- **Imperative mood, sentence case, no trailing period.** "Add", "Fix", "Drop" — not "Added",
+  "Adds", "Adding". Capitalize the first word; the subject is a title, not a sentence. The
+  commit completes "If applied, this commit will…".
+- **Conventional Commits prefix**: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`,
+  `build`.
+- **Scope** is a project or component (e.g. `api`, `loader`, `auth` — use the names your repo
+  already uses). Optional if the repo doesn't scope subjects.
+- **Concrete summary.** "Fix host eval" is useless. "Fix host eval dropping rows when cve_id is
+  null" is a subject line.
+- **≤ 70 characters.** GitHub truncates around 72; leave headroom.
+
+Bad:
+
+```
+Updated the feeds manager and added some tests.
+fixed bug
+feat(TICKET-2456): changes to the way we load feeds and refactored loader.
+```
+
+Good:
+
+```
+feat(vfm): Support paginated feed loads
+fix(observer-host): Drop rows where cve_id is null after dedup
+docs: Mention that foo's bar table is read by service quux
+chore(spark-jobs): Thread context.Context through database logs
+```
+
+---
+
+## Body
+
+GitHub-flavored Markdown. Use `##` headings for sections. Section length is proportional to the
+change — skip a section if it adds no value, and don't invent ceremony for a one-line typo fix.
+
+{{ if $ticketRequired -}}
+### Ticket line first
+
+Every body **must** open with a ticket line. Acceptable forms (this guide uses `Jira:`):
+
+```
+Jira: https://your-tracker.example.com/browse/TICKET-2463
+Jira: TODO
+Jira: This commit only touches documentation
+```
+
+`Jira: TODO` is acceptable while drafting but must be replaced with a real link before the PR
+opens. If you're an AI agent writing a commit and the user hasn't supplied a ticket, ask for
+one and offer `Jira: TODO` only as a placeholder — never invent a ticket key.
+{{- else -}}
+_This machine does not use a ticket line; commit bodies open directly with the effect. (If the
+current repo's own guide or history clearly uses ticket references, defer to the repo.)_
+{{- end }}
+
+### Body
+
+Every description **must** start with an explanation of the effect of the change — what
+behavior, capability, or guarantee changes for users, callers, or the system — not the
+implementation. A reviewer should be able to read the description and know what is now
+different about the running system, without needing the diff to make sense of it.
+
+Exception: for chore/refactor PRs where the implementation is the point (e.g., docs updates,
+dependency bumps, file moves), describing the implementation is appropriate, since that is the
+effect.
+
+Effect examples:
+
+- Good: Vulnerability ingestion now retries transient upstream 5xx errors instead of dropping
+  the batch.
+- Bad: Wrapped fetchBatch in a retry.Do with exponential backoff in ingest.go
+
+- Good: Added a prometheus metric that will allow us to alert on database rows dropped.
+- Bad: Call db.call.err.inc() on errors
+
+If the change has no system effect (docs, comments, formatting, build-script tweaks), there is
+nothing to put first — the body is just *Why*. Don't compensate for the missing effect by
+enumerating what each file gained; that's restating the diff, which `git show` already does.
+
+#### Possible sections
+
+Default to *Why* only. If the **why** is obvious from the commit body then just provide a
+**what**. Add another section only if the commit can't be understood without it — the list
+below is a menu of options, not a checklist to fill in. If you find yourself reaching for three
+or more sections on a change with no system effect, you are probably writing a tour of the
+diff.
+
+- **Why** — what was the world like before this commit, and why was that wrong? Always present,
+  even if implicit in good prose.
+- **Notes for reviewer**: where to start reading; what to focus on; what's intentionally out of
+  scope.
+- **Implementation**:
+  - designs that were attempted and rejected ("tried to use a hashmap instead of a list
+    but...")
+  - tradeoffs that were considered and are valid but were not chosen, along with why.
+- **Verification** / **Tests** — CI runs the test suite and failures will be obvious and
+  prevent merge. Mention (and link to!) additional verification that was performed that is
+  infeasible to incorporate into CI.
+  - Concrete: the QA env you deployed to with a link to logs, the smoke report you compared,
+    the dashboard you watched.
+    - **Useless verification:** "Tested locally. All tests pass."
+    - **Useful verification:** "Ran `VulnObserverHostITCase` against a 30-day prod advisory
+      snapshot; row counts match the pre-change baseline within 0.01%. The 412 spurious rows
+      from the last smoke run are gone." The reviewer cannot see your query or that you ran the
+      job in QA for 3 days — provide links or copy-pasteable text they can use to perform the
+      verification themselves or convince themselves it's useful.
+- **Risks** — known dangers and why they're unavoidable. Include for changes where the exact
+  effect isn't provable in CI. Present **only** if there **is** some risk and mitigations must
+  be considered.
+- **Follow-ups** — things deliberately deferred, with a ticket link.
+
+---
+
+## Things that belong in the commit, not in the source
+
+| Information | Commit message | Source comment |
+| --- | --- | --- |
+| Why this change is happening today | **yes** | no |
+{{ if $ticketRequired -}}
+| Ticket reference | **yes** | no |
+{{ end -}}
+| What was tried and rejected during this change | **yes** | no |
+| Why the code is structured the way it is (still true today) | no | **yes** |
+| Invariants, gotchas, performance characteristics | no | **yes** |
+| Narrative history ("we used to do X, now we do Y") | **yes**, if X is gone | Usually no, **yes**, if X is the reason we still do Y |
+
+The commit message captures the choice as it was made; the source comment captures the choice
+as it must be maintained.
+
+---
+
+## Things that don't belong in a commit message
+
+- **Restating the diff.** "Added a new function `foo` to `bar.go`" — `git show` already says
+  that. Tell us why.
+- **AI co-author trailers.** No `Co-Authored-By: Claude …`, `Generated-with: …`, or similar.
+- **Re-explaining the project.** The reader knows what the component is — they're reading its
+  history.
+- **Re-documenting documentation.** You've updated the docs, just point the reader to them.
+
+---
+
+## Commits within a PR
+
+Many repos squash-and-merge PRs. Where they do, the PR title and body become the merged commit
+and are the canonical artifact — they must follow the rules above. Individual commits on the
+branch do not survive the merge.
+
+That means only the **lead commit** of a PR (and the PR title and body itself) needs a fully
+style-conformant message. Follow-up commits — review responses, fixups, incidental cleanups —
+can use a lighter prefix that names the *kind* of cleanup:
+
+- `review-response: <what>` — addressing review feedback
+- `fixup: <what>` — small fix to an earlier commit on this branch
+- `cleanup: <what>` — incidental polish
+
+Follow-ups {{ if $ticketRequired }}don't need a ticket line (the lead carries it) and {{ end }}don't need a body unless the
+change is non-trivial. Conventional Commits format (`fix(scope): …`) is still fine for a
+follow-up that's a self-contained logical change.
+
+---
+
+## Changes that span multiple PRs
+
+For schema migrations, large rewrites, and stacked PRs:
+
+- Each PR's title and body must stand on its own — don't write a description that only makes
+  sense if you've read the previous PR. Stacked PRs squash-merge into their base branch (not
+  always `main`), so each PR's message must be self-contained even when `Builds on #N` provides
+  the cross-link.
+- The first PR's body sketches the overall arc and links to the design doc or epic ticket.
+- Subsequent PRs reference prior PRs in the body (`Builds on #32301`), not in the subject.
+- Don't use commit messages to coordinate ordering — that's what the PR description and the
+  ticket are for.
+
+---
+
+## Examples
+
+**Change descriptions should be as brief as possible.** Pick the size by reviewer risk, not
+LOC:
+
+- **Brief** is the default. Use it whenever the diff is self-explanatory and the reader only
+  needs the *Why*.
+- **Medium** is for changes where the reviewer needs context the diff doesn't carry — a
+  non-obvious tradeoff, evidence the fix works, a subtle invariant.
+- **Detailed** is for changes a reviewer cannot safely approve from the diff alone: multi-file
+  refactors, behavior changes whose effect must be verified out of band, schema-touching work,
+  anything cross-cutting.
+
+A large diff does not entitle a commit to a long description. A docs rewrite or a mechanical
+rename is *Brief* even if it touches a hundred files.
+
+### Brief
+
+```
+docs: Mention that foo's bar table is read by service quux
+
+{{ if $ticketRequired -}}
+Jira: This commit only touches documentation
+
+{{ end -}}
+This took some investigation, so capture it in the doc comment on BarDao
+where the next reader of that file will find it.
+```
+
+### Too long (anti-pattern)
+
+Same scope as the Brief example above — a docs-only update — written badly:
+
+```
+docs: Mention that foo's bar table is read by service quux
+
+{{ if $ticketRequired -}}
+Jira: This commit only touches documentation
+
+{{ end -}}
+## Why
+
+The relationship between foo and quux was undocumented anywhere in the
+repo, and on-call engineers were repeatedly tracing it from logs at 2am.
+
+## Effect
+
+- BarDao now has a doc comment naming quux as a reader.
+- The package-level Javadoc has been updated to cross-reference BarDao.
+- A pointer from quux's README points back to BarDao.
+
+## Notes for reviewer
+
+The doc comment on BarDao is the easiest path into the change.
+```
+
+The *Effect* section is a tour of the diff — `git show` already lists those three changes.
+*Notes for reviewer* is ceremony for a three-line doc comment. The Brief version above says
+everything that matters in two sentences.
+
+### Medium
+
+```
+fix(observer-host): Drop rows where cve_id is null after dedup
+
+{{ if $ticketRequired -}}
+Jira: https://your-tracker.example.com/browse/TICKET-32418
+
+{{ end -}}
+## Why
+
+The advisory join in `VulnObserverHostJob` was producing rows with null
+`cve_id` when a host package matched an advisory whose CVE list had been
+retracted upstream. These rows survived the dedup step (which keys on
+`host_id + cve_id`) and inflated smoke-report row counts by ~0.3%.
+
+## Verification
+
+Re-ran the smoke report against the prod 30-day snapshot; the 412
+spurious rows from the last run are gone and overall row count is
+within 0.01% of the pre-bug baseline.
+
+Link to shared worksheet: https://example.com/worksheets/c0ffee
+```
+
+### Detailed
+
+````
+refactor(advisory-loader): Extract OS package metadata writer into its own job
+
+{{ if $ticketRequired -}}
+Jira: https://your-tracker.example.com/browse/TICKET-30119
+
+{{ end -}}
+## Why
+
+`VulnAdvisoryLoaderJob` has accreted three responsibilities: loading
+raw advisories, normalizing them, and writing the OS package metadata
+table. The third has a different cadence (hourly vs daily) and a
+different failure mode (idempotent overwrite vs append) than the other
+two, and keeping them in one job has forced us to gate the metadata
+write behind a config flag that's on in prod and off everywhere else.
+
+This split also unblocks the schema-evolution work in TICKET-30122,
+which needs to evolve the metadata table on a different cadence than
+the advisory tables.
+
+## Implementation
+
+Move the metadata write into `VulnAdvisoryOsPkgMetadataUpdaterJob`.
+This looks big, but there is no behavior change. The new job is
+wired into the existing schedule in a follow-up commit; until then
+the old code path is retained behind the same config flag, so this
+commit is safe to land independently.
+
+## Notes for reviewer
+
+The new doc comment on `VulnAdvisoryOsPkgMetadataUpdaterJob` is the
+easiest path into the change.
+
+## Verification
+
+- Diffed both jobs' output against the previous single-job output on
+  a frozen prod snapshot; row counts and column hashes match exactly:
+
+  ```sql
+  -- this change
+  SELECT COUNT(*) FROM ospkgmetadata WHERE created_time == '20260101T000000';
+  -- previous version of the code
+  SELECT COUNT(*) FROM ospkgmetadata WHERE created_time == '20251201T000000';
+  ```
+
+## Risks
+
+None in this commit (no behavior change). The behavior change lands
+in the follow-up.
+
+## Follow-ups
+
+- TICKET-30120: wire the new job into the scheduler.
+- TICKET-30122: schema evolution for the metadata table.
+````
