@@ -1,0 +1,16 @@
+{{ if eq .class "work-devbox" -}}
+# coder-keepalive: warn at interactive shell startup if the server-side keep-alive
+# cannot reach Coder -- almost always the reused `coder login` session expired, so
+# the workspace will autostop after its 2h TTL with nothing holding it up. The
+# helper writes ~/.local/state/coder-keepalive/STATUS on failure and removes it on
+# the next success. Managed by chezmoi (source: home/dot_zsh/zz-coder-keepalive.tmpl);
+# work-devbox only (renders empty -> not deployed elsewhere).
+() {
+    local status_file="$HOME/.local/state/coder-keepalive/STATUS"
+    [[ -f "$status_file" ]] || return 0
+    # Only nag on a recent failure (< 24h) so a stale marker stays quiet.
+    [[ -n "$(find "$status_file" -mmin -1440 2>/dev/null)" ]] || return 0
+    local msg="${$(tail -n1 "$status_file" 2>/dev/null)#* }"   # strip leading timestamp
+    print -P "%F{red}%B⚠ coder keep-alive:%b%f %F{red}${msg:-cannot reach Coder; run: coder login}%f"
+}
+{{- end }}
