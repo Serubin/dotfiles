@@ -28,6 +28,8 @@ brew install romkatv/gitstatus/gitstatus
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
 # require SIP to be partially disabled (manual, out of scope here).
 brew install asmvik/formulae/yabai asmvik/formulae/skhd
+# deja: predictive shell autosuggestions (replaces zsh-autosuggestions).
+brew install Giammarco-Ferranti/deja/deja
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
@@ -82,7 +84,82 @@ else
     sudo apt-get update
     sudo apt-get install -y gh
 fi
+
+# deja: predictive shell autosuggestions (replaces zsh-autosuggestions). No apt
+# package, and deliberately NOT via Homebrew: brew isn't part of this repo's Linux
+# bootstrap, and deja's tap formula just downloads the same prebuilt release
+# tarball we fetch here, so brew would buy nothing but a dependency. Also not
+# upstream's install.sh: that appends `eval "$(deja init zsh)"` to ~/.zshrc (which
+# chezmoi owns) and imports from deja's DEFAULT histfile, not our HISTFILE.
+#
+# The binary is dynamically linked against glibc (deja's sqlite driver is CGO), so
+# it's fine on Debian/Ubuntu but would not run on a musl distro — same constraint
+# brew's bottle would have had.
+#
+# To upgrade later: rm ~/.local/bin/deja and re-run `chezmoi apply`.
+install_deja() {
+    local arch tag version archive base tmp
+    case "$(uname -m)" in
+        x86_64|amd64)  arch=amd64 ;;
+        aarch64|arm64) arch=arm64 ;;
+        *) echo "deja: no prebuilt binary for $(uname -m) — skipping." >&2; return 0 ;;
+    esac
+    tag=$(curl -fsSL https://api.github.com/repos/Giammarco-Ferranti/deja/releases/latest \
+        | grep -m1 '"tag_name":' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
+    [ -n "$tag" ] || { echo "deja: could not resolve latest release tag" >&2; return 1; }
+    version=${tag#v}
+    archive="deja_${version}_linux_${arch}.tar.gz"
+    base="https://github.com/Giammarco-Ferranti/deja/releases/download/${tag}"
+    tmp=$(mktemp -d) || return 1
+    # Every step below is checked EXPLICITLY rather than leaning on `set -e`: this
+    # function is called in an `install_deja || ...` list, and bash suspends -e for
+    # the whole body of a function invoked that way. An unchecked failure would fall
+    # through to the next step — e.g. a failed checksum would still reach `install`.
+    if ! curl -fsSL -o "$tmp/$archive" "$base/$archive" ||
+        ! curl -fsSL -o "$tmp/checksums.txt" "$base/checksums.txt"; then
+        echo "deja: download failed ($base/$archive)" >&2
+        rm -rf "$tmp"; return 1
+    fi
+    # Same-origin digest: catches a truncated or mangled download, NOT a compromised
+    # release (whoever can rewrite the tarball can rewrite checksums.txt). It fails
+    # closed either way — a mismatch, or a checksums.txt with no line for our
+    # archive (empty grep => "no properly formatted checksum lines"), installs
+    # nothing.
+    if ! ( cd "$tmp" && grep " ${archive}\$" checksums.txt | sha256sum -c - >/dev/null ); then
+        echo "deja: checksum verification FAILED for $archive — not installing." >&2
+        rm -rf "$tmp"; return 1
+    fi
+    if ! tar -xzf "$tmp/$archive" -C "$tmp" deja; then
+        echo "deja: $archive did not contain a deja binary" >&2
+        rm -rf "$tmp"; return 1
+    fi
+    # ~/.local/bin, not /usr/local/bin: no sudo needed and dot_zshenv already puts
+    # it on PATH for every zsh invocation.
+    if ! mkdir -p "$HOME/.local/bin" || ! install -m 0755 "$tmp/deja" "$HOME/.local/bin/deja"; then
+        echo "deja: could not install into $HOME/.local/bin" >&2
+        rm -rf "$tmp"; return 1
+    fi
+    rm -rf "$tmp"
+    echo "Installed deja ${version} to $HOME/.local/bin/deja"
+}
+
+# dot_zshenv's ~/.local/bin PATH entry only applies to zsh, so add it here for the
+# guard below and for the history import at the end of this script.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v deja >/dev/null 2>&1; then
+    # Non-fatal on purpose: this is a run_before_ script, so letting a GitHub
+    # outage abort it would abort the whole apply over a nice-to-have.
+    install_deja || echo "deja: install failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+fi
 {{   else -}}
-echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim manually." >&2
+echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim deja manually." >&2
 {{   end -}}
 {{ end -}}
+
+# One-time seed of deja's DB from our history. `deja import` is NOT idempotent
+# (it inserts rows blindly), so run it only when the DB doesn't exist yet. Our
+# HISTFILE is ~/.config/.histfile (see dot_zsh/env.tmpl) — NOT deja's default — so
+# point it there explicitly. Best-effort; never fail the apply.
+if command -v deja >/dev/null 2>&1 && [ ! -f "$HOME/.local/share/deja/deja.db" ]; then
+    deja import --file "$HOME/.config/.histfile" || true
+fi
