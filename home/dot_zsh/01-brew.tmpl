@@ -1,3 +1,6 @@
 {{ if eq .chezmoi.os "darwin" -}}
-export PATH="$PATH:/opt/homebrew/bin"
+# Homebrew PATH now lives in ~/.zprofile: it must be prepended AFTER macOS's
+# /etc/zprofile runs path_helper (which reorders /usr/bin ahead of anything set
+# in ~/.zshenv/~/.zsh), and ABOVE ~/.zprofile's python.org framework prepends so
+# `python3` stays 3.10. ~/.zprofile is unmanaged (python.org-installer-owned).
 {{ end -}}
