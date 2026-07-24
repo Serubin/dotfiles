@@ -28,6 +28,8 @@ brew install romkatv/gitstatus/gitstatus
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
 # require SIP to be partially disabled (manual, out of scope here).
 brew install asmvik/formulae/yabai asmvik/formulae/skhd
+# deja: predictive shell autosuggestions (replaces zsh-autosuggestions).
+brew install Giammarco-Ferranti/deja/deja
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
@@ -82,7 +84,23 @@ else
     sudo apt-get update
     sudo apt-get install -y gh
 fi
+
+# deja: predictive shell autosuggestions (replaces zsh-autosuggestions). Homebrew
+# only, per the migration decision.
+if command -v brew >/dev/null 2>&1; then
+    brew install Giammarco-Ferranti/deja/deja
+else
+    echo "Homebrew not found — skipping deja; run 'brew install Giammarco-Ferranti/deja/deja' once brew is available." >&2
+fi
 {{   else -}}
 echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim manually." >&2
 {{   end -}}
 {{ end -}}
+
+# One-time seed of deja's DB from our history. `deja import` is NOT idempotent
+# (it inserts rows blindly), so run it only when the DB doesn't exist yet. Our
+# HISTFILE is ~/.config/.histfile (see dot_zsh/env.tmpl) — NOT deja's default — so
+# point it there explicitly. Best-effort; never fail the apply.
+if command -v deja >/dev/null 2>&1 && [ ! -f "$HOME/.local/share/deja/deja.db" ]; then
+    deja import --file "$HOME/.config/.histfile" || true
+fi

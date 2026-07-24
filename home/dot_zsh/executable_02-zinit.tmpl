@@ -4,7 +4,18 @@ ZINIT_HOME="${HOME}/.zsh/zinit"
 source "${ZINIT_HOME}/zinit.zsh"
 
 zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-autosuggestions
+
+# deja: predictive ghost-text autosuggestions, replacing zsh-autosuggestions.
+# Binary installed via Homebrew (run_once_before_20-install-packages). deja wraps
+# ZLE widgets — Right/End accept the full suggestion, Ctrl+Right accepts a word
+# (the widgets autosuggestions also hooked) — and re-asserts on every precmd, so
+# load order is irrelevant. Disable the two default keybindings that would else
+# clobber ours each prompt: Tab (keep completion) and ^X (keep ^X^E, see env).
+if (( $+commands[deja] )); then
+    DEJA_CYCLE_KEY=''
+    DEJA_TOGGLE_KEY=''
+    eval "$(deja init zsh)"
+fi
 zinit ice pick"/dev/null" atload'ZSH_JUMP_TARGET_STYLE="fg=blue,bold,underline"; fpath+=(${ZINIT[PLUGINS_DIR]}/scfrazer---zsh-jump-target/functions); autoload -Uz jump-target; zle -N jump-target; bindkey "^F" jump-target'
 zinit light scfrazer/zsh-jump-target
 
