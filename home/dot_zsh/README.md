@@ -128,6 +128,13 @@ by `pre_cmd` to embed git info in the prompt.
 ## Plugins (zinit)
 
 - **zsh-syntax-highlighting** — real-time command highlighting
-- **zsh-autosuggestions** — fish-style autosuggestions
 - **zsh-jump-target** — quick cursor jumping (`^F`)
 - **dircolors-solarized** — solarized color scheme for `ls` (auto-selects `gdircolors` on macOS, `dircolors` on Linux)
+
+Inline suggestions come from **[deja](https://github.com/Giammarco-Ferranti/deja)**
+— predictive ghost-text autosuggestions replacing `zsh-autosuggestions`. It's a
+Homebrew binary + daemon (installed by `run_once_before_20-install-packages`),
+`eval`'d in `02-zinit`, so it's not a zinit-managed plugin. Right/End accept the
+full suggestion, Ctrl+Right accepts a word; its Tab-picker and `^X` toggle are
+disabled (via empty `DEJA_CYCLE_KEY`/`DEJA_TOGGLE_KEY`) to preserve completion and
+`^X^E`.
