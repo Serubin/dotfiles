@@ -52,3 +52,14 @@ if command -v crontab >/dev/null 2>&1; then
     line="*/5 * * * * $HOME/.local/bin/tmux-periodic-save.sh >/dev/null 2>&1 # tmux-periodic-save"
     ( crontab -l 2>/dev/null | grep -vF '# tmux-periodic-save'; echo "$line" ) | crontab -
 fi
+
+# --- Coder keep-alive. Holds the workspace autostop deadline out until 6pm ET on
+# weekdays so a long meeting/lunch (no activity) can't reclaim the box mid-day. The
+# helper (re)provisions a stable coder binary under ~/.local/state (the PATH one
+# lives in a per-SSH-session /tmp dir) and installs its own */15 cron -- both are
+# wiped on a host restart, so like the tmux cron above they are re-established here.
+# It reuses the ambient `coder login` session; if that expires it warns via a
+# ~/.zsh startup banner. Script is chezmoi-managed (~/.local/bin/coder-keepalive.sh).
+if [ -x "$HOME/.local/bin/coder-keepalive.sh" ]; then
+    "$HOME/.local/bin/coder-keepalive.sh" install || true
+fi

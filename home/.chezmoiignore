@@ -57,6 +57,7 @@ personalize
 .local/bin/apply-sshd-keepalive.sh
 .local/bin/tmux-periodic-save.sh
 .local/bin/tmux-devel.sh
+.local/bin/coder-keepalive.sh
 {{ end }}
 
 # sleepwatcher sleep/wake feature (Coder iTerm2/tmux + fwd hygiene): work-mac only.
