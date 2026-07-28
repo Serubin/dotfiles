@@ -173,8 +173,9 @@ chezmoi update               # git pull the source + apply
 │   │   ├── run_once_before_20-install-packages.sh.tmpl      # base tools (incl. gh) BEFORE configs render
 │   │   ├── run_once_after_15-migrate-git-xdg.sh            # one-time: drop legacy ~/.gitconfig
 │   │   └── run_once_after_21-install-env-packages.sh.tmpl  # per-class packages
-│   ├── dot_zshenv  dot_zshrc
-│   ├── dot_zsh/                      # 00-os 01-brew executable_02-zinit alias env function promptrc zz-env prompt/
+│   ├── dot_zshenv  dot_zshrc  dot_zprofile.tmpl
+│   ├── dot_zsh/                      # 00-os executable_02-zinit alias env function promptrc zz-env prompt/
+│   ├── .chezmoiremove                # targets to delete on apply (e.g. retired ~/.zsh files)
 │   ├── dot_local/bin/               # → ~/.local/bin (on PATH); class-gated scripts
 │   ├── dot_tmux.conf
 │   ├── create_dot_custom             # ~/.custom (created once, never overwritten)
@@ -227,8 +228,10 @@ chezmoi update               # git pull the source + apply
 ### Zsh
 
 `.zshrc` sources every file in `~/.zsh/` in lexicographic order (`00-os`,
-`01-brew`, `02-zinit`, `alias`, `env`, `function`, `promptrc`, …), making it easy
-to add or reorder config.
+`02-zinit`, `alias`, `env`, `function`, `promptrc`, …) for interactive shells only,
+making it easy to add or reorder config. `~/.zprofile` (`dot_zprofile.tmpl`) runs
+before that, for every login shell — that's where Homebrew and GNU coreutils get
+prepended onto `PATH`.
 
 **Plugins** (via [zinit](https://github.com/zdharma-continuum/zinit)):
 - `zsh-syntax-highlighting` — command highlighting

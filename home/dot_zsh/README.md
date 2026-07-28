@@ -13,13 +13,18 @@ gitstatus query. Re-measure anytime with `scripts/bench-zsh.sh`.
 ## Structure
 
 Managed by chezmoi (deployed to `~/.zsh/`). `.zshrc` sources all files in `~/.zsh/`
-(excluding `.zwc` compiled files) in lexicographic order. Files prefixed with numbers
-(e.g., `00-os`) load first to establish dependencies for later files.
+(excluding `.zwc` compiled files) in lexicographic order, but only for interactive shells
+(`.zshrc` starts with `[[ $- != *i* ]] && return`). Files prefixed with numbers (e.g.,
+`00-os`) load first to establish dependencies for later files.
+
+`~/.zprofile` (also chezmoi-managed, from `dot_zprofile.tmpl`) runs *before* `~/.zshrc`, for
+every login shell whether interactive or not — that's where Homebrew and GNU coreutils get
+prepended onto `PATH`, since anything in `~/.zsh/*` would be invisible to non-interactive
+login shells (GUI apps resolving `PATH`, editor shell-integration probes, `ssh host cmd`).
 
 | File | Purpose |
 |---|---|
 | `00-os` | Exports `$DISTRO` (resolved by a chezmoi template at apply time — no runtime OS detection) |
-| `01-brew` | Adds Homebrew to `PATH` on macOS |
 | `02-zinit` | Initializes zinit and loads plugins |
 | `alias` | Shell aliases and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |
