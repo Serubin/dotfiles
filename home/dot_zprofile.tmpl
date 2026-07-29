@@ -1,0 +1,21 @@
+{{ if eq .chezmoi.os "darwin" -}}
+# ~/.zprofile runs for ALL login shells, interactive or not — unlike ~/.zsh/* (sourced by
+# ~/.zshrc), which dot_zshrc's `[[ $- != *i* ]] && return` guard skips for non-interactive
+# shells (GUI apps resolving PATH, editor shell-integration probes, `ssh host cmd`). Anything
+# that must be on PATH universally belongs here, not in ~/.zsh/*.
+#
+# chezmoi fully owns this file's content: if something else (pyenv, a future installer, etc.)
+# ever needs to append here, that content will be silently dropped on the next `chezmoi
+# apply` unless folded into this template.
+
+# Homebrew. `brew shellenv` (vs. a raw `export PATH=`) also wires up
+# MANPATH/INFOPATH/FPATH/HOMEBREW_PREFIX and re-invokes path_helper scoped to the Homebrew
+# prefix, so it stays correctly deduped under nested login shells (e.g. tmux's
+# default-command spawns a login shell per pane).
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# GNU coreutils — prepended so the unprefixed GNU names (date, ls, ...) win over macOS's BSD
+# versions on /usr/bin.
+export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+export MANPATH="/opt/homebrew/opt/coreutils/libexec/gnuman:$MANPATH"
+{{ end -}}
