@@ -235,9 +235,14 @@ prepended onto `PATH`.
 
 **Plugins** (via [zinit](https://github.com/zdharma-continuum/zinit)):
 - `zsh-syntax-highlighting` — command highlighting
-- `zsh-autosuggestions` — fish-like suggestions
 - `zsh-jump-target` — quick directory jumping
 - `dircolors-solarized` — solarized color scheme for `ls`
+
+Inline suggestions come from [deja](https://github.com/Giammarco-Ferranti/deja)
+— predictive ghost-text autosuggestions (replaces `zsh-autosuggestions`).
+It's a standalone Go binary + daemon, initialized in `02-zinit`, not a zinit
+plugin — installed via Homebrew on macOS and from upstream's prebuilt release into
+`~/.local/bin` on Debian/Ubuntu.
 
 The prompt is a custom theme powered by
 [gitstatus](https://github.com/romkatv/gitstatus) for fast git status.
