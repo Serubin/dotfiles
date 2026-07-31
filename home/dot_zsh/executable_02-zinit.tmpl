@@ -10,17 +10,51 @@ zinit light zsh-users/zsh-syntax-highlighting
 # prebuilt release into ~/.local/bin on Debian — no brew needed). deja wraps
 # ZLE widgets — Right/End accept the full suggestion, Ctrl+Right accepts a word
 # (the widgets autosuggestions also hooked) — and re-asserts on every precmd, so
-# load order is irrelevant. Disable the two default keybindings that would else
-# clobber ours each prompt: Tab (keep completion) and ^X (keep ^X^E, see env).
-if (( $+commands[deja] )); then
-    DEJA_CYCLE_KEY=''
+# load order is irrelevant. Shift+Tab cycles alternative suggestions. Two of deja's
+# default keybindings are disabled so they don't clobber ours each prompt: Tab
+# (keep completion) and ^X (keep ^X^E, see env).
+#
+# Pinned to ~/.local/bin/deja rather than whatever `deja` resolves to on PATH — on macOS
+# that build carries local changes not yet in a brew release, and it is also where the
+# Debian install lands. Drop the pin for a bare `deja` once those changes ship.
+_deja_bin="${HOME}/.local/bin/deja"
+if [[ -x "$_deja_bin" ]]; then
+    DEJA_CYCLE_KEY='\033[Z'
     DEJA_TOGGLE_KEY=''
-    eval "$(deja init zsh)"
+    # `deja init zsh` writes ~/.local/share/deja/init.zsh and then prints nothing but a
+    # `source` line for it (cmd/deja/init.go), so the documented `eval "$(deja init zsh)"`
+    # spends ~36ms launching a 12MB binary to regenerate a file it already wrote. Source that
+    # file directly while it is newer than the binary, and fall back to the binary — which
+    # rewrites it — after an upgrade. Same regenerate-when-the-binary-is-newer pattern as
+    # _cache_completion in ~/.zsh/function.
+    _deja_init="${HOME}/.local/share/deja/init.zsh"
+    if [[ -s "$_deja_init" && "$_deja_init" -nt "$_deja_bin" ]]; then
+        source "$_deja_init"
+    else
+        eval "$("$_deja_bin" init zsh)"
+    fi
+    unset _deja_init
 fi
+unset _deja_bin
 zinit ice pick"/dev/null" atload'ZSH_JUMP_TARGET_STYLE="fg=blue,bold,underline"; fpath+=(${ZINIT[PLUGINS_DIR]}/scfrazer---zsh-jump-target/functions); autoload -Uz jump-target; zle -N jump-target; bindkey "^F" jump-target'
 zinit light scfrazer/zsh-jump-target
 
-zinit ice as"null" atload'local dc={{ if eq .chezmoi.os "darwin" }}gdircolors{{ else }}dircolors{{ end }}; eval $($dc ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark 2>/dev/null)'
+# dircolors-solarized. Translating the palette file into LS_COLORS costs ~5ms of every
+# startup for a result that only changes when the palette does, so cache it. ~/.zsh/cache is
+# the directory _cache_completion (~/.zsh/function) already uses; env's async block purges
+# entries older than 24h, so this refreshes itself daily on top of the -nt check.
+_dircolors_cached() {
+    local src="$1"
+    local cache="${HOME}/.zsh/cache/dircolors.zsh"
+    local dc={{ if eq .chezmoi.os "darwin" }}gdircolors{{ else }}dircolors{{ end }}
+
+    [[ -d "${cache:h}" ]] || mkdir -p "${cache:h}"
+    if [[ ! -s "$cache" || "$src" -nt "$cache" ]]; then
+        $dc "$src" > "$cache" 2>/dev/null
+    fi
+    source "$cache"
+}
+zinit ice as"null" atload'_dircolors_cached ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark'
 zinit light seebi/dircolors-solarized
 
 if [[ "$1" == "update" ]]; then
