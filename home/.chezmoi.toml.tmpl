@@ -48,6 +48,23 @@
 {{-   $coderHost = promptStringOnce . "coderHost" "coder ssh host for sleep/wake hooks (blank if none)" "" -}}
 {{- end -}}
 
+{{- /* cacheVolumeID / awsAccountID: the /mnt/cache EBS build cache on a work-devbox.
+       Prompted rather than hardcoded for the same reason as the git identity above --
+       this repo is public, and an EBS volume id plus an AWS account id are work
+       infrastructure identifiers (account enumeration / cross-account probing aids).
+       Only asked on work-devbox, but both keys are always emitted below so templates
+       on other classes can reference them without erroring. */ -}}
+{{- $cacheVolumeID := env "DOTFILES_CACHE_VOLUME_ID" -}}
+{{- $awsAccountID := env "DOTFILES_AWS_ACCOUNT_ID" -}}
+{{- if eq $class "work-devbox" -}}
+{{-   if not $cacheVolumeID -}}
+{{-     $cacheVolumeID = promptStringOnce . "cacheVolumeID" "EBS volume id for /mnt/cache (blank if none)" "" -}}
+{{-   end -}}
+{{-   if not $awsAccountID -}}
+{{-     $awsAccountID = promptStringOnce . "awsAccountID" "AWS account id for codeartifact --domain-owner (blank if none)" "" -}}
+{{-   end -}}
+{{- end -}}
+
 {{- /* Keep the chezmoi source at ~/.dotfiles on every machine (vs the default
        ~/.local/share/chezmoi). The first `chezmoi init` still needs --source to
        clone there; persisting it here makes every later bare command use it. */ -}}
@@ -57,6 +74,8 @@ sourceDir = {{ (joinPath .chezmoi.homeDir ".dotfiles") | quote }}
     environment = {{ $env | quote }}
     class = {{ $class | quote }}
     coderHost = {{ $coderHost | quote }}
+    cacheVolumeID = {{ $cacheVolumeID | quote }}
+    awsAccountID = {{ $awsAccountID | quote }}
 
 [data.git]
     name = {{ $name | quote }}

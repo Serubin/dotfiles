@@ -49,8 +49,9 @@
 {{ end }}
 
 # work-devbox bootstrap + helpers: the ~/personalize startup script, the sshd
-# keepalive re-apply helper it calls, and the tmux -CC (iTerm2 control-mode)
-# helpers (periodic-save cron target + stale-client-clearing connect helper).
+# keepalive re-apply helper it calls, the tmux -CC (iTerm2 control-mode) helpers
+# (periodic-save cron target + stale-client-clearing connect helper), and the
+# /mnt/cache EBS build-cache mount command.
 # work-devbox only — the mac side of this workflow is the sleepwatcher feature below.
 {{ if ne .class "work-devbox" }}
 personalize
@@ -58,6 +59,7 @@ personalize
 .local/bin/tmux-periodic-save.sh
 .local/bin/tmux-devel.sh
 .local/bin/coder-keepalive.sh
+.local/bin/mount-cache-dir
 {{ end }}
 
 # sleepwatcher sleep/wake feature (Coder iTerm2/tmux + fwd hygiene): work-mac only.
