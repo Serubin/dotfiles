@@ -17,25 +17,64 @@ zinit light zsh-users/zsh-syntax-highlighting
 # Pinned to ~/.local/bin/deja rather than whatever `deja` resolves to on PATH — on macOS
 # that build carries local changes not yet in a brew release, and it is also where the
 # Debian install lands. Drop the pin for a bare `deja` once those changes ship.
+# `deja init zsh` writes ~/.local/share/deja/init.zsh and then prints nothing but a `source`
+# line for it (cmd/deja/init.go), so the documented `eval "$(deja init zsh)"` spends ~36ms
+# launching a 12MB binary to regenerate a file it already wrote. Source that file directly
+# instead, but only while it still matches the binary it was generated from: init.zsh *is* the
+# binary's embedded internal/shell/zsh.sh with its DEJA_BIN and DEJA_SOCK placeholders
+# substituted, so a mismatched pair can disagree about the variables they share.
+#
+# The freshness test is a stat fingerprint rather than `deja version`, for two reasons:
+#
+#   - `deja version` costs 27-40ms, which is the entire saving this cache exists to make.
+#     `zstat` is a zsh builtin, so the fingerprint costs ~0.007ms.
+#   - It wouldn't work anyway. cmd/deja/main.go hardcodes `version = "dev"` and only
+#     goreleaser stamps a real version at release time, so every local `go build` reports the
+#     same string — a version check would miss exactly the unreleased rebuilds the
+#     ~/.local/bin pin below exists to serve.
+#
+# inode:size:mtime also catches what a plain `-nt` test cannot: a binary whose mtime moves
+# *backwards* (a brew downgrade, a bottle or tarball preserving upstream mtimes, restoring an
+# older build) would otherwise leave a stale init.zsh in place silently.
+_deja_load() {
+    local bin="$1"
+    local init="${HOME}/.local/share/deja/init.zsh"
+    local stamp="${HOME}/.zsh/cache/deja-init.id"
+    local id="" cached=""
+
+    zmodload -F zsh/stat b:zstat 2>/dev/null
+    if (( $+builtins[zstat] )); then
+        local -A st
+        zstat -H st "$bin" 2>/dev/null && id="${st[inode]}:${st[size]}:${st[mtime]}"
+    fi
+    [[ -r "$stamp" ]] && read -r cached < "$stamp"
+
+    # An empty $id means zstat is unavailable and the cache cannot be validated, so it is
+    # never trusted — the fingerprints can't compare equal. Slow but always correct.
+    if [[ -s "$init" && -n "$id" && "$id" == "$cached" ]]; then
+        source "$init"
+        return
+    fi
+
+    # Miss: let deja rewrite init.zsh, then record which binary produced it. env's async block
+    # purges ~/.zsh/cache entries older than 24h and this stamp is only rewritten when the
+    # binary changes, so expect one extra regeneration per day — cheap, and a periodic
+    # self-heal for a cache that drifted some other way.
+    eval "$("$bin" init zsh)"
+    if [[ -n "$id" ]]; then
+        [[ -d "${stamp:h}" ]] || mkdir -p "${stamp:h}"
+        print -r -- "$id" > "$stamp"
+    fi
+}
+
 _deja_bin="${HOME}/.local/bin/deja"
 if [[ -x "$_deja_bin" ]]; then
     DEJA_CYCLE_KEY='\033[Z'
     DEJA_TOGGLE_KEY=''
-    # `deja init zsh` writes ~/.local/share/deja/init.zsh and then prints nothing but a
-    # `source` line for it (cmd/deja/init.go), so the documented `eval "$(deja init zsh)"`
-    # spends ~36ms launching a 12MB binary to regenerate a file it already wrote. Source that
-    # file directly while it is newer than the binary, and fall back to the binary — which
-    # rewrites it — after an upgrade. Same regenerate-when-the-binary-is-newer pattern as
-    # _cache_completion in ~/.zsh/function.
-    _deja_init="${HOME}/.local/share/deja/init.zsh"
-    if [[ -s "$_deja_init" && "$_deja_init" -nt "$_deja_bin" ]]; then
-        source "$_deja_init"
-    else
-        eval "$("$_deja_bin" init zsh)"
-    fi
-    unset _deja_init
+    _deja_load "$_deja_bin"
 fi
 unset _deja_bin
+unfunction _deja_load
 zinit ice pick"/dev/null" atload'ZSH_JUMP_TARGET_STYLE="fg=blue,bold,underline"; fpath+=(${ZINIT[PLUGINS_DIR]}/scfrazer---zsh-jump-target/functions); autoload -Uz jump-target; zle -N jump-target; bindkey "^F" jump-target'
 zinit light scfrazer/zsh-jump-target
 
