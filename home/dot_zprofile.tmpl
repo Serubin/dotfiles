@@ -8,34 +8,24 @@
 # ever needs to append here, that content will be silently dropped on the next `chezmoi
 # apply` unless folded into this template.
 #
-# Everything below is the static expansion of `brew shellenv` plus the GNU-coreutils
-# prepends. `brew shellenv` is deliberately NOT called: it costs ~55ms of a ~210ms shell
-# startup, because it spawns `brew` (a bash script) which in turn re-evals `path_helper` — and
-# this file runs for every login shell, including one per tmux pane. The expansion is static
-# on a given machine: `/opt/homebrew/etc/paths` holds exactly `bin` and `sbin`, and there is
-# no `/opt/homebrew/etc/paths.d`. Re-check that if the Homebrew prefix layout ever changes.
-#
-# #90 originally chose `brew shellenv` because its prefix-scoped `path_helper` re-run kept
-# nested login shells deduped. The move-to-front prepends below do that job directly, and do
-# it more thoroughly: path_helper only rebuilt PATH, so three levels of nesting still produced
-# a doubled coreutils `gnubin`, a doubled `gnuman`, and an INFOPATH carrying
-# `/opt/homebrew/share/info` once per level. Removing each entry before re-prepending it makes
-# re-entry a no-op at any depth.
+# Below is the static expansion of `brew shellenv` plus the GNU-coreutils prepends.
+# `brew shellenv` is deliberately not called — it spawns `brew` (a bash script) which re-evals
+# path_helper, ~55ms on a file that runs for every login shell, one per tmux pane. Valid
+# because `/opt/homebrew/etc/paths` holds exactly `bin` and `sbin` with no `paths.d`; re-check
+# if the Homebrew prefix layout changes.
 
 export HOMEBREW_PREFIX="/opt/homebrew"
 export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
 export HOMEBREW_REPOSITORY="/opt/homebrew"
 
-# PATH: Homebrew's bin/sbin, with GNU coreutils' gnubin ahead of both, so the unprefixed GNU
-# names (date, ls, ...) win over macOS's BSD versions on /usr/bin.
+# gnubin ahead of Homebrew's bin/sbin so the unprefixed GNU names (date, ls, ...) beat macOS's
+# BSD ones on /usr/bin.
 #
-# Each entry is *moved* to the front — removed, then prepended — rather than added only when
-# absent. /etc/zprofile runs path_helper for every login shell, and that rebuilds PATH from
-# /etc/paths, shunting inherited entries to the back. So in a nested login shell (tmux's
-# default-command spawns one per pane) a mere "already present?" check would leave /usr/bin
-# shadowing Homebrew's git, openssl and ruby — the exact bug #90 set out to fix. Removing
-# before prepending is also what keeps nesting from accumulating duplicates, which the old
-# `brew shellenv` path_helper re-run never managed for gnubin.
+# Entries are *moved* to the front — removed, then prepended — not just added when absent.
+# /etc/zprofile's path_helper rebuilds PATH on every login shell and shunts inherited entries
+# to the back, so in a nested login shell (one per tmux pane) an "already present?" check would
+# leave /usr/bin shadowing Homebrew's git and openssl, which is the bug #90 fixed. Removing
+# first also stops nesting accumulating duplicates.
 path=(
     /opt/homebrew/opt/coreutils/libexec/gnubin
     /opt/homebrew/bin
@@ -44,10 +34,9 @@ path=(
 )
 export PATH
 
-# Same move-to-front treatment for the two colon-separated string variables. Keeping the
-# `$entry:$rest` shape means that when $rest is empty the value ends in a colon — the trailing
-# empty entry that tells man(1)/info(1) to search their built-in defaults too, which both
-# `brew shellenv` and the previous coreutils line relied on.
+# Same move-to-front, for colon-separated strings. The `$entry:$rest` shape leaves a trailing
+# colon when $rest is empty — the empty entry that tells man(1)/info(1) to also search their
+# built-in defaults, as `brew shellenv` and the previous coreutils line both did.
 _zprofile_prepend() {
     local var=$1 entry=$2
     local -a parts=("${(@s.:.)${(P)var}}")

@@ -14,35 +14,16 @@ zinit light zsh-users/zsh-syntax-highlighting
 # default keybindings are disabled so they don't clobber ours each prompt: Tab
 # (keep completion) and ^X (keep ^X^E, see env).
 #
-# Resolved from PATH via $commands (a hash lookup, no fork) rather than a hardcoded path, so
-# this follows whichever install is in play: the brew formula on macOS, and the prebuilt
-# release in ~/.local/bin on Debian. It used to pin ~/.local/bin/deja for a locally-built
-# binary carrying unreleased changes; those now ship in brew, and the stale pin left deja
-# silently not loading at all once that build was removed.
+# Found via $commands (a hash lookup, no fork) so this follows whichever install is in play:
+# brew on macOS, ~/.local/bin on Debian.
 #
-# On macOS $commands[deja] is brew's symlink into the Cellar. zstat below follows it, so the
-# fingerprint tracks the real binary and a `brew upgrade` (which retargets the symlink to a
-# new versioned Cellar path) reads as a cache miss, which is what we want.
-#
-# `deja init zsh` writes ~/.local/share/deja/init.zsh and then prints nothing but a `source`
-# line for it (cmd/deja/init.go), so the documented `eval "$(deja init zsh)"` spends ~36ms
-# launching a 12MB binary to regenerate a file it already wrote. Source that file directly
-# instead, but only while it still matches the binary it was generated from: init.zsh *is* the
-# binary's embedded internal/shell/zsh.sh with its DEJA_BIN and DEJA_SOCK placeholders
-# substituted, so a mismatched pair can disagree about the variables they share.
-#
-# The freshness test is a stat fingerprint rather than `deja version`, for two reasons:
-#
-#   - `deja version` costs 27-40ms, which is the entire saving this cache exists to make.
-#     `zstat` is a zsh builtin, so the fingerprint costs ~0.007ms.
-#   - It wouldn't work anyway. cmd/deja/main.go hardcodes `version = "dev"` and only
-#     goreleaser stamps a real version at release time, so every local `go build` reports the
-#     same string — a version check would miss exactly the unreleased rebuilds the
-#     ~/.local/bin pin below exists to serve.
-#
-# inode:size:mtime also catches what a plain `-nt` test cannot: a binary whose mtime moves
-# *backwards* (a brew downgrade, a bottle or tarball preserving upstream mtimes, restoring an
-# older build) would otherwise leave a stale init.zsh in place silently.
+# _deja_load sources deja's generated init.zsh directly instead of the documented
+# `eval "$(deja init zsh)"`, which burns ~36ms launching the binary to rewrite a file it
+# already wrote. That file is generated *from* the binary, so it is only reusable while the
+# two still match: the binary's inode:size:mtime is recorded in ~/.zsh/cache/deja-init.id and
+# rechecked here, regenerating on any mismatch. zstat follows brew's Cellar symlink, so
+# upgrades register. Stat identity rather than `deja version` because every local build
+# reports the same "dev" string, and reading it would cost the launch this avoids.
 _deja_load() {
     local bin="$1"
     local init="${HOME}/.local/share/deja/init.zsh"
@@ -56,17 +37,14 @@ _deja_load() {
     fi
     [[ -r "$stamp" ]] && read -r cached < "$stamp"
 
-    # An empty $id means zstat is unavailable and the cache cannot be validated, so it is
-    # never trusted — the fingerprints can't compare equal. Slow but always correct.
+    # No $id means zstat is unavailable, so the cache can't be validated and is never trusted.
     if [[ -s "$init" && -n "$id" && "$id" == "$cached" ]]; then
         source "$init"
         return
     fi
 
-    # Miss: let deja rewrite init.zsh, then record which binary produced it. env's async block
-    # purges ~/.zsh/cache entries older than 24h and this stamp is only rewritten when the
-    # binary changes, so expect one extra regeneration per day — cheap, and a periodic
-    # self-heal for a cache that drifted some other way.
+    # Miss: deja rewrites init.zsh; record which binary produced it. env's async block purges
+    # this stamp after 24h, costing one extra regeneration a day — also a periodic self-heal.
     eval "$("$bin" init zsh)"
     if [[ -n "$id" ]]; then
         [[ -d "${stamp:h}" ]] || mkdir -p "${stamp:h}"
