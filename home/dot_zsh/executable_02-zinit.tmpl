@@ -14,9 +14,16 @@ zinit light zsh-users/zsh-syntax-highlighting
 # default keybindings are disabled so they don't clobber ours each prompt: Tab
 # (keep completion) and ^X (keep ^X^E, see env).
 #
-# Pinned to ~/.local/bin/deja rather than whatever `deja` resolves to on PATH — on macOS
-# that build carries local changes not yet in a brew release, and it is also where the
-# Debian install lands. Drop the pin for a bare `deja` once those changes ship.
+# Resolved from PATH via $commands (a hash lookup, no fork) rather than a hardcoded path, so
+# this follows whichever install is in play: the brew formula on macOS, and the prebuilt
+# release in ~/.local/bin on Debian. It used to pin ~/.local/bin/deja for a locally-built
+# binary carrying unreleased changes; those now ship in brew, and the stale pin left deja
+# silently not loading at all once that build was removed.
+#
+# On macOS $commands[deja] is brew's symlink into the Cellar. zstat below follows it, so the
+# fingerprint tracks the real binary and a `brew upgrade` (which retargets the symlink to a
+# new versioned Cellar path) reads as a cache miss, which is what we want.
+#
 # `deja init zsh` writes ~/.local/share/deja/init.zsh and then prints nothing but a `source`
 # line for it (cmd/deja/init.go), so the documented `eval "$(deja init zsh)"` spends ~36ms
 # launching a 12MB binary to regenerate a file it already wrote. Source that file directly
@@ -67,8 +74,8 @@ _deja_load() {
     fi
 }
 
-_deja_bin="${HOME}/.local/bin/deja"
-if [[ -x "$_deja_bin" ]]; then
+_deja_bin="${commands[deja]}"
+if [[ -n "$_deja_bin" ]]; then
     DEJA_CYCLE_KEY='\033[Z'
     DEJA_TOGGLE_KEY=''
     _deja_load "$_deja_bin"
