@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Attach + mount the EBS build-cache volume at /mnt/cache. Nothing outside
+# /home/coder survives a workspace host restart, so the volume must be
+# re-attached and re-mounted after every restart.
+#
+# Run it by hand any time, or let ~/.local/bin/ensure-cache-mount.sh call it once
+# per SSH connection (from tmux-devel.sh) when /mnt/cache is not mounted.
+#
+# The volume id and AWS account id come from chezmoi [data] rather than being
+# hardcoded: this repo is public, and both are work infrastructure identifiers.
+# Set them with `chezmoi init` (or DOTFILES_CACHE_VOLUME_ID / DOTFILES_AWS_ACCOUNT_ID).
+#
+# Managed by chezmoi (source: home/dot_local/bin/executable_mount-cache-dir.tmpl),
+# work-devbox only.
+
+{{/* hasKey guards: a bare .cacheVolumeID would hard-error `chezmoi apply` on a
+     machine whose config predates these keys (a missing key errors before any
+     `default` pipe can apply). Empty renders are caught at runtime just below. */ -}}
+VOLUME_ID={{ if hasKey . "cacheVolumeID" }}{{ .cacheVolumeID | quote }}{{ else }}""{{ end }}
+AWS_ACCOUNT_ID={{ if hasKey . "awsAccountID" }}{{ .awsAccountID | quote }}{{ else }}""{{ end }}
+
+cachedir_dev="/dev/sdj"
+
+if [[ -z "$VOLUME_ID" ]]; then
+  echo "no EBS volume id configured for /mnt/cache"
+  echo "set it with: chezmoi init   (prompts for 'EBS volume id for /mnt/cache')"
+  exit 1
+fi
+
+TOKEN=$(curl -fsSL -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+aws_mount_volume() {
+  if ! AWS_REGION=$(curl -fsSL -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region) ; then
+    echo "Couldn't get aws region"
+    exit 1
+  fi
+  export AWS_REGION
+
+  aws ec2 attach-volume \
+      --volume-id "$VOLUME_ID" \
+      --instance-id "$INSTANCE_ID" \
+      --device "$cachedir_dev"
+}
+
+# Refresh SSO creds, then re-authenticate pip against CodeArtifact. Kept as two
+# independent checks: only the SSO login gates attach-volume, so a codeartifact
+# failure must not abort the mount (and must not be misreported as an SSO failure).
+aws_login() {
+  if ! aws sso login ; then
+    echo "couldn't aws sso login"
+    return 1
+  fi
+
+  if [[ -n "$AWS_ACCOUNT_ID" ]]; then
+    aws codeartifact login --profile devtest-power --tool pip --repository dpe-python \
+        --domain lacework --domain-owner "$AWS_ACCOUNT_ID" --region us-west-2 \
+      || echo "warning: codeartifact login failed; pip may not resolve internal packages"
+  else
+    echo "warning: no AWS account id configured; skipping codeartifact login"
+  fi
+}
+
+if [[ ! -b "$cachedir_dev" ]]; then
+  echo "cachedir device does not exist $cachedir_dev"
+  INSTANCE_ID=$(curl -fsSL -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+  if [[ -z "$INSTANCE_ID" ]]; then
+      echo "unable to get instance id"
+      exit 1
+  fi
+  echo "attaching ebs volume to $cachedir_dev"
+
+  if ! aws_mount_volume ; then
+    aws_login || exit 1
+    aws_mount_volume
+  fi
+
+  echo -n "waiting for $cachedir_dev to exist "
+  while [[ ! -b "$cachedir_dev" ]]; do
+    sleep 1
+    echo -n "."
+  done
+  echo
+fi
+
+if [[ $(sudo file -Ls $cachedir_dev) == "$cachedir_dev: data" ]]; then
+  sudo mkfs -t ext4 $cachedir_dev
+  echo "Initialized filesystem on $cachedir_dev"
+fi
+
+if ! grep -q /mnt/cache /etc/fstab ; then
+  echo "$cachedir_dev /mnt/cache ext4 defaults 0 0" | sudo tee -a /etc/fstab >/dev/null
+fi
+
+sudo mkdir -p /mnt/cache
+sudo mount -a
+
+sudo chown coder:coder /mnt/cache
+
+bazel shutdown
+
+echo
+df -h | rg 'cache|coder|Use%'
