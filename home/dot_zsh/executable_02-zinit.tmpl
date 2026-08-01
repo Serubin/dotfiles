@@ -10,17 +10,75 @@ zinit light zsh-users/zsh-syntax-highlighting
 # prebuilt release into ~/.local/bin on Debian — no brew needed). deja wraps
 # ZLE widgets — Right/End accept the full suggestion, Ctrl+Right accepts a word
 # (the widgets autosuggestions also hooked) — and re-asserts on every precmd, so
-# load order is irrelevant. Disable the two default keybindings that would else
-# clobber ours each prompt: Tab (keep completion) and ^X (keep ^X^E, see env).
-if (( $+commands[deja] )); then
-    DEJA_CYCLE_KEY=''
+# load order is irrelevant. Shift+Tab cycles alternative suggestions. Two of deja's
+# default keybindings are disabled so they don't clobber ours each prompt: Tab
+# (keep completion) and ^X (keep ^X^E, see env).
+#
+# Found via $commands (a hash lookup, no fork) so this follows whichever install is in play:
+# brew on macOS, ~/.local/bin on Debian.
+#
+# _deja_load sources deja's generated init.zsh directly instead of the documented
+# `eval "$(deja init zsh)"`, which burns ~36ms launching the binary to rewrite a file it
+# already wrote. That file is generated *from* the binary, so it is only reusable while the
+# two still match: the binary's inode:size:mtime is recorded in ~/.zsh/cache/deja-init.id and
+# rechecked here, regenerating on any mismatch. zstat follows brew's Cellar symlink, so
+# upgrades register. Stat identity rather than `deja version` because every local build
+# reports the same "dev" string, and reading it would cost the launch this avoids.
+_deja_load() {
+    local bin="$1"
+    local init="${HOME}/.local/share/deja/init.zsh"
+    local stamp="${HOME}/.zsh/cache/deja-init.id"
+    local id="" cached=""
+
+    zmodload -F zsh/stat b:zstat 2>/dev/null
+    if (( $+builtins[zstat] )); then
+        local -A st
+        zstat -H st "$bin" 2>/dev/null && id="${st[inode]}:${st[size]}:${st[mtime]}"
+    fi
+    [[ -r "$stamp" ]] && read -r cached < "$stamp"
+
+    # No $id means zstat is unavailable, so the cache can't be validated and is never trusted.
+    if [[ -s "$init" && -n "$id" && "$id" == "$cached" ]]; then
+        source "$init"
+        return
+    fi
+
+    # Miss: deja rewrites init.zsh; record which binary produced it. env's async block purges
+    # this stamp after 24h, costing one extra regeneration a day — also a periodic self-heal.
+    eval "$("$bin" init zsh)"
+    if [[ -n "$id" ]]; then
+        [[ -d "${stamp:h}" ]] || mkdir -p "${stamp:h}"
+        print -r -- "$id" > "$stamp"
+    fi
+}
+
+_deja_bin="${commands[deja]}"
+if [[ -n "$_deja_bin" ]]; then
+    DEJA_CYCLE_KEY='\033[Z'
     DEJA_TOGGLE_KEY=''
-    eval "$(deja init zsh)"
+    _deja_load "$_deja_bin"
 fi
+unset _deja_bin
+unfunction _deja_load
 zinit ice pick"/dev/null" atload'ZSH_JUMP_TARGET_STYLE="fg=blue,bold,underline"; fpath+=(${ZINIT[PLUGINS_DIR]}/scfrazer---zsh-jump-target/functions); autoload -Uz jump-target; zle -N jump-target; bindkey "^F" jump-target'
 zinit light scfrazer/zsh-jump-target
 
-zinit ice as"null" atload'local dc={{ if eq .chezmoi.os "darwin" }}gdircolors{{ else }}dircolors{{ end }}; eval $($dc ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark 2>/dev/null)'
+# dircolors-solarized. Translating the palette file into LS_COLORS costs ~5ms of every
+# startup for a result that only changes when the palette does, so cache it. ~/.zsh/cache is
+# the directory _cache_completion (~/.zsh/function) already uses; env's async block purges
+# entries older than 24h, so this refreshes itself daily on top of the -nt check.
+_dircolors_cached() {
+    local src="$1"
+    local cache="${HOME}/.zsh/cache/dircolors.zsh"
+    local dc={{ if eq .chezmoi.os "darwin" }}gdircolors{{ else }}dircolors{{ end }}
+
+    [[ -d "${cache:h}" ]] || mkdir -p "${cache:h}"
+    if [[ ! -s "$cache" || "$src" -nt "$cache" ]]; then
+        $dc "$src" > "$cache" 2>/dev/null
+    fi
+    source "$cache"
+}
+zinit ice as"null" atload'_dircolors_cached ${ZINIT[PLUGINS_DIR]}/seebi---dircolors-solarized/dircolors.256dark'
 zinit light seebi/dircolors-solarized
 
 if [[ "$1" == "update" ]]; then

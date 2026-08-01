@@ -7,15 +7,50 @@
 # chezmoi fully owns this file's content: if something else (pyenv, a future installer, etc.)
 # ever needs to append here, that content will be silently dropped on the next `chezmoi
 # apply` unless folded into this template.
+#
+# Below is the static expansion of `brew shellenv` plus the GNU-coreutils prepends.
+# `brew shellenv` is deliberately not called — it spawns `brew` (a bash script) which re-evals
+# path_helper, ~55ms on a file that runs for every login shell, one per tmux pane. Valid
+# because `/opt/homebrew/etc/paths` holds exactly `bin` and `sbin` with no `paths.d`; re-check
+# if the Homebrew prefix layout changes.
 
-# Homebrew. `brew shellenv` (vs. a raw `export PATH=`) also wires up
-# MANPATH/INFOPATH/FPATH/HOMEBREW_PREFIX and re-invokes path_helper scoped to the Homebrew
-# prefix, so it stays correctly deduped under nested login shells (e.g. tmux's
-# default-command spawns a login shell per pane).
-eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+export HOMEBREW_REPOSITORY="/opt/homebrew"
 
-# GNU coreutils — prepended so the unprefixed GNU names (date, ls, ...) win over macOS's BSD
-# versions on /usr/bin.
-export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-export MANPATH="/opt/homebrew/opt/coreutils/libexec/gnuman:$MANPATH"
+# gnubin ahead of Homebrew's bin/sbin so the unprefixed GNU names (date, ls, ...) beat macOS's
+# BSD ones on /usr/bin.
+#
+# Entries are *moved* to the front — removed, then prepended — not just added when absent.
+# /etc/zprofile's path_helper rebuilds PATH on every login shell and shunts inherited entries
+# to the back, so in a nested login shell (one per tmux pane) an "already present?" check would
+# leave /usr/bin shadowing Homebrew's git and openssl, which is the bug #90 fixed. Removing
+# first also stops nesting accumulating duplicates.
+path=(
+    /opt/homebrew/opt/coreutils/libexec/gnubin
+    /opt/homebrew/bin
+    /opt/homebrew/sbin
+    ${path:#(/opt/homebrew/opt/coreutils/libexec/gnubin|/opt/homebrew/bin|/opt/homebrew/sbin)}
+)
+export PATH
+
+# Same move-to-front, for colon-separated strings. The `$entry:$rest` shape leaves a trailing
+# colon when $rest is empty — the empty entry that tells man(1)/info(1) to also search their
+# built-in defaults, as `brew shellenv` and the previous coreutils line both did.
+_zprofile_prepend() {
+    local var=$1 entry=$2
+    local -a parts=("${(@s.:.)${(P)var}}")
+    typeset -gx "$var=$entry:${(j.:.)${(@)parts:#$entry}}"
+}
+_zprofile_prepend MANPATH /opt/homebrew/opt/coreutils/libexec/gnuman
+_zprofile_prepend INFOPATH /opt/homebrew/share/info
+unset -f _zprofile_prepend
+
+# fpath is already an array, so it needs no splitting. Exported as FPATH to match
+# `brew shellenv`, so non-zsh consumers still see it.
+fpath=(
+    /opt/homebrew/share/zsh/site-functions
+    ${fpath:#/opt/homebrew/share/zsh/site-functions}
+)
+export FPATH
 {{ end -}}

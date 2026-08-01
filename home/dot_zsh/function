@@ -27,7 +27,9 @@ _cache_completion() {
 
   [ -z "$bin_path" ] && return
 
-  mkdir -p "$cache_dir"
+  # Guarded: coreutils' mkdir is a fork, ~7ms per call, and this runs on every startup for
+  # every cached completion even though the directory almost always already exists.
+  [ -d "$cache_dir" ] || mkdir -p "$cache_dir"
   if [ ! -f "$cache_file" ] || [ "$bin_path" -nt "$cache_file" ]; then
     $cmd completion zsh > "$cache_file" 2>/dev/null
   fi
