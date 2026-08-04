@@ -14,5 +14,29 @@ if [ -r $HOME/.custom ]; then
     source $HOME/.custom;
 fi
 
-unsetopt extendedglob
+# Move Homebrew to the front, here rather than in ~/.zprofile: /etc/zsh/zshrc re-sources
+# /etc/zsh/zprofile.d/*sh* after it and 02-zinit prepends zinit's bin, so this is the last
+# word. Non-interactive shells never reach ~/.zshrc, which is why ~/.zprofile only appends.
+# gnubin leads where it exists (macOS); the (-/N) qualifier drops it on Linux.
+# Removed then re-added, so nested shells can't accumulate copies. Per-entry `:#` because
+# text substituted into a pattern is matched literally -- `${path:#(${(j:|:)arr})}` would
+# silently match nothing.
+if [[ -n $HOMEBREW_PREFIX ]]; then
+    typeset -a _brew_front=(
+        $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin(-/N)
+        $HOMEBREW_PREFIX/bin
+        $HOMEBREW_PREFIX/sbin
+    )
+    for _brew_dir in $_brew_front; do
+        path=(${path:#$_brew_dir})
+    done
+    path=($_brew_front $path)
+    unset _brew_front _brew_dir
+fi
 
+# Collapse duplicates. `typeset -U path` from /etc/zsh/zshenv only dedupes ARRAY
+# assignments, so the scalar `PATH=...:$PATH` form that eval-me installers emit slips
+# them through. Unquoted also drops any empty entry, i.e. an implicit `.` on PATH.
+path=($path)
+
+unsetopt extendedglob
