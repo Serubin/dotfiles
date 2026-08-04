@@ -112,6 +112,7 @@ Hand-maintained — keep in sync with the gating logic.
 | Homebrew base packages | ✅ | — | ✅ | — |
 | yabai + skhd (config + install) | ✅ | — | ✅ | — |
 | `~/.local/bin` on PATH | ✅ | ✅ | ✅ | ✅ |
+| Homebrew on PATH before `~/.zsh/*` (`~/.zprofile`) | ✅ | opt-in | ✅ | opt-in |
 | Per-class packages (`run_once_after_21`) | — | — | opt-in | opt-in |
 | `example-work-mac` script | — | — | ✅ | — |
 | `example-work-devbox` script | — | — | — | ✅ |
@@ -230,8 +231,15 @@ chezmoi update               # git pull the source + apply
 `.zshrc` sources every file in `~/.zsh/` in lexicographic order (`00-os`,
 `02-zinit`, `alias`, `env`, `function`, `promptrc`, …) for interactive shells only,
 making it easy to add or reorder config. `~/.zprofile` (`dot_zprofile.tmpl`) runs
-before that, for every login shell — that's where Homebrew and GNU coreutils get
-prepended onto `PATH`.
+before that, for every login shell — that's where Homebrew lands on `PATH`:
+prepended along with GNU coreutils on macOS, appended on Linux where linuxbrew is
+present. The asymmetry is forced, not stylistic: on the Debian devbox
+`/etc/zsh/zshrc` re-sources `/etc/zsh/zprofile.d/*sh*` (rust, nvm, goenv, pyenv,
+spark, …) *after* `~/.zprofile`, so nothing `~/.zprofile` prepends can hold the
+front. Appending is enough for what's actually needed — `02-zinit` gates `deja` on
+`${commands[deja]}`, which only requires the binary to be findable — and it keeps
+brew from displacing the system toolchain in the non-interactive login shells that
+never reach `/etc/zshrc` or `~/.zsh/*`.
 
 **Plugins** (via [zinit](https://github.com/zdharma-continuum/zinit)):
 - `zsh-syntax-highlighting` — command highlighting

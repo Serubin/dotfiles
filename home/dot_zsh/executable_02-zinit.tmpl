@@ -15,7 +15,9 @@ zinit light zsh-users/zsh-syntax-highlighting
 # (keep completion) and ^X (keep ^X^E, see env).
 #
 # Found via $commands (a hash lookup, no fork) so this follows whichever install is in play:
-# brew on macOS, ~/.local/bin on Debian.
+# brew on macOS or Linux, ~/.local/bin on Debian. The prefix must already be on PATH here —
+# ~/.zprofile and ~/.zshenv both run before ~/.zshrc's ~/.zsh/* loop; anything added later
+# (e.g. from ~/.custom) is too late and this block silently no-ops.
 #
 # _deja_load sources deja's generated init.zsh directly instead of the documented
 # `eval "$(deja init zsh)"`, which burns ~36ms launching the binary to rewrite a file it
