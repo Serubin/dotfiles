@@ -17,11 +17,16 @@
 .config/nvim/lazy
 
 # Claude Code: only the curated config (settings.json, CLAUDE.md, skills/,
-# plugins/{known_marketplaces,blocklist}.json) is managed. Guard the
-# machine-local override, secrets, and the cloned marketplace repos.
+# plugins/blocklist.json) is managed. Guard the machine-local override, secrets,
+# and the cloned marketplace repos.
+#
+# known_marketplaces.json is listed rather than just deleted from the source, because
+# Claude Code rewrites it in place and `chezmoi add`/`re-add` would pull it back in.
+# It holds per-machine clone paths and a `lastUpdated` stamp: generated state, not config.
 .claude/settings.local.json
 .claude/.credentials.json
 .claude/plugins/marketplaces
+.claude/plugins/known_marketplaces.json
 
 # Repo docs kept next to the config they document, but NOT deployed to $HOME.
 # (.zsh/README.md would otherwise be sourced by .zshrc's `~/.zsh/*` loop.)
