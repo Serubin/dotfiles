@@ -28,8 +28,9 @@ brew install romkatv/gitstatus/gitstatus
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
 # require SIP to be partially disabled (manual, out of scope here).
 brew install asmvik/formulae/yabai asmvik/formulae/skhd
-# deja: predictive shell autosuggestions (replaces zsh-autosuggestions).
-brew install Giammarco-Ferranti/deja/deja
+# deja: predictive shell autosuggestions. HEAD-only formula, so --HEAD is required; it
+# conflicts_with giammarco-ferranti/deja/deja, which must be uninstalled first if present.
+brew install --HEAD serubin/tools/deja-canary
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
@@ -85,18 +86,14 @@ else
     sudo apt-get install -y gh
 fi
 
-# deja: predictive shell autosuggestions (replaces zsh-autosuggestions). No apt
-# package, and deliberately NOT via Homebrew: brew isn't part of this repo's Linux
-# bootstrap, and deja's tap formula just downloads the same prebuilt release
-# tarball we fetch here, so brew would buy nothing but a dependency. Also not
-# upstream's install.sh: that appends `eval "$(deja init zsh)"` to ~/.zshrc (which
-# chezmoi owns) and imports from deja's DEFAULT histfile, not our HISTFILE.
+# deja: no apt package, so brew when available (see the guard below), else install_deja --
+# upstream's checksum-verified release tarball into ~/.local/bin, which keeps brew-less boxes
+# working. The fallback gets upstream deja, not the canary.
 #
-# The binary is dynamically linked against glibc (deja's sqlite driver is CGO), so
-# it's fine on Debian/Ubuntu but would not run on a musl distro — same constraint
-# brew's bottle would have had.
+# Not upstream's install.sh: it appends `eval "$(deja init zsh)"` to ~/.zshrc (chezmoi owns
+# that) and imports from deja's default histfile rather than ours.
 #
-# To upgrade later: rm ~/.local/bin/deja and re-run `chezmoi apply`.
+# Either binary is glibc-linked (CGO sqlite driver), so fine on Debian, not on musl.
 install_deja() {
     local arch tag version archive base tmp
     case "$(uname -m)" in
@@ -147,9 +144,16 @@ install_deja() {
 # guard below and for the history import at the end of this script.
 export PATH="$HOME/.local/bin:$PATH"
 if ! command -v deja >/dev/null 2>&1; then
-    # Non-fatal on purpose: this is a run_before_ script, so letting a GitHub
-    # outage abort it would abort the whole apply over a nice-to-have.
-    install_deja || echo "deja: install failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+    # Non-fatal on purpose, both paths: this is a run_before_ script, so letting a GitHub
+    # outage or a failed source build abort it would abort the whole apply over a
+    # nice-to-have. Explicit `|| echo` rather than relying on set -e, for the same reason
+    # install_deja checks every step itself.
+    if command -v brew >/dev/null 2>&1; then
+        brew install --HEAD serubin/tools/deja-canary ||
+            echo "deja: 'brew install --HEAD serubin/tools/deja-canary' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+    else
+        install_deja || echo "deja: install failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+    fi
 fi
 {{   else -}}
 echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim deja manually." >&2
