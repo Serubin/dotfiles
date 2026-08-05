@@ -28,9 +28,10 @@ brew install romkatv/gitstatus/gitstatus
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
 # require SIP to be partially disabled (manual, out of scope here).
 brew install asmvik/formulae/yabai asmvik/formulae/skhd
-# deja: predictive shell autosuggestions. HEAD-only formula, so --HEAD is required; it
-# conflicts_with giammarco-ferranti/deja/deja, which must be uninstalled first if present.
-brew install --HEAD serubin/tools/deja-canary
+# deja: predictive shell autosuggestions, as a prebuilt binary. Deliberately not --HEAD:
+# that path pulls in brew's `go` and builds from source. conflicts_with
+# giammarco-ferranti/deja/deja, which must be uninstalled first or this aborts the script.
+brew install serubin/tools/deja-canary
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
@@ -94,6 +95,9 @@ fi
 # that) and imports from deja's default histfile rather than ours.
 #
 # Either binary is glibc-linked (CGO sqlite driver), so fine on Debian, not on musl.
+#
+# On work-devbox the brew prefix does not survive a host restart, so ~/personalize reinstalls
+# deja every boot; this script only covers the first apply.
 install_deja() {
     local arch tag version archive base tmp
     case "$(uname -m)" in
@@ -143,14 +147,23 @@ install_deja() {
 # dot_zshenv's ~/.local/bin PATH entry only applies to zsh, so add it here for the
 # guard below and for the history import at the end of this script.
 export PATH="$HOME/.local/bin:$PATH"
+# Absolute path, because /etc/profile.d/homebrew.sh puts only <prefix>/Homebrew/bin on
+# PATH and that copy of brew reports its own directory as HOMEBREW_PREFIX -- a bare
+# `brew install` would then split the Cellar in two.
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    brew_bin=/home/linuxbrew/.linuxbrew/bin/brew
+else
+    brew_bin=$(command -v brew 2>/dev/null || true)
+fi
+
 if ! command -v deja >/dev/null 2>&1; then
     # Non-fatal on purpose, both paths: this is a run_before_ script, so letting a GitHub
-    # outage or a failed source build abort it would abort the whole apply over a
-    # nice-to-have. Explicit `|| echo` rather than relying on set -e, for the same reason
-    # install_deja checks every step itself.
-    if command -v brew >/dev/null 2>&1; then
-        brew install --HEAD serubin/tools/deja-canary ||
-            echo "deja: 'brew install --HEAD serubin/tools/deja-canary' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+    # outage or a failed download abort it would abort the whole apply over a nice-to-have.
+    # Explicit `|| echo` rather than relying on set -e, for the same reason install_deja
+    # checks every step itself.
+    if [ -n "$brew_bin" ]; then
+        "$brew_bin" install serubin/tools/deja-canary ||
+            echo "deja: 'brew install serubin/tools/deja-canary' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
     else
         install_deja || echo "deja: install failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
     fi
