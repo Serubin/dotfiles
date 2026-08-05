@@ -48,9 +48,12 @@ nohup /home/coder/lwcode/reset-vscode-settings.sh > /tmp/startup-vscode-settings
 # here, not by chezmoi). Generation lives in its own chezmoi-managed script.
 "$HOME/.local/bin/apply-sshd-keepalive.sh"
 
-# --- Re-optimize the image's /etc/zsh (root-owned, also wiped on restart). Races the
-# first shell of a session: a pane opening before this finishes still pays full price.
-"$HOME/.local/bin/apply-etc-zsh-perf.sh"
+# --- Re-optimize the image's /etc/zsh (root-owned, also wiped on restart). Backgrounded:
+# personalize is the Coder startup script, so a slow or hung step here delays workspace
+# readiness and shows up as "agent failed to connect". This is a pure perf optimization --
+# nothing downstream needs it -- so it must never gate startup. A pane opening before it
+# finishes just pays full price once (it already raced the first shell even when synchronous).
+nohup "$HOME/.local/bin/apply-etc-zsh-perf.sh" > /tmp/startup-apply-etc-zsh-perf.log 2>&1 &
 
 # --- Periodic tmux-resurrect save cron (every 5 min). The crontab does not survive
 # a host restart, so it is (re)installed here rather than at chezmoi apply. The
