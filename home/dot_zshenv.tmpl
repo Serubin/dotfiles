@@ -1,0 +1,63 @@
+# Sourced for ALL zsh invocations (login, interactive, non-interactive, scripts).
+# Anything here applies to subshells launched by GUI apps (Cursor's embedded nvim,
+# git editors, etc.) — not just interactive terminals where .zshrc runs.
+
+# Raise the per-process FD soft limit. macOS launchd defaults to 256, which is
+# trivially exhausted by Neovim plugins that spawn many subprocesses
+# (gitsigns -> git, conform/lint formatters, LSP), producing
+# `EMFILE: too many open files` from vim/_core/system.lua.
+# Only raise — never lower — so this composes correctly with the
+# limit.maxfiles LaunchDaemon (which sets soft=65536) and any other tool
+# that may already have set a higher limit.
+_cur_nofile=$(ulimit -Sn)
+if [ "$_cur_nofile" != "unlimited" ] && [ "$_cur_nofile" -lt 65536 ]; then
+    ulimit -Sn 65536 2>/dev/null
+fi
+unset _cur_nofile
+
+# Skip the global compinit in Debian/Ubuntu's /etc/zsh/zshrc. ~/.zsh/env runs its own
+# compinit immediately afterward (with a -C fast path and a 24h dump refresh), so the
+# system one only rebuilds the same dump a second time. This is the opt-out /etc/zshrc
+# documents itself; measured ~13ms per interactive shell on the work devbox, more on a
+# cold dump. Set here rather than in ~/.zsh/* because /etc/zshrc runs first.
+skip_global_compinit=1
+
+# Put ~/.local/bin on PATH for ALL zsh invocations (interactive, scripts, and
+# GUI-launched tools) — chezmoi installs machine-specific executables there.
+# Appended (not prepended) so user scripts can never shadow system binaries.
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$PATH:$HOME/.local/bin" ;;
+esac
+{{ if and (eq .chezmoi.os "linux") (stat "/home/linuxbrew/.linuxbrew/bin") }}
+# Homebrew (linuxbrew) for EVERY zsh invocation, which is why it is here and not in
+# ~/.zprofile: a tmux pane is a non-login shell (tmux.conf sets `default-command
+# "/usr/bin/env zsh"`) and never sources that file. Panes then could not find `deja` at all,
+# and brew's fpath entry existed only in login shells while ~/.zcompdump is shared between
+# them, so whichever shape rebuilt the dump decided whether brew's completions worked.
+#
+# Static expansion of `brew shellenv`, which is not called because it spawns brew.
+# HOMEBREW_REPOSITORY is $prefix/Homebrew on Linux, not the prefix itself. Gated on the
+# prefix existing at apply time, since brew is not part of this repo's Linux bootstrap.
+export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
+
+# Appended, not prepended, so non-interactive shells keep the system/goenv/pyenv copies;
+# dot_zshrc moves the prefix to the front for interactive shells. Added rather than moved so
+# a nested shell can't demote its parent's ordering.
+for _brewdir in /home/linuxbrew/.linuxbrew/bin /home/linuxbrew/.linuxbrew/sbin; do
+    (( ${path[(Ie)$_brewdir]} )) || path+=("$_brewdir")
+done
+unset _brewdir
+export PATH
+
+# No MANPATH: man-db derives $prefix/share/man from the PATH entry above. No INFOPATH:
+# $prefix/share/info doesn't exist.
+
+# fpath must be set before compinit, which runs in ~/.zsh/env.
+_brew_fpath=/home/linuxbrew/.linuxbrew/share/zsh/site-functions
+(( ${fpath[(Ie)$_brew_fpath]} )) || fpath+=("$_brew_fpath")
+unset _brew_fpath
+export FPATH
+{{ end -}}

@@ -53,29 +53,4 @@ fpath=(
     ${fpath:#/opt/homebrew/share/zsh/site-functions}
 )
 export FPATH
-{{ else if and (eq .chezmoi.os "linux") (stat "/home/linuxbrew/.linuxbrew/bin") -}}
-# Static expansion of `brew shellenv`, as in the macOS branch. HOMEBREW_REPOSITORY is
-# $prefix/Homebrew on Linux, not the prefix itself. Gated on the prefix existing at apply
-# time, since brew is not part of this repo's Linux bootstrap.
-export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
-export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
-
-# Appended, not prepended: /etc/zsh/zshrc re-sources /etc/zsh/zprofile.d/*sh* AFTER this
-# file, so anything prepended here is buried anyway. 02-zinit only needs `deja` findable,
-# not first. Added rather than moved so a nested shell can't demote its parent's ordering.
-for _brewdir in /home/linuxbrew/.linuxbrew/bin /home/linuxbrew/.linuxbrew/sbin; do
-    (( ${path[(Ie)$_brewdir]} )) || path+=("$_brewdir")
-done
-unset _brewdir
-export PATH
-
-# No MANPATH: man-db derives $prefix/share/man from the PATH entry above. No INFOPATH:
-# $prefix/share/info doesn't exist.
-
-# fpath must be set before compinit, which runs in ~/.zsh/env.
-_brew_fpath=/home/linuxbrew/.linuxbrew/share/zsh/site-functions
-(( ${fpath[(Ie)$_brew_fpath]} )) || fpath+=("$_brew_fpath")
-unset _brew_fpath
-export FPATH
 {{ end -}}
