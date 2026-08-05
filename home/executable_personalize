@@ -24,12 +24,12 @@ else
          "onboard first by running this repo's install.sh." >&2
 fi
 
-# --- Work-devbox packages. Nothing outside /home/coder survives a host restart,
-# so every package not baked into the base image is (re)installed here each run
-# (chezmoi's run_once can't help: its "done" state persists but the packages
-# don't). spr = stacked-PR workflow; claude-code = Claude Code CLI.
+# --- Work-devbox packages. Nothing outside /home/coder survives a host restart, so every
+# package not baked into the base image is (re)installed here each run; chezmoi's run_once
+# does not apply.
 brew install \
     ejoffe/tap/spr \
+    serubin/tools/deja-canary \
     claude-code@latest \
     mosh \
     inotify-tools \
