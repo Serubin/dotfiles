@@ -44,6 +44,10 @@ nohup /home/coder/lwcode/reset-vscode-settings.sh > /tmp/startup-vscode-settings
 # here, not by chezmoi). Generation lives in its own chezmoi-managed script.
 "$HOME/.local/bin/apply-sshd-keepalive.sh"
 
+# --- Re-optimize the image's /etc/zsh (root-owned, also wiped on restart). Races the
+# first shell of a session: a pane opening before this finishes still pays full price.
+"$HOME/.local/bin/apply-etc-zsh-perf.sh"
+
 # --- Periodic tmux-resurrect save cron (every 5 min). The crontab does not survive
 # a host restart, so it is (re)installed here rather than at chezmoi apply. The
 # script itself is chezmoi-managed (~/.local/bin/tmux-periodic-save.sh); this only
