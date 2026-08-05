@@ -15,6 +15,10 @@ if [ "$_cur_nofile" != "unlimited" ] && [ "$_cur_nofile" -lt 65536 ]; then
 fi
 unset _cur_nofile
 
+# Skip Debian's global compinit -- ~/.zsh/env runs its own right after, with a -C fast
+# path. Must be set here: /etc/zshrc runs before ~/.zsh/*.
+skip_global_compinit=1
+
 # Put ~/.local/bin on PATH for ALL zsh invocations (interactive, scripts, and
 # GUI-launched tools) — chezmoi installs machine-specific executables there.
 # Appended (not prepended) so user scripts can never shadow system binaries.
