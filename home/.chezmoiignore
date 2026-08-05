@@ -53,15 +53,16 @@
 .local/bin/example-work-devbox
 {{ end }}
 
-# work-devbox bootstrap + helpers: the ~/personalize startup script, the sshd
-# keepalive re-apply helper it calls, the tmux -CC (iTerm2 control-mode) helpers
-# (periodic-save cron target + stale-client-clearing connect helper), and the
-# /mnt/cache EBS build-cache mount command plus the gate the connect helper
-# calls to run it.
+# work-devbox bootstrap + helpers: the ~/personalize startup script, the two /etc
+# re-apply helpers it calls (sshd keepalive, and the /etc/zsh startup-cost
+# optimization), the tmux -CC (iTerm2 control-mode) helpers (periodic-save cron
+# target + stale-client-clearing connect helper), and the /mnt/cache EBS
+# build-cache mount command plus the gate the connect helper calls to run it.
 # work-devbox only — the mac side of this workflow is the sleepwatcher feature below.
 {{ if ne .class "work-devbox" }}
 personalize
 .local/bin/apply-sshd-keepalive.sh
+.local/bin/apply-etc-zsh-perf.sh
 .local/bin/tmux-periodic-save.sh
 .local/bin/tmux-devel.sh
 .local/bin/coder-keepalive.sh

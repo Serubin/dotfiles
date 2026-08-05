@@ -4,11 +4,20 @@
 
 | Metric | Time |
 |---|---|
-| Shell startup | ~80ms |
+| Shell startup — `zsh -i`, work-devbox | ~150ms |
+| Shell startup — `zsh -li` (login, e.g. ssh), work-devbox | ~155ms |
 | Prompt render (in git repo) | ~2ms |
 
 Startup is dominated by eager zinit plugin loading; prompt render is mostly the
-gitstatus query. Re-measure anytime with `scripts/bench-zsh.sh`.
+gitstatus query. Re-measure anytime with `scripts/bench-zsh.sh`, and note which shell
+*shape* you are measuring — a tmux pane is `zsh -i` (`default-command` is
+`/usr/bin/env zsh`, so panes are **non-login**), while ssh gives you `zsh -li`.
+
+Of that ~150ms, roughly 20ms is this repo and the rest is the machine's system config.
+On work-devbox the base image was responsible for ~874ms of a ~1018ms pane until
+`~/.local/bin/apply-etc-zsh-perf.sh` (run at startup by `~/personalize`) started caching
+its eager `goenv`/`pyenv`/`nvm` initialization — see that script's header for what it
+does and what it trades away.
 
 ## Structure
 
