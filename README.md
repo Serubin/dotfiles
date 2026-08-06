@@ -251,8 +251,11 @@ duplicate entries left behind by scalar `PATH=…` assignments.
 Inline suggestions come from [deja](https://github.com/Giammarco-Ferranti/deja)
 — predictive ghost-text autosuggestions (replaces `zsh-autosuggestions`).
 It's a standalone Go binary + daemon, initialized in `02-zinit`, not a zinit
-plugin — installed via Homebrew on macOS and from upstream's prebuilt release into
-`~/.local/bin` on Debian/Ubuntu.
+plugin. On Debian/Ubuntu it comes from Homebrew when brew is available
+(`brew install --HEAD serubin/tools/deja-canary`, built from source), falling back to
+upstream's checksum-verified prebuilt release into `~/.local/bin` on brew-less boxes.
+Either way `~/.zprofile` puts the prefix on `PATH` early enough for `02-zinit` to
+find it.
 
 The prompt is a custom theme powered by
 [gitstatus](https://github.com/romkatv/gitstatus) for fast git status.
