@@ -253,10 +253,10 @@ Inline suggestions come from [deja](https://github.com/Giammarco-Ferranti/deja)
 — predictive ghost-text autosuggestions (replaces `zsh-autosuggestions`).
 It's a standalone Go binary + daemon, initialized in `02-zinit`, not a zinit
 plugin. On Debian/Ubuntu it comes from Homebrew when brew is available
-(`brew install --HEAD serubin/tools/deja-canary`, built from source), falling back to
-upstream's checksum-verified prebuilt release into `~/.local/bin` on brew-less boxes.
-Either way `~/.zprofile` puts the prefix on `PATH` early enough for `02-zinit` to
-find it.
+(`brew install serubin/tools/deja-canary`, a checksum-verified prebuilt binary), falling
+back to upstream's prebuilt release into `~/.local/bin` on brew-less boxes — the difference
+is which release you get, canary or upstream, not prebuilt versus source. On work-devbox the
+brew prefix is wiped by a host restart, so `~/personalize` reinstalls it each boot.
 
 The prompt is a custom theme powered by
 [gitstatus](https://github.com/romkatv/gitstatus) for fast git status.
