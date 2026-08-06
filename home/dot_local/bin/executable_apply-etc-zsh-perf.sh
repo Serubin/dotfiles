@@ -181,9 +181,8 @@ if command -v pyenv >/dev/null 2>&1; then
     else
         {
             printf '%s\n\n' "$MARK"
-            printf '%s\n' '# Cached equivalent of the AMI pyenv.sh. Nothing is given up: the pyenv() shell'
-            printf '%s\n' '# function and the pyenv-virtualenv auto-activate precmd hook are both included'
-            printf '%s\n' '# verbatim -- only the three forks per shell go away.'
+            printf '%s\n' '# Cached AMI pyenv.sh: pyenv() and the virtualenv precmd hook are kept, only'
+            printf '%s\n' '# the per-shell forks go. `pyenv rehash` is manual now, as with goenv.'
             printf '\n'
             printf '%s\n' 'export PYENV_ROOT=/opt/pyenv'
             printf '%s\n' 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"'
@@ -192,7 +191,11 @@ if command -v pyenv >/dev/null 2>&1; then
             printf '%s\n' '# removes an existing shims entry so the next line can re-prepend it.'
             printf '%s\n' 'path=(${path:#/opt/pyenv/shims})'
             printf '\n'
-            printf '%s\n' "$pyenv_init" | tail -n +6
+            # `command pyenv rehash` regenerates the shims on every shell: 46ms of a 145ms
+            # pane. Same fork stripped from goenv above; the pyenv() function's own
+            # rehash branch is untouched, so an explicit `pyenv rehash` still works.
+            printf '%s\n' "$pyenv_init" | tail -n +6 |
+                grep -Ev '^[[:space:]]*(command[[:space:]]+)?pyenv rehash[[:space:]]*$'
             printf '\n'
             printf '%s\n' "$pyenv_venv"
         } > "$TMP/pyenv.sh"
