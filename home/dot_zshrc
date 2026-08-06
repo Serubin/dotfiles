@@ -14,5 +14,24 @@ if [ -r $HOME/.custom ]; then
     source $HOME/.custom;
 fi
 
-unsetopt extendedglob
+# Move Homebrew to the front — here, not ~/.zprofile, since /etc/zsh/zshrc re-sources
+# zprofile.d after it. Non-interactive shells skip ~/.zshrc, so ~/.zprofile only appends.
+# Per-entry `:#`, not one alternation: a substituted pattern would match literally.
+if [[ -n $HOMEBREW_PREFIX ]]; then
+    typeset -a _brew_front=(
+        $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin(-/N)
+        $HOMEBREW_PREFIX/bin
+        $HOMEBREW_PREFIX/sbin
+    )
+    for _brew_dir in $_brew_front; do
+        path=(${path:#$_brew_dir})
+    done
+    path=($_brew_front $path)
+    unset _brew_front _brew_dir
+fi
 
+# Collapse duplicates: `typeset -U path` only dedupes array assignments, not the scalar
+# `PATH=...:$PATH` that eval-me installers emit. Unquoted also drops empty (implicit `.`).
+path=($path)
+
+unsetopt extendedglob

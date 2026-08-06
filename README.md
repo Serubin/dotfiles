@@ -239,7 +239,9 @@ spark, …) *after* `~/.zprofile`, so nothing `~/.zprofile` prepends can hold th
 front. Appending is enough for what's actually needed — `02-zinit` gates `deja` on
 `${commands[deja]}`, which only requires the binary to be findable — and it keeps
 brew from displacing the system toolchain in the non-interactive login shells that
-never reach `/etc/zshrc` or `~/.zsh/*`.
+never reach `/etc/zshrc` or `~/.zsh/*`. `.zshrc` then has the last word for
+interactive shells: it moves Homebrew to the front of `PATH` and collapses any
+duplicate entries left behind by scalar `PATH=…` assignments.
 
 **Plugins** (via [zinit](https://github.com/zdharma-continuum/zinit)):
 - `zsh-syntax-highlighting` — command highlighting
