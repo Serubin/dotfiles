@@ -306,15 +306,16 @@ full breakdown (options, keymaps, per-plugin notes, autocommands).
 ### Claude Code
 
 Only curated config is managed — `CLAUDE.md`, `settings.json`,
-`statusline-command.sh`, `skills/`, and plugin config
-(`plugins/known_marketplaces.json`, `plugins/blocklist.json`). Everything else in
+`statusline-command.sh`, `skills/`, and `plugins/blocklist.json`. Everything else in
 `~/.claude` (sessions, projects, history, caches, `settings.local.json`,
 credentials) is left untouched.
 
-> **Caveat:** the plugin JSONs include app-maintained fields (`lastUpdated`,
-> `installLocation`, `fetchedAt`) that Claude Code rewrites, so `chezmoi status`
-> may show them as drifted and `apply` reverts those fields. `installLocation` is
-> also macOS-specific. If the churn is annoying, drop them from management.
+> **Caveat:** `plugins/blocklist.json` carries an app-maintained `fetchedAt` field
+> that Claude Code rewrites, so `chezmoi status` may show it as drifted and `apply`
+> reverts it. Its blocked-plugin entries are worth tracking anyway.
+> `plugins/known_marketplaces.json` is deliberately *not* managed: on top of a
+> `lastUpdated` stamp it records each marketplace's clone path, which is absolute
+> and per-machine, making it generated state rather than config.
 
 ## Docker testing (Debian)
 
