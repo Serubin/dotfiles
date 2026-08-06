@@ -114,6 +114,7 @@ Hand-maintained — keep in sync with the gating logic.
 | `~/.local/bin` on PATH | ✅ | ✅ | ✅ | ✅ |
 | Homebrew on PATH before `~/.zsh/*` (`~/.zprofile`) | ✅ | opt-in | ✅ | opt-in |
 | Per-class packages (`run_once_after_21`) | — | — | opt-in | opt-in |
+| `/etc/zsh` startup-cost optimization (`apply-etc-zsh-perf.sh`) | — | — | — | ✅ |
 | `example-work-mac` script | — | — | ✅ | — |
 | `example-work-devbox` script | — | — | — | ✅ |
 
@@ -259,6 +260,23 @@ find it.
 
 The prompt is a custom theme powered by
 [gitstatus](https://github.com/romkatv/gitstatus) for fast git status.
+
+**Startup cost on work-devbox.** The Coder base image initializes goenv, pyenv and nvm
+eagerly in `/etc/zsh/zprofile.d`, and `/etc/zsh/zshrc` re-sources that whole directory
+even for login shells, which `/etc/zprofile` has already done. That was ~874ms of a
+~1018ms tmux pane. `~/.local/bin/apply-etc-zsh-perf.sh`, run at startup by
+`~/personalize` (root-owned `/etc` does not survive a host restart), regenerates those
+snippets with each tool's init output *cached* rather than re-derived per shell, taking a
+pane to ~150ms. Two behavior changes follow from it:
+
+- `goenv rehash` is manual — run it after installing a new Go version.
+- `nvm` loads lazily, so its first call in a shell pays ~250ms. `node`, `npm`, `npx` and
+  the nvm-installed `claude` stay on `PATH` regardless.
+
+Every step is guarded on the image's current content and validated afterward by
+re-deriving the full command-resolution map, so an image change or an unexpected `PATH`
+effect restores `/etc` instead of leaving a broken shell. Re-run it by hand after
+switching a Go/Python/node version, since the selected versions are baked in.
 
 **Notable aliases**: `vim` → `nvim`, `cd` → `cdls` (auto-`ls` after cd), `_` →
 `sudo`, `extract` → `aunpack`.
