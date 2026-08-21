@@ -44,7 +44,10 @@ Every commit **must** have:
   already uses). Optional if the repo doesn't scope subjects.
 - **Concrete summary.** "Fix host eval" is useless. "Fix host eval dropping rows when cve_id is
   null" is a subject line.
-- **≤ 70 characters.** GitHub truncates around 72; leave headroom.
+- **≤ 70 characters, and aim for 61 where the repo squash-merges.** GitHub truncates around 72,
+  and squash merge appends ` (#NNNNN)` — about 9 characters you don't control. Spend the
+  display budget *before* that suffix exists, or the subject lands truncated in every list
+  view.
 
 Bad:
 
@@ -58,9 +61,9 @@ Good:
 
 ```
 feat(vfm): Support paginated feed loads
-fix(observer-host): Drop rows where cve_id is null after dedup
+fix(observer-host): Drop rows with a null cve_id after dedup
 docs: Mention that foo's bar table is read by service quux
-chore(spark-jobs): Thread context.Context through database logs
+chore(spark-jobs): Thread context.Context into db logs
 ```
 
 ---
@@ -69,6 +72,24 @@ chore(spark-jobs): Thread context.Context through database logs
 
 GitHub-flavored Markdown. Use `##` headings for sections. Section length is proportional to the
 change — skip a section if it adds no value, and don't invent ceremony for a one-line typo fix.
+
+**Don't paste the repo's `.github/pull_request_template.md` headings into a commit message.**
+A commit body is prose, not a filled-in form. Fill the template in on the PR itself, where it
+belongs.
+
+### Wrap prose at 72, never wrap tables or code
+
+Wrap prose lines at 72 characters so `git log` reads well in a terminal. **Table rows and
+fenced-code lines are exempt and must stay on one line each.** A markdown table row broken
+across two lines renders as literal pipe characters on GitHub — the row is silently destroyed,
+and the terminal reader sees noise too. If a row is too wide to fit on one line, the table is
+the wrong shape: use prose.
+
+**Long literals are also exempt.** A line carrying a single unbreakable token — a dashboard
+URL, a docker image tag, an S3 key, a job id — cannot be shortened by reflowing, so leave it
+long rather than breaking it. Breaking a URL across lines makes it unclickable, which is
+strictly worse than a wide line. Put the literal on its own line so it doesn't drag prose past
+the margin with it.
 
 {{ if $ticketRequired -}}
 ### Ticket line first
@@ -140,6 +161,33 @@ diff.
       from the last smoke run are gone." The reviewer cannot see your query or that you ran the
       job in QA for 3 days — provide links or copy-pasteable text they can use to perform the
       verification themselves or convince themselves it's useful.
+  - **Every performance number needs a link the reader can open, pinned to an absolute UTC
+    window.** A quoted figure with nowhere to check it asks the reviewer to take your word for
+    it, and the number outlives the memory of where it came from. Metrics, logs, and
+    job-history UIs all work as anchors; generate the link from the tool rather than
+    hand-assembling it.
+
+    **Relative windows are the failure mode to design against.** `from=now-6h` is correct for
+    about as long as it takes to write the sentence; a reviewer opening it the next day sees an
+    empty graph and concludes the claim was wrong — the most expensive kind of wrong, because
+    it discredits a correct change. The same applies to a bare dashboard link with no
+    `from`/`to`: it opens on whatever range the reader's dashboard happens to default to. And
+    don't anchor with an `@ <epoch>` modifier inside the query — that overrides the reader's
+    time picker, so widening the range leaves the value stubbornly unchanged and the graph
+    looks broken.
+
+    If a number came from a CI benchmark rather than production, say that instead — it's
+    checkable by re-running CI, and no link is needed.
+  - **Proof blocks are free — they don't count against the body budget.** Fenced code and its
+    contents are excluded from the word count, so a query, a plan fragment, or a row-count diff
+    never competes with prose. Include the real thing rather than paraphrasing it.
+  - **Collapse a proof block past ~20 lines behind `<details><summary>the claim it
+    proves</summary>`.** Where the repo squash-merges, do this in the commit message itself and
+    not just in the PR body: GitHub pre-fills the PR description from the commit message, so
+    the commit message is what gets rendered and reviewed. The summary line should state the
+    claim, so a reader who trusts you can skip the block and a reader who doesn't can expand
+    it. This costs two lines of literal HTML in `git log`, a fair trade against a reviewer
+    scrolling thirty lines of SQL to reach your point.
 - **Risks** — known dangers and why they're unavoidable. Include for changes where the exact
   effect isn't provable in CI. Present **only** if there **is** some risk and mitigations must
   be considered.
@@ -182,6 +230,13 @@ Many repos squash-and-merge PRs. Where they do, the PR title and body become the
 and are the canonical artifact — they must follow the rules above. Individual commits on the
 branch do not survive the merge.
 
+**The commit message is where the effort belongs.** GitHub pre-fills the PR title and
+description from the commit message when the PR is opened, and a human massages the squash
+message afterwards only where needed. So the flow is commit message → PR body → merged commit,
+not the reverse: a good lead commit message means the PR description is already written, and it
+is also what renders on GitHub for reviewers. Write it for that audience, GitHub-flavored
+Markdown and all.
+
 That means only the **lead commit** of a PR (and the PR title and body itself) needs a fully
 style-conformant message. Follow-up commits — review responses, fixups, incidental cleanups —
 can use a lighter prefix that names the *kind* of cleanup:
@@ -216,16 +271,23 @@ For schema migrations, large rewrites, and stacked PRs:
 **Change descriptions should be as brief as possible.** Pick the size by reviewer risk, not
 LOC:
 
-- **Brief** is the default. Use it whenever the diff is self-explanatory and the reader only
-  needs the *Why*.
-- **Medium** is for changes where the reviewer needs context the diff doesn't carry — a
-  non-obvious tradeoff, evidence the fix works, a subtle invariant.
-- **Detailed** is for changes a reviewer cannot safely approve from the diff alone: multi-file
-  refactors, behavior changes whose effect must be verified out of band, schema-touching work,
-  anything cross-cutting.
+| Tier | Use when | Body budget | Sections |
+|---|---|---|---|
+| **Brief** (default) | The diff is self-explanatory; the reader only needs the *Why*. | ≤ 60 words | ≤ 1 |
+| **Medium** | The reviewer needs context the diff doesn't carry — a non-obvious tradeoff, evidence the fix works, a subtle invariant. | ≤ 150 words | ≤ 2 |
+| **Detailed** | A reviewer cannot safely approve from the diff alone: multi-file refactors, effects verifiable only out of band, schema-touching work. | ≤ 350 words | ≤ 4 |
+
+The budgets are real limits, not aspirations. They count prose and table words; fenced code and
+link targets are evidence and don't count against you. The three worked examples below come in
+around 30, 80, and 200 words respectively — that is what each tier is supposed to feel like. If
+you're over budget, the fix is to cut, not to promote the commit to the next tier.
 
 A large diff does not entitle a commit to a long description. A docs rewrite or a mechanical
 rename is *Brief* even if it touches a hundred files.
+
+`lint-commit-msg.py`, alongside this guide in the `commit` skill, checks everything on this
+page that arithmetic can decide — budgets, subject format, {{ if $ticketRequired }}the ticket line, {{ end }}render integrity, banned
+trailers. It cannot tell whether your *Why* is real; that part is still on you.
 
 ### Brief
 
@@ -274,7 +336,7 @@ everything that matters in two sentences.
 ### Medium
 
 ```
-fix(observer-host): Drop rows where cve_id is null after dedup
+fix(observer-host): Drop rows with a null cve_id after dedup
 
 {{ if $ticketRequired -}}
 Jira: https://your-tracker.example.com/browse/TICKET-32418
@@ -293,13 +355,14 @@ Re-ran the smoke report against the prod 30-day snapshot; the 412
 spurious rows from the last run are gone and overall row count is
 within 0.01% of the pre-bug baseline.
 
-Link to shared worksheet: https://example.com/worksheets/c0ffee
+Link to the shared worksheet, pinned to the run:
+https://your-org.snowflake.com/worksheets/c0ffee?from=2026-07-30T14:00:00Z
 ```
 
 ### Detailed
 
 ````
-refactor(advisory-loader): Extract OS package metadata writer into its own job
+refactor(advisory-loader): Split out the metadata writer job
 
 {{ if $ticketRequired -}}
 Jira: https://your-tracker.example.com/browse/TICKET-30119
@@ -320,16 +383,12 @@ the advisory tables.
 
 ## Implementation
 
-Move the metadata write into `VulnAdvisoryOsPkgMetadataUpdaterJob`.
-This looks big, but there is no behavior change. The new job is
-wired into the existing schedule in a follow-up commit; until then
-the old code path is retained behind the same config flag, so this
-commit is safe to land independently.
-
-## Notes for reviewer
-
-The new doc comment on `VulnAdvisoryOsPkgMetadataUpdaterJob` is the
-easiest path into the change.
+Move the metadata write into `VulnAdvisoryOsPkgMetadataUpdaterJob`,
+whose new doc comment is the easiest path into the change. This looks
+big, but there is no behavior change: the new job is wired into the
+existing schedule in a follow-up commit, and until then the old code
+path is retained behind the same config flag, so this commit is safe
+to land independently.
 
 ## Verification
 
@@ -342,11 +401,6 @@ easiest path into the change.
   -- previous version of the code
   SELECT COUNT(*) FROM ospkgmetadata WHERE created_time == '20251201T000000';
   ```
-
-## Risks
-
-None in this commit (no behavior change). The behavior change lands
-in the follow-up.
 
 ## Follow-ups
 

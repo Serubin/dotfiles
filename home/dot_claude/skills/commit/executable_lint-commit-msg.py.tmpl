@@ -1,0 +1,600 @@
+#!/usr/bin/env python3
+"""Mechanically check a commit message or PR body against the bundled style guide.
+
+Only checks what arithmetic can decide: budgets, formats, render integrity,
+banned strings. Judging whether the *why* is real stays with a human or a
+review agent -- this script deliberately does not try.
+
+The guide is references/style-commits.md, alongside this script. A repo that
+ships its own commit-style guide wins on any conflict, so every rule this
+linter is opinionated about has a flag to bend it: --tier, --require-ticket /
+--no-require-ticket, --pr-template.
+
+Exit 0 if clean (warnings allowed), 1 if any error.
+
+    lint-commit-msg.py MSGFILE [--tier brief|medium|detailed] [--mode commit|pr]
+
+Tier defaults to `brief`. Exceeding it is an error naming the next tier up, so
+growing the budget is an explicit decision that shows up in the transcript
+rather than a default that drifts upward.
+"""
+
+import argparse
+import glob
+import os
+import re
+import sys
+
+# Grounded in the guide's own worked examples (29 / 84 / 197 body words),
+# with headroom. See references/style-commits.md "Examples".
+TIERS = {
+    "brief": {"words": 60, "sections": 1},
+    "medium": {"words": 150, "sections": 2},
+    "detailed": {"words": 350, "sections": 4},
+}
+
+# Rendered by chezmoi from .environment: work machines carry a tracking ticket,
+# personal ones don't. --require-ticket / --no-require-ticket overrides it for a
+# repo whose convention differs from the machine's.
+TICKET_REQUIRED = {{ if eq .environment "work" }}True{{ else }}False{{ end }}
+
+# Where a repo squash-merges, GitHub appends " (#NNNNN)", so the message as
+# authored gets ~9 characters longer the moment it lands. The 70-char display
+# budget has to be spent before that suffix exists -- hence a warning, not an
+# error, since a repo that merge-commits pays no such tax.
+SQUASH_SUFFIX = 9
+SUBJECT_HARD_MAX = 70
+SUBJECT_MAX = SUBJECT_HARD_MAX - SQUASH_SUFFIX
+
+TYPES = "feat|fix|refactor|perf|test|docs|chore|build|ci|style|revert"
+FOLLOWUP = "review-response|fixup|cleanup"
+
+SUBJECT_RE = re.compile(rf"^({TYPES})(\([a-z0-9._/-]+\))?: (.+)$")
+FOLLOWUP_RE = re.compile(rf"^({FOLLOWUP}): (.+)$")
+
+# Ticket conventions differ per repo, so accept the common ones rather than
+# hardcoding one tracker: a `Jira:`-style line carrying a URL, a KEY-123, or a
+# prose justification for touching no production code; or a GitHub closing
+# keyword. The guide's own default is `Jira:`.
+TICKET_KEYS = "Jira|Ticket|Refs?|Issue|Bug|Story"
+CLOSE_KEYS = "Closes|Fixes|Resolves"
+TICKET_RE = re.compile(
+    rf"^(?:(?:{TICKET_KEYS}):\s*(?:https?://\S+|[A-Z]\S*(?:\s+\S+)*)"
+    rf"|(?:{CLOSE_KEYS}):?\s+(?:#\d+|[A-Z][A-Z0-9]+-\d+|https?://\S+))$"
+)
+TICKET_TODO_RE = re.compile(rf"^(?:{TICKET_KEYS}):\s*TODO\.?$")
+
+# A commit body is not the PR form. Headings lifted from a repo's PR template
+# mean someone filled in the form instead of writing a message -- but only in
+# commit mode: filling the template in is the correct thing to do in a PR body.
+PR_TEMPLATE_FILES = (
+    ".github/pull_request_template.md",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    "docs/pull_request_template.md",
+    "PULL_REQUEST_TEMPLATE.md",
+    "pull_request_template.md",
+)
+PR_TEMPLATE_GLOBS = (
+    ".github/PULL_REQUEST_TEMPLATE/*.md",
+    ".github/pull_request_template/*.md",
+)
+# Fallback for a repo with no template on disk: headings nobody writes by hand
+# in a commit message. Lower confidence than a real template, so these warn.
+BOILERPLATE_HEADINGS = {
+    "description",
+    "type of change",
+    "checklist",
+    "screenshots",
+    "linked issues",
+    "linked jira issues",
+    "tests and additional notes",
+    "how has this been tested",
+    "motivation and context",
+}
+
+AI_FINGERPRINTS = [
+    (re.compile(r"Co-authored-by:\s*Claude", re.I), "Claude co-author trailer"),
+    (re.compile(r"Generated (with|by)\s+\[?Claude", re.I), "'Generated with Claude'"),
+    (re.compile(r"\N{ROBOT FACE}"), "robot emoji"),
+    (re.compile(r"\bAs an AI\b", re.I), "'As an AI'"),
+]
+
+# "Tests pass" with no link is theatre; CI already proves it.
+THEATRE_RE = re.compile(
+    r"^(?![-*]?\s*\[).*\b("
+    r"all tests pass|tests? pass(es|ed)?\b|tested locally|ran the tests|"
+    r"works as expected|verified locally|no regressions( found)?"
+    r")",
+    re.I,
+)
+
+PROSE_WIDTH = 72
+# A single whitespace-delimited token at least this long cannot be wrapped, so
+# the line holding it is exempt from the width rule. Dashboard links are always
+# well past this, as are image tags and S3 keys.
+UNBREAKABLE_TOKEN = 45
+# Inline proof blocks longer than this are worth collapsing.
+FENCE_COLLAPSE_LINES = 20
+
+# UIs whose links a reader can actually open to check a measurement. Spark
+# history counts -- it is the right anchor for a Spark job's runtime figures.
+ANCHOR_HOSTS = re.compile(
+    r"https?://\S*(grafana|kibana|spark-history|snowflake|elastic|datadog|"
+    r"honeycomb|splunk)",
+    re.I,
+)
+
+# A number carrying a unit: "68 GB", "11m 01s", "0.3%", "2.4x", "p99".
+MEASUREMENT = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s?(?:GB|MB|TB|KB|ms|sec|s)\b"
+    r"|\b\d+(?:\.\d+)?\s?%"
+    r"|\b\d+(?:\.\d+)?x\b"
+    r"|\bp\d{2}\b"
+    r"|\b\d+m\s?\d+s\b",
+    re.I,
+)
+
+# Only ask for an anchor when the commit is actually making a perf claim.
+PERF_VOCAB = re.compile(
+    r"\b(latency|throughput|faster|slower|speedup|regress\w*|OOM|spill\w*|shuffle|"
+    r"evict\w*|runtime|wall.?clock|duration|p50|p95|p99|memory|heap|broadcast|"
+    r"row count|perf\w*)\b",
+    re.I,
+)
+
+# A link whose window moves with the reader's clock proves nothing tomorrow.
+RELATIVE_WINDOW = re.compile(r"https?://\S*?(now-\d|now%2D\d|from:now|rangeFrom=now)", re.I)
+# Dashboard link with no explicit window at all.
+GRAFANA_NO_WINDOW = re.compile(r"https?://\S*grafana\S*", re.I)
+# `@ <epoch>` pins evaluation inside the query and overrides the time picker.
+AT_MODIFIER = re.compile(r"@\s*\d{10}\b")
+
+# Link targets, excluded from the word budget (see count_words).
+URL_TOKEN = re.compile(r"<?https?://\S+>?")
+# A footer reference definition: `[label]: https://...`
+REF_DEFINITION = re.compile(r"^\s*\[[^\]]+\]:\s*\S+\s*$")
+
+# Machine-authored messages nobody hand-writes. Linting them produces noise and
+# no action: the format is imposed by GitHub or a bot, not chosen by an author.
+GENERATED_RE = re.compile(
+    r'^(Revert ".*"|chore\(deps(-dev)?\): bump |chore: update \S+-versions? )', re.I
+)
+
+
+class Report:
+    def __init__(self):
+        self.errors = []
+        self.warnings = []
+
+    def error(self, code, msg):
+        self.errors.append((code, msg))
+
+    def warn(self, code, msg):
+        self.warnings.append((code, msg))
+
+
+def split_message(text, mode):
+    """Return (subject, body). PR bodies carry no subject line."""
+    if mode == "pr":
+        return None, text
+    lines = text.split("\n")
+    subject = lines[0].rstrip()
+    if len(lines) > 1 and lines[1].strip():
+        return subject, "\n".join(lines[1:])
+    return subject, "\n".join(lines[2:])
+
+
+def classify_lines(body):
+    """Tag each line as fence / table / prose so width rules can skip the
+    first two. Wrapping a table row or a code line is what actually breaks
+    rendering, so those must never be reflowed and must not be measured."""
+    out = []
+    in_fence = False
+    fence_marker = None
+    for line in body.split("\n"):
+        stripped = line.strip()
+        m = re.match(r"^(`{3,}|~{3,})", stripped)
+        if m:
+            if not in_fence:
+                in_fence, fence_marker = True, m.group(1)[0]
+                out.append((line, "fence"))
+                continue
+            if stripped[0] == fence_marker:
+                in_fence, fence_marker = False, None
+                out.append((line, "fence"))
+                continue
+        if in_fence:
+            out.append((line, "code"))
+        elif stripped.startswith("|"):
+            out.append((line, "table"))
+        else:
+            out.append((line, "prose"))
+    return out, in_fence
+
+
+def count_words(lines):
+    """Words the reader actually reads. Link *targets* are addressing, not prose:
+    a URL is one unreadable token, and a reference definition at the foot of the
+    body is pure plumbing. Charging for them would penalise the anchored evidence
+    that P1/P4 exist to demand. Link *text* still counts -- that is prose.
+    """
+    n = 0
+    for line, kind in lines:
+        if kind not in ("prose", "table"):
+            continue
+        if REF_DEFINITION.match(line):
+            continue
+        n += len(URL_TOKEN.sub(" ", line).split())
+    return n
+
+
+def normalize_heading(text):
+    """Fold a heading to a comparable key: '### Linked JIRA issue(s)' -> 'linked
+    jira issues'. Templates and the bodies copied from them differ in case,
+    punctuation, and heading level far more often than in wording."""
+    text = re.sub(r"^#+\s*", "", text.strip())
+    text = re.sub(r"[^0-9a-z ]+", " ", text.lower())
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def headings_in(text):
+    return {normalize_heading(m) for m in re.findall(r"^#{1,6}\s*(.+)$", text, re.M)}
+
+
+def find_pr_templates(start):
+    """Locate the repo's PR template, walking up from `start` and stopping at
+    the repo root. Returns a list of paths; empty if the repo ships none."""
+    d = os.path.abspath(start or ".")
+    while True:
+        found = [os.path.join(d, name) for name in PR_TEMPLATE_FILES
+                 if os.path.isfile(os.path.join(d, name))]
+        for pattern in PR_TEMPLATE_GLOBS:
+            found.extend(sorted(glob.glob(os.path.join(d, pattern))))
+        if found:
+            return found
+        if os.path.isdir(os.path.join(d, ".git")) or os.path.isfile(os.path.join(d, ".git")):
+            return []
+        parent = os.path.dirname(d)
+        if parent == d:
+            return []
+        d = parent
+
+
+def check_subject(subject, rep, mode):
+    if subject is None:
+        return
+    if not subject:
+        rep.error("S0", "no subject line")
+        return
+
+    m = SUBJECT_RE.match(subject)
+    followup = FOLLOWUP_RE.match(subject)
+    if not m and not followup:
+        rep.error(
+            "S1",
+            f"subject is not Conventional Commits: expected '<{TYPES}>(<scope>): <summary>' "
+            f"or '<{FOLLOWUP}>: <summary>'",
+        )
+    summary = m.group(3) if m else (followup.group(2) if followup else subject)
+
+    n = len(subject)
+    label = "PR title" if mode == "pr" else "subject"
+    if n > SUBJECT_HARD_MAX:
+        rep.error("S2", f"{label} is {n} chars, over the 70 budget; GitHub truncates near 72")
+    elif n > SUBJECT_MAX:
+        rep.warn(
+            "S2a",
+            f"{label} is {n} chars, within 70 now, but where the repo squash-merges GitHub "
+            f"appends ' (#NNNNN)', so it lands at ~{n + SQUASH_SUFFIX} and gets truncated. "
+            f"Aim for {SUBJECT_MAX}",
+        )
+
+    if subject.endswith("."):
+        rep.error("S3", "subject ends with a period")
+
+    first = summary.split()[0] if summary.split() else ""
+    if first and first[:1].islower() and not re.match(r"^[a-z_]+[./(]|^`", first):
+        rep.error("S4", f"summary should be sentence case: {first!r} is not capitalized")
+
+    # Imperative mood: "If applied, this commit will <summary>".
+    if re.match(r"^\w+(ed|ing)$", first) or first.lower() in {
+        "adds", "fixes", "updates", "removes", "makes", "drops", "moves",
+        "changes", "improves", "refactors", "bumps", "adding", "fixing",
+    }:
+        rep.warn("S5", f"subject may not be imperative: {first!r} (want 'Add', not 'Adds'/'Added')")
+
+    vague = re.match(
+        r"^(fix|update|change|improve|clean ?up|refactor|address|handle|misc|various|"
+        r"minor|small|some)\b[\s\w]{0,12}$",
+        summary,
+        re.I,
+    )
+    if vague:
+        rep.error("S6", f"summary is too vague to be useful: {summary!r}")
+
+
+def load_pr_template_headings(repo_root, template_override):
+    """Headings of the repo's PR template, empty if it ships none."""
+    paths = [template_override] if template_override else find_pr_templates(repo_root)
+    headings = set()
+    for p in paths:
+        try:
+            with open(p) as fh:
+                headings |= headings_in(fh.read())
+        except OSError:
+            continue
+    return headings
+
+
+def check_template_headings(body, rep, template_headings):
+    """A commit message that reproduces the repo's PR-template headings is a
+    filled-in form, not a message. Callers skip this for PR bodies, where
+    filling the template in is exactly right."""
+    body_headings = headings_in(body)
+    if not body_headings:
+        return
+
+    if template_headings:
+        hits = sorted(body_headings & template_headings)
+        if len(hits) >= 2:
+            rep.error(
+                "B2",
+                f"body reproduces the repo's PR-template headings ({', '.join(hits)}). "
+                "A commit message is not the PR form -- write the ticket line and prose "
+                "instead, and let the PR body carry the template",
+            )
+        return
+
+    hits = sorted(body_headings & BOILERPLATE_HEADINGS)
+    if len(hits) >= 2:
+        rep.warn(
+            "B2a",
+            f"body reads as a filled-in PR form ({', '.join(hits)}). Sections are a menu, "
+            "not a checklist -- write prose unless the repo's own guide asks for these",
+        )
+
+
+def check_body(body, tier, rep, mode, followup=False, require_ticket=False,
+               repo_root=None, template_override=None):
+    lines, unclosed = classify_lines(body)
+    if unclosed:
+        rep.error("B7a", "unclosed code fence")
+
+    nonblank = [(i, l, k) for i, (l, k) in enumerate(lines) if l.strip()]
+    if not nonblank:
+        # Follow-ups ride on the lead commit's ticket and why, and squash away on
+        # merge, so a bare subject is the correct shape for them.
+        if not followup:
+            rep.error("B0", "empty body")
+        return
+
+    template_headings = load_pr_template_headings(repo_root, template_override)
+    if mode == "commit":
+        check_template_headings(body, rep, template_headings)
+
+    # Ticket line, where the machine or repo uses one. A follow-up may carry one
+    # but is not required to.
+    if require_ticket and not followup and mode == "commit":
+        first_line = nonblank[0][1].strip()
+        if not TICKET_RE.match(first_line):
+            rep.error(
+                "B1",
+                f"body must open with a well-formed ticket line, got {first_line[:60]!r}. "
+                "Use 'Jira: <ticket URL>', 'Jira: TODO', or 'Jira: <why this touches no "
+                "production code>' (Ticket:/Refs:/Issue:/Closes #N are accepted too)",
+            )
+    for _, line, kind in nonblank:
+        if kind == "prose" and TICKET_TODO_RE.match(line.strip()):
+            rep.warn("B1a", "'TODO' must be replaced with a real ticket before the PR opens")
+            break
+
+    # Budgets. Count only prose+table words; fences are evidence, not prose.
+    budget = TIERS[tier]
+    prose_words = count_words(lines)
+    if prose_words > budget["words"]:
+        bigger = next(
+            (t for t in ("medium", "detailed") if TIERS[t]["words"] >= prose_words
+             and TIERS[t]["words"] > budget["words"]),
+            None,
+        )
+        hint = (
+            f"pass --tier {bigger} if the reviewer genuinely cannot approve this from the diff alone"
+            if bigger
+            else "no tier allows this; the guide's most detailed worked example is 197 words. Cut it"
+        )
+        rep.error(
+            "B3",
+            f"body is {prose_words} words, over the {tier} budget of {budget['words']}. {hint}",
+        )
+
+    sections = re.findall(r"^##+\s*(.+)$", body, re.M)
+    # A PR body structured around the repo's template is following the repo, not
+    # padding: let the template's own heading count raise the ceiling there.
+    section_budget = budget["sections"]
+    if mode == "pr" and template_headings:
+        section_budget = max(section_budget, len(template_headings))
+    if len(sections) > section_budget:
+        rep.error(
+            "B4",
+            f"{len(sections)} sections ({', '.join(s.strip() for s in sections)}) exceeds the "
+            f"{tier} budget of {section_budget}. Sections are a menu, not a checklist -- "
+            "drop any the diff does not require",
+        )
+
+    for pat, what in AI_FINGERPRINTS:
+        if pat.search(body):
+            rep.error("B5", f"remove the {what}; the guide forbids AI trailers")
+
+    for i, line, kind in nonblank:
+        if kind != "prose":
+            continue
+        if THEATRE_RE.match(line.strip()) and not re.search(r"https?://", line):
+            rep.warn(
+                "B6",
+                f"line {i + 1} reads as verification theatre ({line.strip()[:50]!r}); "
+                "CI runs the tests. Mention verification only when CI cannot, and link evidence",
+            )
+
+    # Render integrity. A wrapped table row renders as literal pipes on GitHub
+    # and as noise in `git log`; it is the highest-value check here.
+    for i, line, kind in nonblank:
+        if kind == "table" and not line.rstrip().endswith("|"):
+            rep.error(
+                "B7b",
+                f"line {i + 1} is a wrapped markdown table row -- GitHub renders this as "
+                "literal text. Keep each row on one line, or drop the table for prose",
+            )
+
+    # Width, prose only, URLs exempt. Reported as one warning: a body wrapped at
+    # 75 out of habit trips this on every line, and thirty identical warnings
+    # bury the errors that actually need fixing.
+    wide = []
+    for i, line, kind in nonblank:
+        if kind != "prose":
+            continue
+        if len(line) <= PROSE_WIDTH:
+            continue
+        # Wrapping only helps if the line is made of breakable words. A URL,
+        # image tag, S3 key or job id is one token that no reflow can shorten,
+        # so a line carrying one is exempt rather than unfixable.
+        longest = max((len(t) for t in line.split()), default=0)
+        if longest > UNBREAKABLE_TOKEN:
+            continue
+        wide.append((i + 1, len(line)))
+    if wide:
+        shown = ", ".join(str(n) for n, _ in wide[:8])
+        more = f" (+{len(wide) - 8} more)" if len(wide) > 8 else ""
+        rep.warn(
+            "B8",
+            f"{len(wide)} prose line(s) over {PROSE_WIDTH} chars, up to {max(w for _, w in wide)}: "
+            f"lines {shown}{more}. Wrap prose at {PROSE_WIDTH} so `git log` reads well in a terminal",
+        )
+
+
+def check_evidence(body, subject, rep):
+    """Performance claims need a link a reader can open, pinned to a fixed window.
+
+    A relative window is correct for as long as it takes to write the sentence,
+    and a reader who opens it the next day sees an empty graph and concludes the
+    claim was wrong.
+    """
+    for m in RELATIVE_WINDOW.finditer(body):
+        rep.error(
+            "P1",
+            f"link carries a relative time window ({m.group(1)!r}) -- it shows an empty "
+            "view a day later, which reads as 'the evidence was wrong'. Pin absolute UTC "
+            "instants in the link instead",
+        )
+
+    for m in GRAFANA_NO_WINDOW.finditer(body):
+        if not re.search(r"[?&](from|to)=|range", m.group(0)):
+            rep.warn(
+                "P2",
+                "dashboard link carries no time window, so it opens on whatever range the "
+                "reader's dashboard defaults to. Prefer an Explore-style link that carries "
+                "the query and an absolute range",
+            )
+
+    if AT_MODIFIER.search(body):
+        rep.warn(
+            "P3",
+            "an `@ <epoch>` modifier pins evaluation inside the query and overrides the "
+            "reader's time picker -- they widen the range, the value refuses to move, and "
+            "they conclude the graph is broken. Anchor via start/end or the URL's range",
+        )
+
+    # Does this commit quote a measurement with nowhere for a reader to check it?
+    # (see also check_long_fences: proof blocks are budget-free but still cost
+    # the reader scroll)
+    prose = "\n".join(l for l, k in classify_lines(body)[0] if k in ("prose", "table"))
+    claims_perf = (subject or "").startswith("perf(") or PERF_VOCAB.search(prose)
+    if claims_perf and MEASUREMENT.search(prose) and not ANCHOR_HOSTS.search(body):
+        rep.warn(
+            "P4",
+            "quotes a measurement but links no evidence a reviewer can open. Add a metrics, "
+            "logs, or job-history link carrying an absolute UTC range. If the number came "
+            "from a CI benchmark, say that instead -- that is checkable by re-running CI",
+        )
+
+
+def check_long_fences(body, rep):
+    """Suggest collapsing a large proof block behind <details>.
+
+    Applies to commit messages too, not just PR bodies: where a repo squash-merges,
+    GitHub pre-fills the PR description from the commit message, so the commit
+    message is what actually gets rendered and reviewed. The cost is two lines of
+    literal HTML in `git log`; the benefit is a reviewer not scrolling 30 lines of
+    SQL to reach the point. Worth it past FENCE_COLLAPSE_LINES.
+    """
+    for m in re.finditer(r"^(`{3,}|~{3,}).*?\n(.*?)\n\1", body, re.S | re.M):
+        n = len(m.group(2).splitlines())
+        if n > FENCE_COLLAPSE_LINES and "<details" not in body:
+            rep.warn(
+                "V1",
+                f"a {n}-line code block sits inline; it costs the reader scroll before they "
+                "reach the point. Wrap it in <details><summary>the claim it proves</summary> "
+                "so the body stays scannable and the proof is one click away",
+            )
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("msgfile", help="file holding the message ('-' for stdin)")
+    ap.add_argument("--tier", choices=list(TIERS), default="brief")
+    ap.add_argument("--mode", choices=["commit", "pr"], default="commit")
+    ap.add_argument("--title", help="PR title to check alongside a --mode pr body")
+    ap.add_argument("--require-ticket", dest="require_ticket", action="store_true",
+                    default=None, help="require a ticket line (default: %(default)s)")
+    ap.add_argument("--no-require-ticket", dest="require_ticket", action="store_false",
+                    help="accept a body with no ticket line")
+    ap.add_argument("--repo-root", default=None,
+                    help="where to start looking for a PR template (default: cwd)")
+    ap.add_argument("--pr-template", default=None,
+                    help="path to the repo's PR template, skipping discovery")
+    ap.add_argument("--quiet", action="store_true", help="print nothing when clean")
+    args = ap.parse_args()
+
+    require_ticket = TICKET_REQUIRED if args.require_ticket is None else args.require_ticket
+
+    text = sys.stdin.read() if args.msgfile == "-" else open(args.msgfile).read()
+    text = text.replace("\r\n", "\n").rstrip("\n")
+
+    subject, body = split_message(text, args.mode)
+    if args.mode == "pr" and args.title:
+        subject = args.title.strip()
+
+    if subject and GENERATED_RE.match(subject):
+        if not args.quiet:
+            print(f"skipped: machine-generated message ({subject[:50]!r})")
+        return 0
+
+    rep = Report()
+    check_subject(subject, rep, args.mode)
+    # A follow-up squashes into its lead on merge, so the guide exempts it from
+    # the ticket line and lets it go bodyless.
+    followup = bool(subject and FOLLOWUP_RE.match(subject)) and args.mode == "commit"
+    check_body(body, args.tier, rep, args.mode, followup=followup,
+               require_ticket=require_ticket, repo_root=args.repo_root or os.getcwd(),
+               template_override=args.pr_template)
+    check_evidence(body, subject, rep)
+    check_long_fences(body, rep)
+
+    for code, msg in rep.errors:
+        print(f"error [{code}] {msg}", file=sys.stderr)
+    for code, msg in rep.warnings:
+        print(f"warn  [{code}] {msg}", file=sys.stderr)
+
+    if rep.errors:
+        print(f"\n{len(rep.errors)} error(s), {len(rep.warnings)} warning(s) "
+              f"against tier '{args.tier}'.", file=sys.stderr)
+        return 1
+    if not args.quiet:
+        words = count_words(classify_lines(body)[0])
+        print(f"clean: tier '{args.tier}', {words}/{TIERS[args.tier]['words']} words, "
+              f"{len(rep.warnings)} warning(s).")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

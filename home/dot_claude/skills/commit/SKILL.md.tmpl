@@ -1,7 +1,8 @@
-{{- $ticketRequired := eq .environment "work" -}}
+{{- $work := eq .environment "work" -}}
+{{- $ticketRequired := $work -}}
 ---
 name: commit
-description: Describe a git or jj change OR draft a GitHub PR title/description, conforming to a commit style guide. Mines the session for the real "why", asks for missing inputs (ticket link, motivation), drafts a body proportional to the change, and self-reviews against the style guide with a fresh-context agent before applying. Use when the user says "commit", "/commit", "describe this change", "write a commit message", "write/draft/generate a PR description or body" (also "write PR", "draft PR", "generate PR"), or wants to finalize the current staged git diff / jj working copy / GitHub PR.
+description: Describe a git or jj change OR draft a GitHub PR title/description, conforming to a commit style guide. Mines the session for the real "why", asks for missing inputs (ticket link, motivation), drafts a body proportional to the change, gates it on a mechanical linter, and self-reviews against the style guide with a fresh-context agent before applying. Use when the user says "commit", "/commit", "describe this change", "write a commit message", "write/draft/generate a PR description or body" (also "write PR", "draft PR", "generate PR"), or wants to finalize the current staged git diff / jj working copy / GitHub PR.
 ---
 
 # Commit Skill
@@ -82,8 +83,8 @@ treat as lead.
 
 1. **Read the bundled `references/style-commits.md` in full this turn** (plus the repo's own
    guide if it has one — see "Defer to the repo"). It's short. Going from memory will get you
-   a draft that fails the self-review in Step 4.
-2. **Detect the VCS.** `.jj/` present → Jujutsu; otherwise → git. See Step 5 for the exact
+   a draft that fails the lint in Step 4 and the self-review in Step 5.
+2. **Detect the VCS.** `.jj/` present → Jujutsu; otherwise → git. See Step 6 for the exact
    apply commands — always pass the message via a file (`git commit -F file`,
    `jj describe --stdin < file`, `gh ... --body-file file`), never via shell-escaped `-m`
    strings or heredocs.
@@ -120,9 +121,10 @@ Only ask for what you couldn't find.
 Use `AskUserQuestion` to collect what's still missing. Keep questions short and only ask what
 you need.
 
-**Subject line** — `<type>(<scope>): <imperative sentence-case summary>`, ≤ 70 chars, no
-period. Concrete summaries only. "fix bug" / "update X" / "various changes" will be rejected by
-the review step; spend the effort up front.
+**Subject line** — `<type>(<scope>): <imperative sentence-case summary>`, ≤ 70 chars — aim for
+61 where the repo squash-merges, since GitHub appends ` (#NNNNN)` on merge — and no period.
+Concrete summaries only. "fix bug" / "update X" / "various changes" are rejected by the linter
+in Step 4; spend the effort up front.
 
 **(followup)** Subject is the only required input — the lead commit already carries the
 {{ if $ticketRequired }}ticket and the {{ end }}why. The style guide's "Commits within a PR" section defines the preferred prefixes;
@@ -133,7 +135,7 @@ offer the user one when it fits:
 - `cleanup: <what>` — incidental polish
 
 Conventional Commits (`fix(scope): …`) is still fine when the follow-up is a self-contained
-logical change. Add a body only if the change is non-trivial. Skip to Step 5.
+logical change. Add a body only if the change is non-trivial. Skip to Step 4.
 
 **(lead / pr)** The rest of Step 2 applies:
 
@@ -163,15 +165,53 @@ skill exists to prevent. Better to ask one short question than to fabricate.
 
 Pick the size by reviewer risk, not LOC:
 
-| Diff shape | Description size | Sections |
-|---|---|---|
-| Docs / typo / one-line / mechanical rename / dep bump | **Brief** | Usually none. Subject + {{ if $ticketRequired }}ticket + {{ end }}one or two sentences. |
-| Behavior change with non-obvious tradeoff or evidence | **Medium** | Why + one of {Verification, Implementation} if genuinely needed |
-| Schema-touching, cross-cutting, behavior-change-not-provable-in-CI | **Detailed** | Why + Implementation + Verification (with links) + Risks if real |
+| Diff shape | Tier | Budget | Sections |
+|---|---|---|---|
+| Docs / typo / one-line / mechanical rename / dep bump | **Brief** | ≤ 60 words | ≤ 1 — usually none. Subject + {{ if $ticketRequired }}ticket + {{ end }}one or two sentences. |
+| Behavior change with non-obvious tradeoff or evidence | **Medium** | ≤ 150 words | ≤ 2 — Why + one of {Verification, Implementation} if genuinely needed |
+| Schema-touching, cross-cutting, behavior-change-not-provable-in-CI | **Detailed** | ≤ 350 words | ≤ 4 — Why + Implementation + Verification (with links) + Risks if real |
 
 A docs rewrite touching a hundred files is still **Brief**. A 20-line schema change can be
 **Detailed**. Size follows risk, not byte count.
 
+**Start at Brief and justify every step up.** The budgets are enforced in Step 4. When a draft
+busts its budget the fix is to cut, not to promote the commit a tier — promotion is for when
+the *reviewer's* need genuinely warrants it, which is a judgement about the diff, not about how
+much you happen to have written.
+
+Wide tables are a trap. Keep every table row on a single line: a row wrapped at 72 characters
+renders as literal pipes on GitHub, destroying the row. If a row can't fit, use prose. Long
+literals — dashboard URLs, image tags, S3 keys — are likewise exempt from the 72-char wrap;
+breaking a URL makes it unclickable. Give each one its own line.
+
+**Where the repo squash-merges, write the commit message as the thing GitHub will render.**
+Opening a PR pre-fills its title and description from the commit message, and a human massages
+the squash message only where needed — so the commit message *is* the PR body, and reviewers
+read it on GitHub. Two consequences: proof blocks past ~20 lines go inside
+`<details><summary>the claim it proves</summary>` (the linter warns as `V1`), and fenced code
+plus URL targets cost nothing against the word budget, so include the real query rather than
+paraphrasing it.
+
+### If you quote a performance number, link the evidence
+
+A measurement with nowhere to check it asks the reviewer to take your word for it, and the
+number outlives the memory of where it came from. Anchor it with a metrics, logs, or
+job-history link carrying an **absolute UTC window**.
+
+**Never ship a relative window.** `from=now-6h` is correct for about as long as it takes to
+write the sentence; a reviewer opening it tomorrow sees an empty graph and concludes the claim
+was wrong. The linter errors on a relative window (`P1`), warns when a measurement has no
+anchor at all (`P4`), and warns on an `@ <epoch>` modifier (`P3`) — that pins evaluation inside
+the query and overrides the reader's time picker, so widening the range leaves the value
+stubbornly unchanged and the graph looks broken. If the number came from a CI benchmark, say
+so — that's checkable by re-running CI and needs no link.
+{{ if $work }}
+Don't hand-assemble these URLs at work — generate them. The **metrics-query** skill's
+`scripts/promql-evidence.py` (Grafana) and the **elastic-query** skill's `scripts/es-evidence.py`
+(Kibana) each emit the reproducible command and the matching link over the same fixed window,
+and refuse to hand you a link that opens on an empty view. A Spark history URL is the right
+anchor for a Spark job's runtime / shuffle / spill numbers.
+{{ end }}
 **Lead with the effect of the change** (what is now different about the running system), not
 the implementation. Exception: chore/refactor/docs commits where the implementation *is* the
 effect.
@@ -217,22 +257,48 @@ PR") is not an anomaly — it just goes in the body. The rule: if you're tempted
 hedge is a signal to ask, not to ship. If the user confirms it's intentional, carry on; if they
 want to fix it first, stop here.
 
-## Step 4 — Self-review with a fresh-context agent
+## Step 4 — Lint the draft
+
+Write the draft to a temp file (e.g. `mktemp -t commit-msg` with a `.md` suffix) — subject +
+blank line + body for `commit` mode, body only for `pr` mode. **This is the file Step 6 will
+apply**, so what gets linted and reviewed is byte-for-byte what gets committed.
+
+Run the linter bundled with this skill (resolve its path relative to this SKILL.md's own
+directory), passing the tier you picked in Step 3:
+
+```bash
+python3 ~/.claude/skills/commit/lint-commit-msg.py "$msgfile" --tier brief   # or medium / detailed
+# PR mode: --mode pr --title "<the PR title>"
+```
+
+It has no dependencies and needs no credentials. It checks only what arithmetic can decide: the
+word and section budgets, subject format and length, {{ if $ticketRequired }}the ticket line, {{ end }}wrapped table rows, unclosed
+fences, AI trailers, PR-template headings pasted into a commit body, and performance claims
+with no openable evidence. Fix every `error` and re-run until it exits 0. Warnings are
+advisory — `S2a` (the subject truncates once a squash merge appends ` (#NNNNN)`) is worth
+fixing, `B8` (prose over 72 chars) matters for terminal readability.
+
+**The repo still wins.** Where a check contradicts the repo's own convention, bend the linter
+rather than the message, and say which flag you used and why: `--tier`, `--pr-template <path>`,
+{{ if $ticketRequired }}`--no-require-ticket` for a repo that tracks no tickets{{ else }}`--require-ticket` for a repo whose guide or history clearly uses ticket lines{{ end }}.
+
+This step exists because the countable failures are the ones a language model is worst at
+policing in its own output.
+
+**(followup)** Lint and stop there — skip Step 5 and go to Step 6.
+
+## Step 5 — Self-review with a fresh-context agent
 
 Mandatory for **lead** and **pr** modes. **Skip for follow-up commits** — running a full
-conformance review on "review-response: fix typo in BarDao" is overkill. For follow-ups, do a
-quick local sanity check: subject is concrete (not "fix things"), uses one of the accepted
-prefixes (`review-response:` / `fixup:` / `cleanup:` / Conventional Commits), is imperative,
-and has no AI-fingerprint trailers (`Co-Authored-By: Claude …`, `🤖 Generated with …`). Then go
-to Step 5.
+conformance review on "review-response: fix typo in BarDao" is overkill; Step 4's lint is
+enough. Then go to Step 6.
 
-First, write the draft to a temp file (e.g. `mktemp -t commit-msg` with a `.md` suffix) —
-subject + blank line + body for `commit` mode, body only for `pr` mode. **This is the file
-Step 5 will apply**, so what the reviewer sees is byte-for-byte what gets committed. Don't
-paste the draft inline into the agent prompt; pass the path.
+Don't paste the draft inline into the agent prompt; pass the path to the very file Step 4
+linted.
 
-Spawn an `Agent` (subagent_type `general-purpose`) with no conversation context — it judges
-only against the guide. Pass:
+Spawn an `Agent` (subagent_type `general-purpose`, `model: sonnet`) with no conversation
+context — it judges only against the guide. Conformance-checking a page of prose against a
+short guide doesn't need a frontier model, and this review runs on every lead commit. Pass:
 
 - The absolute path to this skill's bundled `references/style-commits.md` (the copy alongside
   this SKILL.md — resolve it relative to this SKILL.md's own directory), **and** the repo's own
@@ -246,27 +312,28 @@ only against the guide. Pass:
 - The absolute path to the draft file.
 
 Tell the agent to return a numbered list of concrete fixes, or the literal line `LOOKS GOOD` if
-it conforms. Have it check specifically:
+it conforms. **Tell it the draft already passed the mechanical linter**, so it should not spend
+effort re-counting characters, words, or sections{{ if $ticketRequired }}, or re-checking the ticket line{{ end }} — its job is the four
+things arithmetic cannot judge:
 
-- Subject line: Conventional Commits format, imperative sentence case, no period, ≤ 70 chars,
-  concrete (not "fix bug")
-{{ if $ticketRequired -}}
-- Ticket line present and well-formed
-{{ end -}}
-- Body opens with the effect of the change, unless this is a chore/docs exception
-- Description size is proportional to the diff shape passed in — flag any section the diff
-  doesn't justify
-- **Why** describes motivation distinct from the *what* — a "why" that paraphrases the
-  implementation is a hard fail
-- No AI co-author trailers (`Co-Authored-By: Claude …`, `🤖 Generated with …`, etc.)
-- No restating the diff (file-by-file lists), no re-explaining the project, no "tested locally
-  / tests pass" verification theater
+1. **Is the subject true to the diff?** The most damaging failure is a message that describes
+   something the diff doesn't do. Flag any claim not visible in the change.
+2. **Does the body open with the *effect*** — what is now different about the running system —
+   rather than the implementation? (Chore/docs commits are exempt; there the implementation
+   *is* the effect.)
+3. **Is the *Why* real motivation, distinct from the *what*?** A why that paraphrases the
+   implementation with an approving verb glued on ("improves observability by adding metrics")
+   is a hard fail. A real why names the prior problem.
+4. **Is anything here already said by `git show`?** File-by-file tours, re-explanations of what
+   the component does, and "tested locally / tests pass" all fail. Verification counts only
+   when CI cannot run it and the text links evidence a reader can reuse.
 
 **Apply the agent's feedback by editing the draft file in place.** Do not argue with the agent.
 If a fix requires more info from the user, ask. Re-run the review only if you made substantive
-content changes; small wording tweaks don't need a second pass.
+content changes; small wording tweaks don't need a second pass. Any edit that adds prose sends
+you back through Step 4's linter — that's how a "one more clarifying sentence" busts a budget.
 
-## Step 5 — Confirm and apply
+## Step 6 — Confirm and apply
 
 Show the final message to the user (`cat` the temp file). Ask for confirmation.
 
