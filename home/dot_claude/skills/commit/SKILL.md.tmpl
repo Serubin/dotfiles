@@ -296,8 +296,9 @@ enough. Then go to Step 6.
 Don't paste the draft inline into the agent prompt; pass the path to the very file Step 4
 linted.
 
-Spawn an `Agent` (subagent_type `general-purpose`) with no conversation context — it judges
-only against the guide. Pass:
+Spawn an `Agent` (subagent_type `general-purpose`, `model: sonnet`) with no conversation
+context — it judges only against the guide. Conformance-checking a page of prose against a
+short guide doesn't need a frontier model, and this review runs on every lead commit. Pass:
 
 - The absolute path to this skill's bundled `references/style-commits.md` (the copy alongside
   this SKILL.md — resolve it relative to this SKILL.md's own directory), **and** the repo's own
