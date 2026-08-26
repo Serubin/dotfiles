@@ -35,10 +35,12 @@ if [ "$PROMPT_UCFUSER" != "" ]; then
 fi
 
 HostName="%m"
-PathShort="%~"
 PathFull="%/"
 
-Title="$User@%m: %~"
+# Overwritten by pre_cmd on every render, which builds the path with prompt_pwd rather
+# than %~ -- see prompt/prompt-theme. This initial value only exists so the parameter is
+# set before the first prompt.
+Title="$User@%m"
 
 function prompt_precmd() {
 

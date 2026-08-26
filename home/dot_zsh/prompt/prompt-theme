@@ -13,16 +13,41 @@ git_dirty_suffix="*"
 
 PromptSymbol="❯"
 
+# The current directory, as the prompt and terminal title show it.
+#
+# Deliberately not `%~`: that substitutes `hash -d` named directories, so ~/.dotfiles
+# renders as ~dotfiles. The named dirs in the alias file exist so `cd ~services` and
+# `~ath<TAB>` work -- they are not meant to rename locations on screen. $HOME still
+# collapses to ~, which `%d` would not do, so neither escape fits and we build it here.
+#
+# Sets REPLY instead of printing: this runs on every prompt and a command substitution
+# would fork.
+function prompt_pwd() {
+    local dir=$PWD
+    if [[ $dir == $HOME ]]; then
+        dir='~'
+    elif [[ $dir == $HOME/* ]]; then
+        # Anchored on the / boundary. ${PWD/#$HOME/~} looks equivalent but matches a bare
+        # string prefix, turning /home/coder2/x into ~2/x.
+        dir="~${dir#$HOME}"
+    fi
+    # print -P reads % as an escape, so a directory named `pct%test` needs it doubled.
+    REPLY="${dir//\%/%%}"
+}
+
 # pre_cmd updating
 function pre_cmd() {
     local exit="$?"
     local pre_prompt_user=""
 
+    prompt_pwd
+    local path_disp=$REPLY
+
     # Term Title
-    Title="$User $PathShort"
+    Title="$User $path_disp"
 
     # Title and prompt for ssh connections
-    [[ "$SSH_CONNECTION" != '' ]] && Title="$User@$HostName $ShortPath"
+    [[ "$SSH_CONNECTION" != '' ]] && Title="$User@$HostName $path_disp"
 
     [[ "$SSH_CONNECTION" != '' ]] && pre_prompt_user="$BBlue$User@$HostName "
 
@@ -32,7 +57,7 @@ function pre_cmd() {
     local git=`git_stat`
 
     # Formatting
-    local preprompt_format="$pre_prompt_user$BCyan$PathShort $git"
+    local preprompt_format="$pre_prompt_user$BCyan$path_disp $git"
 
     # ZSH - So simple!
     print -P $preprompt_format

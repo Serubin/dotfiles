@@ -35,7 +35,7 @@ login shells (GUI apps resolving `PATH`, editor shell-integration probes, `ssh h
 |---|---|
 | `00-os` | Exports `$DISTRO` (resolved by a chezmoi template at apply time — no runtime OS detection) |
 | `02-zinit` | Initializes zinit and loads plugins |
-| `alias` | Shell aliases and keybindings |
+| `alias` | Shell aliases, named directories, and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |
 | `function` | General-purpose helper functions |
 | `promptrc` | Prompt precmd hooks and PS1 setup |
@@ -103,9 +103,23 @@ Precmd hook that trims the displayed directory depth, calls `pre_cmd` to render 
 
 Idempotently registers `prompt_precmd` into the `precmd_functions` array.
 
+#### `prompt_pwd`
+
+Sets `REPLY` to the current directory as the prompt and terminal title show it: `$HOME`
+collapsed to `~`, everything else literal.
+
+Deliberately **not** `%~`, which would substitute [named directories](#named-directories)
+— `~/.dotfiles` would render as `~dotfiles`. Those names exist for `cd` and completion,
+not to rename locations on screen. `%d` doesn't fit either, since it wouldn't collapse
+`$HOME`, so the path is built here. Two details worth preserving if you touch it: the
+`$HOME/*` test is anchored on the `/` boundary (`${PWD/#$HOME/~}` would turn
+`/home/coder2/x` into `~2/x`), and `%` is doubled so `print -P` doesn't eat it. It sets
+`REPLY` rather than printing because a command substitution here would fork on every
+prompt.
+
 #### `pre_cmd`
 
-Builds the pre-prompt line: optionally shows `user@host` for SSH sessions or root, then the current path in cyan, followed by git status.
+Builds the pre-prompt line: optionally shows `user@host` for SSH sessions or root, then the current path (via `prompt_pwd`) in cyan, followed by git status. Also sets `Title` for the terminal window.
 
 #### `git_stat`
 
@@ -129,6 +143,8 @@ by `pre_cmd` to embed git info in the prompt.
 | `ll` | `ls -lhAr` |
 | `_` | `sudo` |
 | `g` | `git` |
+| `cm` | `chezmoi` |
+| `grep` | `grep --color=auto` |
 | `v` | `vim` |
 | `rr` | `rm -r` |
 | `vim` | `nvim` |
@@ -138,6 +154,35 @@ by `pre_cmd` to embed git info in the prompt.
 | `extract` | `aunpack` |
 | `ipdns` | Public IP via OpenDNS |
 | `ipl` | Local IP addresses |
+
+## Named directories
+
+Defined with `hash -d` in the `alias` file, to reach the checkouts below without typing
+their full paths. Preferred over `cdfoo`-style aliases because the name is a path
+*prefix*, not a fixed destination — `cd ~athena/vuln-eval` works, and `~ath<TAB>`
+completes, neither of which an alias can do.
+
+**They do not change how the prompt renders.** zsh's `%~` would substitute them
+(`~/.dotfiles` becoming `~dotfiles`), which is not the point of having them — the prompt
+builds its path with `prompt_pwd` instead, so it always shows the real location. See
+[Prompt](#prompt-promptrc-promptprompt-theme-promptprompt-git) below.
+
+`hash -d` is per-shell state, so shells started before a `chezmoi apply` need an
+`exec zsh` before the names exist.
+
+| Name | Path | Gate |
+|---|---|---|
+| `~dotfiles` | `~/.dotfiles` (the chezmoi source dir) | all machines |
+| `~services` | `~/lwcode/services/vulnerability` | `.environment == "work"` |
+| `~athena` | `~/lwcode/athena` | `.environment == "work"` |
+| `~athena-eval` | `~/lwcode/athena/vuln-eval` | `.environment == "work"` |
+| `~athena-redis` | `~/lwcode/athena/athena-redis-db` | `.environment == "work"` |
+| `~helm3` | `~/lwcode/helm3-platform` | `.environment == "work"` |
+
+> Note: `alias -r` is *not* used anywhere here. When **defining** an alias, `-r` is a
+> no-op — regular is already the default, and `-g` / `-s` are what select the other
+> namespaces. `-r` only does work when **listing** (`alias -r` prints just the regular
+> aliases, skipping global and suffix ones) or with `-m` pattern matching.
 
 ## Plugins (zinit)
 
