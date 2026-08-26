@@ -19,9 +19,13 @@ alias ls="ls --color=auto -N"
 alias la="ls -A"
 alias ll="ls -lhAr"
 
+# BSD grep takes --color=auto too, so this needs no darwin/ggrep branch.
+alias grep="grep --color=auto"
+
 # shortcuts
 alias _="sudo"
 alias g="git"
+alias cm="chezmoi"
 alias v="vim"
 alias rr="rm -r"
 alias sudo="sudo "
@@ -43,6 +47,18 @@ alias cd="cdls"
 alias cd..="cd .."
 alias cd.="cd ."
 
+# Named directories, for reaching these checkouts quickly. Better than `cdfoo` aliases:
+# the name is a path *prefix*, so `cd ~dotfiles/home` works, and `~dot<TAB>` completes.
+# They do not change how the prompt renders -- it shows the real path on purpose, see
+# prompt_pwd in prompt/prompt-theme. Tildes expand to absolute paths at definition time.
+hash -d dotfiles=~/.dotfiles
+{{ if eq .environment "work" -}}
+hash -d services=~/lwcode/services/vulnerability
+hash -d athena=~/lwcode/athena
+hash -d athena-eval=~/lwcode/athena/vuln-eval
+hash -d athena-redis=~/lwcode/athena/athena-redis-db
+hash -d helm3=~/lwcode/helm3-platform
+{{ end }}
 alias py="python"
 
 alias extract="aunpack"
