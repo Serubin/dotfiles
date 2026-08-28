@@ -1,16 +1,14 @@
 {{ if eq .class "work-devbox" -}}
 # cache-mount: warn at interactive shell startup if the per-connection mount of
-# /mnt/cache (the EBS Bazel build cache) failed or was skipped with Ctrl-C, so a
-# cold cache does not silently slow every build. ~/.local/bin/ensure-cache-mount.sh
-# writes ~/.local/state/cache-mount/STATUS in both cases and removes it on the
-# next success.
+# /mnt/cache (the EBS Bazel build cache) failed or was skipped with Ctrl-C, so a cold
+# cache does not silently slow every build. ~/.local/bin/ensure-cache-mount.sh writes
+# ~/.local/state/cache-mount/STATUS in both cases and clears it on the next success.
 #
-# The banner is the ONLY way that failure is visible: the helper runs from
+# This banner is the ONLY way that failure becomes visible: the helper runs from
 # tmux-devel.sh just before `exec tmux -CC`, and tmux switches the pty into control
 # mode immediately after, discarding anything printed there.
 #
-# Managed by chezmoi (source: home/dot_zsh/zz-cache-mount.tmpl); work-devbox only
-# (renders empty -> not deployed elsewhere).
+# work-devbox only (renders empty -> not deployed elsewhere).
 () {
     local status_file="$HOME/.local/state/cache-mount/STATUS"
     [[ -f "$status_file" ]] || return 0

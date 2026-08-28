@@ -5,8 +5,8 @@
 #
 # Startup = `zsh -i -c exit` (sources ~/.zsh/* + loads zinit plugins), warmed.
 #           Uses hyperfine if installed, otherwise a zsh timing loop.
-# Prompt  = the precmd chain, timed under a pseudo-tty so gitstatus's background
-#           daemon is live, run inside a git repo, with a per-component breakdown.
+# Prompt  = the precmd chain, per component, timed in a git repo under a
+#           pseudo-tty so gitstatus's background daemon is live.
 set -euo pipefail
 
 startup_runs="${1:-30}"
@@ -32,8 +32,8 @@ fi
 
 echo
 echo "== zsh prompt render (pty; gitstatus live; cwd=$repo_root) =="
-# The prompt uses gitstatus, whose daemon needs job control — so run interactive
-# zsh under a pseudo-tty via `script` (BSD and util-linux arg orders differ).
+# gitstatus's daemon needs job control, so run interactive zsh under a pseudo-tty
+# via `script` (BSD and util-linux arg orders differ).
 tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 cat > "$tmp" <<PROMPTEOF

@@ -1,19 +1,19 @@
--- Workaround for a gitsigns.nvim bug (Neovim 0.11.2+, native vim.system):
--- the cwd-HEAD branch watcher (setup_cwd_head -> setup_cwd_watcher) starts an
--- fs_event on <gitdir>/HEAD, re-arms on every event, and calls Repo.get_info
--- (git rev-parse) un-serialized, bypassing the attach-path semaphore. On any
--- FSEvents-monitored path (everything under $HOME) the re-arm self-triggers,
--- spawning unreaped `git rev-parse` until the per-uid process table fills
--- (EAGAIN) and Neovim wedges. Remove once fixed upstream.
+-- Workaround for a gitsigns.nvim bug (Neovim 0.11.2+, native vim.system): the
+-- cwd-HEAD watcher (setup_cwd_head -> setup_cwd_watcher) starts an fs_event on
+-- <gitdir>/HEAD, re-arms on every event,
+-- and calls Repo.get_info (git rev-parse) un-serialized, bypassing the
+-- attach-path semaphore. Under FSEvents (everything below $HOME) the re-arm
+-- self-triggers, spawning unreaped `git rev-parse` until the per-uid process
+-- table fills (EAGAIN) and Neovim wedges. Remove once fixed upstream.
 return {
   "lewis6991/gitsigns.nvim",
   opts = function(_, opts)
     local uv = vim.uv or vim.loop
     local unpack = table.unpack or unpack
 
-    -- Guard 1: neuter ONLY the cwd-HEAD watcher (fs_event on '*/HEAD').
-    -- The per-buffer sign watcher watches the gitdir directory, so it is
-    -- unaffected. Applied to the shared fs_event metatable before setup().
+    -- Guard 1: neuter ONLY the cwd-HEAD watcher (fs_event on '*/HEAD'), via the
+    -- shared fs_event metatable, before setup(). The per-buffer sign watcher
+    -- watches the gitdir directory itself, so it is unaffected.
     local ok, probe = pcall(uv.new_fs_event)
     if ok and probe then
       local mt = getmetatable(probe)

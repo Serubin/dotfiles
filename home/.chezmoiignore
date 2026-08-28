@@ -2,8 +2,7 @@
 #
 # IMPORTANT: do NOT list external targets (.zsh/zinit, .zsh/gitstatus,
 # .tmux/plugins) here. .chezmoiignore removes entries from the target state,
-# including .chezmoiexternal entries — ignoring them would silently prevent the
-# plugin-manager clones.
+# .chezmoiexternal entries included — ignoring one silently skips its clone.
 
 # zsh runtime / compiled caches
 .zsh/cache
@@ -17,18 +16,17 @@
 .config/nvim/lazy
 
 # Claude Code: only the curated config (settings.json, CLAUDE.md, skills/,
-# plugins/blocklist.json) is managed. Guard secrets and the cloned marketplace repos.
+# plugins/blocklist.json) is managed; guard secrets and the cloned marketplace repos.
 #
-# settings.json itself is merged rather than overwritten -- see
-# dot_claude/modify_settings.json.tmpl. Claude Code owns the keys it toggles.
+# settings.json is merged, not overwritten (Claude Code owns the keys it toggles)
+# -- see dot_claude/modify_settings.json.tmpl.
 #
-# settings.local.json is listed defensively only: Claude Code reads it at PROJECT scope
-# (<repo>/.claude/settings.local.json), never at user scope, so nothing here would consume
-# ~/.claude/settings.local.json even if one existed.
+# settings.local.json is listed defensively: Claude Code reads it at PROJECT scope
+# only, so a user-scope copy would never be consumed anyway.
 #
-# known_marketplaces.json is listed rather than just deleted from the source, because
-# Claude Code rewrites it in place and `chezmoi add`/`re-add` would pull it back in.
-# It holds per-machine clone paths and a `lastUpdated` stamp: generated state, not config.
+# known_marketplaces.json is listed rather than deleted from the source because
+# Claude Code rewrites it in place and `chezmoi add`/`re-add` would pull it back:
+# per-machine clone paths and a `lastUpdated` stamp are state, not config.
 .claude/settings.local.json
 .claude/.credentials.json
 .claude/plugins/marketplaces
@@ -40,7 +38,7 @@
 .config/nvim/README.md
 
 # ----- machine-class gating (see README "Machine targeting" + feature matrix) -----
-# Gate by OS (.chezmoi.os), environment (.environment), or class (.class). Patterns
+# Gate by OS (.chezmoi.os), environment (.environment), or class (.class); patterns
 # match TARGET paths. NOTE: never glob a path that would swallow a .chezmoiexternal
 # target (.zsh/zinit, .zsh/gitstatus, .tmux/plugins/tpm) — that suppresses its clone.
 
@@ -60,11 +58,10 @@
 {{ end }}
 
 # work-devbox bootstrap + helpers: the ~/personalize startup script, the two /etc
-# re-apply helpers it calls (sshd keepalive, and the /etc/zsh startup-cost
-# optimization), the tmux -CC (iTerm2 control-mode) helpers (periodic-save cron
-# target + stale-client-clearing connect helper), and the /mnt/cache EBS
-# build-cache mount command plus the gate the connect helper calls to run it.
-# work-devbox only — the mac side of this workflow is the sleepwatcher feature below.
+# re-apply helpers it calls (sshd keepalive, /etc/zsh startup cost), the tmux -CC
+# (iTerm2 control-mode) helpers (periodic-save cron target + stale-client-clearing
+# connect helper), and the /mnt/cache EBS build-cache mount plus the gate the connect
+# helper calls to run it. The mac side of this workflow is the sleepwatcher feature below.
 {{ if ne .class "work-devbox" }}
 personalize
 .local/bin/apply-sshd-keepalive.sh

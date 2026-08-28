@@ -16,12 +16,10 @@ PromptSymbol="❯"
 # The current directory, as the prompt and terminal title show it.
 #
 # Deliberately not `%~`: that substitutes `hash -d` named directories, so ~/.dotfiles
-# renders as ~dotfiles. The named dirs in the alias file exist so `cd ~services` and
-# `~ath<TAB>` work -- they are not meant to rename locations on screen. $HOME still
-# collapses to ~, which `%d` would not do, so neither escape fits and we build it here.
-#
-# Sets REPLY instead of printing: this runs on every prompt and a command substitution
-# would fork.
+# renders as ~dotfiles. Those names exist so `cd ~services` and `~ath<TAB>` work, not to
+# rename locations on screen. `%d` would not collapse $HOME to ~, so neither escape fits
+# and we build it here. Sets REPLY rather than printing: this runs on every prompt, and
+# a command substitution would fork.
 function prompt_pwd() {
     local dir=$PWD
     if [[ $dir == $HOME ]]; then

@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# One-time migration: git config moved from ~/.gitconfig + ~/.gitignore_global to
-# the XDG layout ~/.config/git/{config,ignore}. Because ~/.gitconfig is read at a
-# HIGHER precedence than ~/.config/git/config, a leftover ~/.gitconfig would
-# silently shadow the new file — and chezmoi does not auto-delete a target when
-# its source entry is removed. So drop the legacy paths once the new ones exist.
+# One-time migration to the XDG git layout ~/.config/git/{config,ignore}. git
+# reads ~/.gitconfig at HIGHER precedence, so a leftover would silently shadow the
+# new file — and chezmoi does not auto-delete a target when its source entry goes
+# away. Drop the legacy paths once the new ones exist.
 #
-# Guarded + idempotent: each legacy file is removed only when its XDG replacement
-# is present, making this a safe no-op on fresh machines. run_after scripts run
-# after all file writes, so the new files already exist here. run_once re-runs
-# only if this script's content changes.
+# Each legacy file is removed only when its XDG replacement is present, so this is
+# a safe no-op on fresh machines. run_after runs once all files are written, so those
+# replacements already exist here; run_once re-runs only if this script changes.
 set -euo pipefail
 
 if [ -f "$HOME/.config/git/config" ] && [ -e "$HOME/.gitconfig" ]; then

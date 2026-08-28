@@ -38,10 +38,9 @@ TIERS = {
 # repo whose convention differs from the machine's.
 TICKET_REQUIRED = {{ if eq .environment "work" }}True{{ else }}False{{ end }}
 
-# Where a repo squash-merges, GitHub appends " (#NNNNN)", so the message as
-# authored gets ~9 characters longer the moment it lands. The 70-char display
-# budget has to be spent before that suffix exists -- hence a warning, not an
-# error, since a repo that merge-commits pays no such tax.
+# GitHub appends " (#NNNNN)" on squash-merge, so an authored subject gains ~9
+# characters the moment it lands and the 70-char display budget must be spent
+# before that. A warning, not an error: a repo that merge-commits pays no such tax.
 SQUASH_SUFFIX = 9
 SUBJECT_HARD_MAX = 70
 SUBJECT_MAX = SUBJECT_HARD_MAX - SQUASH_SUFFIX
@@ -52,10 +51,10 @@ FOLLOWUP = "review-response|fixup|cleanup"
 SUBJECT_RE = re.compile(rf"^({TYPES})(\([a-z0-9._/-]+\))?: (.+)$")
 FOLLOWUP_RE = re.compile(rf"^({FOLLOWUP}): (.+)$")
 
-# Ticket conventions differ per repo, so accept the common ones rather than
-# hardcoding one tracker: a `Jira:`-style line carrying a URL, a KEY-123, or a
-# prose justification for touching no production code; or a GitHub closing
-# keyword. The guide's own default is `Jira:`.
+# Ticket conventions differ per repo, so accept the common ones rather than one
+# tracker: a `Jira:`-style line carrying a URL, a KEY-123, or a prose justification
+# for touching no production code; or a GitHub closing keyword. The guide's own
+# default is `Jira:`.
 TICKET_KEYS = "Jira|Ticket|Refs?|Issue|Bug|Story"
 CLOSE_KEYS = "Closes|Fixes|Resolves"
 TICKET_RE = re.compile(
@@ -445,18 +444,18 @@ def check_body(body, tier, rep, mode, followup=False, require_ticket=False,
                 "literal text. Keep each row on one line, or drop the table for prose",
             )
 
-    # Width, prose only, URLs exempt. Reported as one warning: a body wrapped at
-    # 75 out of habit trips this on every line, and thirty identical warnings
-    # bury the errors that actually need fixing.
+    # Width, prose only, URLs exempt. One warning for the whole body: a body wrapped
+    # at 75 out of habit trips this on every line, and thirty identical warnings bury
+    # the errors that actually need fixing.
     wide = []
     for i, line, kind in nonblank:
         if kind != "prose":
             continue
         if len(line) <= PROSE_WIDTH:
             continue
-        # Wrapping only helps if the line is made of breakable words. A URL,
-        # image tag, S3 key or job id is one token that no reflow can shorten,
-        # so a line carrying one is exempt rather than unfixable.
+        # Wrapping only helps if the line is made of breakable words. A URL, image
+        # tag, S3 key or job id is one token no reflow can shorten, so a line
+        # carrying one is exempt rather than unfixable.
         longest = max((len(t) for t in line.split()), default=0)
         if longest > UNBREAKABLE_TOKEN:
             continue

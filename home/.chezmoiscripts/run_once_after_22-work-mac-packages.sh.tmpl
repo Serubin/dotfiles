@@ -2,7 +2,7 @@
 {{ if eq .class "work-mac" -}}
 # work-mac packages. sleepwatcher drives the ~/.config/sleepwatcher sleep/wake
 # hooks (agent: net.serubin.sleepwatcher). Isolated from the main installer so a
-# tap-trust hiccup there can't block it, and vice versa.
+# tap-trust hiccup in either can't block the other.
 set -euo pipefail
 if command -v brew >/dev/null 2>&1; then
     brew install sleepwatcher

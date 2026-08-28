@@ -1,9 +1,9 @@
-# Per-machine shell config, resolved at apply time by chezmoi (no runtime
-# detection). Sourced LAST by ~/.zshrc's `~/.zsh/*` loop (the `zz-` prefix sorts
-# after alias/env/function/promptrc), so it can override anything set earlier.
+# Per-machine shell config, resolved at apply time by chezmoi (no runtime detection).
+# Sourced LAST by ~/.zshrc's `~/.zsh/*` loop — the `zz-` prefix sorts after
+# alias/env/function/promptrc — so it can override anything set earlier.
 #
-# This is machine-ROLE config committed to the repo. For machine-LOCAL, unmanaged
-# overrides and secrets use ~/.custom instead (sourced afterward, not tracked).
+# Machine-ROLE config, committed. Machine-LOCAL overrides and secrets go in ~/.custom
+# instead (sourced afterward, untracked).
 #
 # environment={{ .environment }}  class={{ .class }}
 export DOTFILES_ENV={{ .environment | quote }}

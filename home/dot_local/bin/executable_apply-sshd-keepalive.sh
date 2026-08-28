@@ -3,10 +3,9 @@
 # ungracefully (lid close, Wi-Fi/VPN switch) releases its session attachment after
 # ~60s (15s x 4) instead of lingering until TCP timeout (~2h).
 #
-# This is root-owned config under /etc, which is wiped on a host restart, so it is
-# re-applied at startup by ~/personalize (chezmoi only manages $HOME). /run/sshd is
-# created first: this host is socket-activated, so the privsep dir may not exist yet
-# at startup and `sshd -t` validation needs it.
+# Root-owned /etc config, wiped on a host restart, so ~/personalize re-applies it at
+# startup (chezmoi only manages $HOME). /run/sshd is created first: this host is
+# socket-activated, so the privsep dir `sshd -t` needs may not exist yet.
 set -uo pipefail
 
 sudo mkdir -p /run/sshd

@@ -1,9 +1,6 @@
-# Git prompt powered by gitstatus (romkatv/gitstatus)
-# Replaces the vendored __git_ps1 with a persistent background daemon,
-# eliminating per-prompt git subprocess overhead.
-#
-# Provides git_stat() for use by prompt-theme.
-# Requires: gitstatus (brew install romkatv/gitstatus/gitstatus, or clone romkatv/gitstatus)
+# Git prompt powered by gitstatus (romkatv/gitstatus): a persistent background daemon
+# instead of a git subprocess per prompt. Provides git_stat() for prompt-theme.
+# Requires gitstatus — brew install romkatv/gitstatus/gitstatus, or clone it.
 
 _gitstatus_plugin=""
 for _p in \
@@ -41,9 +38,8 @@ function git_stat() {
         g="${gitdir_ref#gitdir: }"
     fi
 
-    # Action state (rebase, merge, etc.)
-    # VCS_STATUS_ACTION is a composite string: "rebase-i 2/3" (action + step/total)
-    # Split on first space to get action type and optional step/total.
+    # Action state. VCS_STATUS_ACTION is composite — "rebase-i 2/3" — so split on the
+    # first space into action type and optional step/total.
     local action=""
     if [[ -n "$VCS_STATUS_ACTION" ]]; then
         local action_type="${VCS_STATUS_ACTION%% *}"

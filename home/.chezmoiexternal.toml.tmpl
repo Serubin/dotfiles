@@ -1,9 +1,8 @@
-# Plugin managers, cloned and kept up to date by chezmoi (replaces the old
-# per-OS manual `git clone` setup scripts).
+# Plugin managers, cloned and kept up to date by chezmoi.
 #
-# Note: these only install the *managers*. zinit auto-installs its plugins on
-# the first interactive shell (see dot_zsh/executable_02-zinit); tpm still needs
-# `prefix + I` or `~/.tmux/plugins/tpm/bin/install_plugins` to fetch tmux plugins.
+# These install only the *managers*. zinit auto-installs its plugins on the first
+# interactive shell (see dot_zsh/executable_02-zinit); tpm still needs
+# `prefix + I` or `~/.tmux/plugins/tpm/bin/install_plugins`.
 
 [".zsh/zinit"]
     type = "git-repo"
@@ -17,9 +16,8 @@
 
 {{- if eq .chezmoi.os "linux" }}
 
-# macOS gets gitstatus via Homebrew (prompt-git prefers the brew path); on Linux
-# we clone it. A shallow clone is enough — gitstatus ships a prebuilt daemon
-# fetcher, no history needed.
+# macOS gets gitstatus via Homebrew (prompt-git prefers the brew path); Linux
+# clones it. Shallow is enough — gitstatus ships a prebuilt daemon fetcher.
 [".zsh/gitstatus"]
     type = "git-repo"
     url = "https://github.com/romkatv/gitstatus.git"

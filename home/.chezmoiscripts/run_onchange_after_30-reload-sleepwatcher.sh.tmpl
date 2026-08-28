@@ -1,7 +1,7 @@
 #!/bin/bash
 {{ if eq .class "work-mac" -}}
-# Reload the chezmoi-managed sleepwatcher agent when its plist changes; migrate off
-# brew's service and the old ~/.wakeup/~/.sleep layout. Idempotent.
+# Reload the chezmoi-managed sleepwatcher agent when its plist changes, and take
+# over from brew's service and the old ~/.wakeup/~/.sleep layout. Idempotent.
 # plist-hash: {{ include "Library/LaunchAgents/net.serubin.sleepwatcher.plist.tmpl" | sha256sum }}
 set -euo pipefail
 export PATH="/opt/homebrew/bin:$PATH"

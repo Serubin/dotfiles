@@ -8,16 +8,15 @@
 #   From a local clone:
 #     git clone https://github.com/Serubin/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh
 #
-# Installs chezmoi if needed, then runs `chezmoi init --apply`. The chezmoi source
-# directory is ~/.dotfiles (pinned via `sourceDir` in the config): run this from a
-# ~/.dotfiles checkout to use it in place, otherwise the repo is cloned from GitHub
-# into ~/.dotfiles. chezmoi then prompts once for the
-# machine environment/class + your git identity, clears any legacy GNU Stow
-# symlinks, installs packages for your OS, and writes the managed files into $HOME.
+# Installs chezmoi if needed, then runs `chezmoi init --apply`. The source dir is
+# pinned to ~/.dotfiles via `sourceDir` in the config: run from a checkout there
+# to use it in place, otherwise
+# the repo is cloned from GitHub. chezmoi then prompts once for machine
+# environment/class + git identity, clears legacy GNU Stow symlinks, installs
+# packages for your OS, and writes the managed files into $HOME.
 #
-# Machine targeting: set the environment and/or class non-interactively via flags
-# or env vars (both just seed $DOTFILES_ENV / $DOTFILES_CLASS, which the chezmoi
-# config template reads):
+# Machine targeting: --env / --class (or $DOTFILES_ENV / $DOTFILES_CLASS) seed the
+# values the chezmoi config template reads:
 #     dotfiles/install.sh --env work
 #     dotfiles/install.sh --env work --class work-ci
 #     DOTFILES_ENV=work DOTFILES_CLASS=work-ci sh -c "$(curl -fsLS .../install.sh)"
@@ -35,9 +34,8 @@ usage: install.sh [--env personal|work] [--class NAME] [personal|work]
 USAGE
 }
 
-# Flags (and a backward-compatible bare `personal|work`) just seed $DOTFILES_ENV /
-# $DOTFILES_CLASS, which the chezmoi config template reads; a flag overrides a
-# value already present in the environment.
+# Flags (plus a backward-compatible bare `personal|work`) seed $DOTFILES_ENV /
+# $DOTFILES_CLASS; a flag overrides a value already in the environment.
 DOTFILES_ENV="${DOTFILES_ENV:-}"
 DOTFILES_CLASS="${DOTFILES_CLASS:-}"
 while [ $# -gt 0 ]; do
@@ -52,8 +50,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-# Validate environment (the config template validates too, but fail early with a
-# clear message). Class is intentionally free-form and left unvalidated.
+# The config template validates too; fail early with a clearer message. Class is
+# deliberately free-form and unvalidated.
 case "$DOTFILES_ENV" in
     ""|personal|work) ;;
     *) echo "invalid --env '$DOTFILES_ENV' (want personal|work)" >&2; exit 2 ;;
@@ -61,9 +59,9 @@ esac
 if [ -n "$DOTFILES_ENV" ];   then export DOTFILES_ENV;   fi
 if [ -n "$DOTFILES_CLASS" ]; then export DOTFILES_CLASS; fi
 
-# Non-interactive installs (curl | sh pipe, CI) have no TTY: fall back to chezmoi's
-# prompt defaults so init can't hang on the git-identity prompts (which fire on a
-# fresh init even when env/class are supplied). Env/class still win in the template.
+# No TTY (curl | sh, CI) would hang on the git-identity prompts, which fire on a
+# fresh init even when env/class are supplied. Fall back to chezmoi's defaults;
+# env/class still win in the template.
 init_flags=""
 [ -t 0 ] || init_flags="--promptDefaults"
 
@@ -96,10 +94,9 @@ else
     set -- chezmoi init --apply ${init_flags} --source="${HOME}/.dotfiles" "${GITHUB_REPO}"
 fi
 
-# git-repo externals (zinit/gitstatus/tpm) can flake on the first heavy
-# init --apply; retry once so a transient clone hiccup doesn't leave onboarding
-# half-done. The retry converges cheaply: cloned externals are cached, run_once
-# scripts are already recorded, and nothing re-installs.
+# git-repo externals (zinit/gitstatus/tpm) can flake on the first heavy apply, so
+# retry once rather than leave onboarding half-done. Cheap: cloned externals are
+# cached and run_once scripts already recorded, so nothing re-installs.
 if ! "$@"; then
     echo "==> first apply failed; retrying once (transient external clone?)..." >&2
     "$@"
