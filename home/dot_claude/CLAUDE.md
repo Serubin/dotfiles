@@ -68,6 +68,18 @@ When you need to ask the user something, use the AskUserQuestion tool — not fr
 - Structured questions are easier for the user to answer and harder to miss.
 - Exception: plan approval goes through ExitPlanMode, which already requests approval. Don't double-ask via AskUserQuestion for plan sign-off.
 
+## Code comments
+
+Comments earn their place by explaining *why*. Keep them terse — a phrase or a sentence.
+
+- Default to no comment. Code that reads clearly needs none, and a comment that restates the line below it is noise.
+- Explain *what* only when the code genuinely cannot be made clear on its own: a gnarly regex, a non-obvious algorithm, a bit-twiddling trick, a workaround for someone else's bug.
+- Prefer the reason the code is shaped this way — the constraint, the invariant, the failure it prevents, the trade-off, the surprising upstream behavior. Cite the ticket, RFC, or CVE when one exists.
+- Never write a changelog. No "changed X to Y", "previously we did Z", "added in v2", no dates, no author names, no `NEW:` / `FIXED:` markers. Git history is the changelog.
+- Don't address me in a comment about the edit you just made. That belongs in your response, not in the file.
+- Match the file's existing comment density and voice. Don't comment code that had none, and don't delete comments that are still true.
+- Docstrings and public-API doc comments are the exception: stating the contract — params, return, errors, units, thread-safety — is their job. Still terse, still no changelog.
+
 ## File operations
 
 - When moving a file, use `mv` rather than reading-and-rewriting. It preserves history, permissions, and inode metadata, and avoids accidental content drift between the old and new path.
