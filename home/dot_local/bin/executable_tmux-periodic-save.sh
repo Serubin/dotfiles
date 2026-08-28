@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Attach-independent periodic snapshot of tmux state via tmux-resurrect.
 # WHY: tmux-continuum's periodic save rides status-line #() interpolation, which
-# tmux does NOT evaluate under iTerm2 control mode (-CC) -- so its timer never
-# fires in our workflow. cron runs this every few minutes regardless of attach
-# state. Managed by chezmoi (source: home/dot_local/bin/executable_tmux-periodic-save.sh);
-# the */5 cron entry is (re)installed at startup by ~/personalize (the crontab does
-# not survive a host restart, so scheduling lives there rather than at chezmoi apply).
+# tmux does NOT evaluate under iTerm2 control mode (-CC), so its timer never fires
+# in our workflow. cron runs this every few minutes regardless of attach state.
+#
+# chezmoi-managed; the */5 cron entry is (re)installed at startup by ~/personalize,
+# since the crontab does not survive a host restart.
 set -uo pipefail
 SAVE="$HOME/.tmux/plugins/tmux-resurrect/scripts/save.sh"
 RESURRECT_DIR="$HOME/.local/share/tmux/resurrect"

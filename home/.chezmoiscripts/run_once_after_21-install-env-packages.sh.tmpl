@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 # Per-class package installs, kept SEPARATE from before_20-install-packages so
-# that switching class (or editing these lists) re-runs only this script — never
-# the base install. run_once_ re-runs whenever this file's RENDERED content
-# changes.
+# switching class (or editing these lists) re-runs only this script, never the
+# base install. run_once_ re-runs whenever the RENDERED content changes.
 #
-# run_after_ (not before_ like the base install): nothing rendered by chezmoi
-# depends on class-specific packages, so these can install after files are
-# written. The before/after split is deliberate — run_before_ = tools a config or
-# template depends on (e.g. gh for git's credential helper); run_after_ = actions
-# that depend on already-written configs (migrate-git-xdg, reload-sleepwatcher).
+# run_after_, not before_: the split is deliberate. run_before_ = tools a config
+# or template depends on (e.g. gh for git's credential helper); run_after_ =
+# actions that depend on already-written configs. Nothing rendered by chezmoi
+# depends on class-specific packages, so these belong after.
 set -euo pipefail
 
 {{ if eq .class "work-mac" -}}

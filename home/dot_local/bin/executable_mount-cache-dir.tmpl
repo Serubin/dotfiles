@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # Attach + mount the EBS build-cache volume at /mnt/cache. Nothing outside
-# /home/coder survives a workspace host restart, so the volume must be
-# re-attached and re-mounted after every restart.
-#
-# Run it by hand any time, or let ~/.local/bin/ensure-cache-mount.sh call it once
-# per SSH connection (from tmux-devel.sh) when /mnt/cache is not mounted.
+# /home/coder survives a workspace host restart, so it must be re-attached and
+# re-mounted after every one. Run by hand any time, or let
+# ~/.local/bin/ensure-cache-mount.sh call it once per SSH connection.
 #
 # The volume id and AWS account id come from chezmoi [data] rather than being
-# hardcoded: this repo is public, and both are work infrastructure identifiers.
+# hardcoded: this repo is public and both are work infrastructure identifiers.
 # Set them with `chezmoi init` (or DOTFILES_CACHE_VOLUME_ID / DOTFILES_AWS_ACCOUNT_ID).
 #
 # Managed by chezmoi (source: home/dot_local/bin/executable_mount-cache-dir.tmpl),

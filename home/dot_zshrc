@@ -2,10 +2,10 @@
 
 setopt extendedglob
 
-# Call all files in .zsh, except .zwc (compiled zsh files). The `(-.N)` qualifier keeps this
-# to regular files (following symlinks): without it the glob also matched the cache/, prompt/
-# and zinit/ subdirectories, and `source`ing a directory costs ~4ms each to fail. N stops the
-# loop from running once over a literal unmatched pattern if ~/.zsh is ever empty.
+# Source every file in ~/.zsh except compiled .zwc. `(-.N)` restricts to regular files,
+# following symlinks: without it the glob also matched the cache/, prompt/ and zinit/
+# subdirectories, and `source`ing a directory costs ~4ms each to fail. N keeps the loop
+# from running once over a literal unmatched pattern if ~/.zsh is ever empty.
 for rc in $HOME/.zsh/*~*.zwc(-.N); do
     source $rc
 done

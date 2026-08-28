@@ -27,8 +27,8 @@ _cache_completion() {
 
   [ -z "$bin_path" ] && return
 
-  # Guarded: coreutils' mkdir is a fork, ~7ms per call, and this runs on every startup for
-  # every cached completion even though the directory almost always already exists.
+  # Guarded: coreutils' mkdir is a ~7ms fork, and this runs on every startup for every
+  # cached completion even though the directory almost always exists already.
   [ -d "$cache_dir" ] || mkdir -p "$cache_dir"
   if [ ! -f "$cache_file" ] || [ "$bin_path" -nt "$cache_file" ]; then
     $cmd completion zsh > "$cache_file" 2>/dev/null
@@ -36,11 +36,9 @@ _cache_completion() {
   source "$cache_file"
 }
 
-# Lazy-load nvm: defers sourcing nvm.sh until first use of nvm/node/npm/npx.
-# Call this from ~/.custom to enable. Optionally pass --auto-use to
-# automatically switch node versions when entering a directory with .nvmrc.
+# Defer sourcing nvm.sh until the first nvm/node/npm/npx call. Call from ~/.custom;
+# --auto-use also switches node version on entering a directory with .nvmrc.
 #
-# Usage (in ~/.custom):
 #   export NVM_DIR="$HOME/.nvm"
 #   lazy_load_nvm            # basic lazy loading
 #   lazy_load_nvm --auto-use # also auto-switch on .nvmrc

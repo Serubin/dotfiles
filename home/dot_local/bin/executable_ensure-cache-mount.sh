@@ -4,22 +4,20 @@
 # fstab, mount -- belongs to ~/.local/bin/mount-cache-dir; this only decides
 # WHETHER to run it and repairs the environment it needs.
 #
-# Why it is invoked from tmux-devel.sh and not a shell rc file: Coder's agent
-# serves SSH itself (there is no sshd on this box), so ForceCommand and
-# ~/.ssh/rc do not exist. iTerm2 runs ~/.local/bin/tmux-devel.sh as the SSH
-# *command*, and the agent runs command sessions as `zsh -c` -- non-login and
-# non-interactive -- so ~/.zprofile and ~/.zlogin never fire on that path.
-# tmux-devel.sh is therefore the one hook that runs exactly once per connection.
-# tmux panes (`default-command "/usr/bin/env zsh"`) never re-run it, which is why
-# this does not fire on each new terminal.
+# Invoked from tmux-devel.sh, not a shell rc file: Coder's agent serves SSH itself
+# (no sshd on this box), so ForceCommand and ~/.ssh/rc do not exist, and the agent
+# runs command sessions as a non-login, non-interactive `zsh -c`, so ~/.zprofile
+# and ~/.zlogin never fire. iTerm2 runs tmux-devel.sh as the SSH *command*, making
+# it the one hook that runs exactly once per connection. tmux panes
+# (`default-command "/usr/bin/env zsh"`) never re-run it, so this does not fire on
+# each new terminal.
 #
 # Degrades LOUDLY, never fatally: it must never block the tmux attach, so every
-# exit is 0 and failures are recorded in a STATUS marker that the ~/.zsh startup
-# banner surfaces in new panes. A message printed here would be invisible --
-# tmux -CC switches the pty into control mode immediately afterward and eats it.
+# exit is 0 and failures land in a STATUS marker that the ~/.zsh startup banner
+# surfaces in new panes. A message printed here would be invisible -- tmux -CC
+# switches the pty into control mode immediately afterward and eats it.
 #
-# Managed by chezmoi (source: home/dot_local/bin/executable_ensure-cache-mount.sh),
-# work-devbox only. Deliberately not `set -e`.
+# chezmoi-managed, work-devbox only. Deliberately not `set -e`.
 #
 # Usage: ensure-cache-mount.sh
 #   SKIP_CACHE_MOUNT=1    bypass entirely (escape hatch)
@@ -49,8 +47,8 @@ log() {
 [[ -n "$SKIP_CACHE_MOUNT" ]] && exit 0
 
 # The common case on every reconnect. `mountpoint` rather than the [[ -b /dev/sdj ]]
-# test mount-cache-dir uses, because on Nitro the volume attached as /dev/sdj
-# actually surfaces as an /dev/nvme*n1 device.
+# test mount-cache-dir uses: on Nitro, a volume attached as /dev/sdj actually
+# surfaces as /dev/nvme*n1.
 if mountpoint -q "$CACHE_MOUNTPOINT"; then
     clear_status
     exit 0
@@ -62,12 +60,12 @@ if [[ ! -x "$CACHE_MOUNT_SCRIPT" ]]; then
     exit 0
 fi
 
-# Restore the two environment variables an interactive shell would have set but a
-# `zsh -c` command session does not, both of which mount-cache-dir depends on:
+# Restore the two variables mount-cache-dir depends on that an interactive shell
+# would set but a `zsh -c` command session does not:
 #
-#   AWS_PROFILE -- ~/.custom sets devtest-admin, but ~/.custom is sourced from
-#     ~/.zshrc (interactive only). Unset, the aws CLI falls back to the [default]
-#     profile, which is lw-readonly-role and CANNOT ec2 attach-volume.
+#   AWS_PROFILE -- set by ~/.custom, which ~/.zshrc sources only when interactive.
+#     Unset, the aws CLI falls back to [default] = lw-readonly-role, which CANNOT
+#     ec2 attach-volume.
 #   BROWSER -- /etc/motd_fetcher.sh and ~/.custom both set fwd-browse, again
 #     interactive-only. Without it `aws sso login` cannot open a browser on the Mac.
 export AWS_PROFILE="${AWS_PROFILE:-devtest-admin}"
@@ -78,8 +76,8 @@ log "running $CACHE_MOUNT_SCRIPT (AWS_PROFILE=$AWS_PROFILE)"
 
 # Ctrl-C at the `aws sso login` prompt is a legitimate "skip this", but SIGINT
 # reaches this script too and would kill it before the check below runs -- no
-# marker, no banner, and a whole session built against a cold cache. Record the
-# skip so it stays visible, then let the attach proceed.
+# marker, no banner, and a session built against a cold cache. Record the skip so
+# it stays visible, then let the attach proceed.
 on_interrupt() {
     log "INTERRUPTED: mount skipped by user"
     set_status "$CACHE_MOUNTPOINT not mounted; skipped with Ctrl-C -- run: $CACHE_MOUNT_SCRIPT"

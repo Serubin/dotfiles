@@ -2,19 +2,18 @@
 # Coder workspace keep-alive. Holds the autostop deadline out until STOP_HOUR
 # (evaluated in TZ_NAME) on weekdays, then lets the workspace autostop normally.
 #
-# WHY: the team's 2h autostop reclaims the workspace during long meetings / lunch
-# (no activity -> deadline lapses). The Mac-side `fwd` SOCKS tunnel used to keep it
-# alive by generating "activity", but closing the laptop tears `fwd` down. This runs
-# SERVER-SIDE on a */15 cron, so it is independent of the laptop. It reuses the
-# ambient `coder login` session (no stored token); when that session expires it
-# degrades LOUDLY -- a STATUS marker + a ~/.zsh startup banner -- rather than
-# silently letting the workspace die.
+# WHY: the team's 2h autostop reclaims the workspace during long meetings or lunch
+# (no activity -> deadline lapses). The Mac-side `fwd` SOCKS tunnel kept it alive by
+# generating "activity", but closing the laptop tears `fwd` down. This runs
+# SERVER-SIDE on a */15 cron, independent of the laptop. It reuses the ambient
+# `coder login` session (no stored token); when that expires it degrades LOUDLY --
+# a STATUS marker plus a ~/.zsh startup banner -- rather than letting the workspace
+# die silently.
 #
-# Managed by chezmoi (source: home/dot_local/bin/executable_coder-keepalive.sh),
-# work-devbox only. The */15 cron and the stable coder binary are (re)provisioned
-# at each host boot by ~/personalize via `coder-keepalive.sh install`: neither the
-# crontab nor the per-SSH-session /tmp coder binary survives a host restart, but
-# $HOME does.
+# chezmoi-managed, work-devbox only. ~/personalize re-provisions the */15 cron and
+# the stable coder binary at each host boot via `coder-keepalive.sh install`:
+# neither the crontab nor the per-SSH-session /tmp coder binary survives a restart,
+# but $HOME does.
 #
 # Subcommands:
 #   install   provision stable binary + state env + install cron + one run (boot)
@@ -65,8 +64,8 @@ load_env() {
 
 # ---- decision -------------------------------------------------------------
 # Echo "dow mins": ET weekday (1=Mon..7=Sun) and whole minutes until today's
-# STOP_HOUR:00 in TZ_NAME. Both derived from now_epoch() so --check can simulate.
-# Epoch subtraction (not HH:MM arithmetic) => correct across the hour and DST.
+# STOP_HOUR:00 in TZ_NAME, both from now_epoch() so --check can simulate. Epoch
+# subtraction, not HH:MM arithmetic, so it stays correct across the hour and DST.
 compute() {
     local now dow ymd target
     now="$(now_epoch)"
@@ -127,8 +126,8 @@ do_run() {
         return 0
     fi
 
-    # Read the achieved deadline back; detect a template cap (belt-and-suspenders:
-    # the soft-TTL viability check passed, but surface a regression passively).
+    # Read the achieved deadline back to detect a template cap. Belt-and-suspenders:
+    # the soft-TTL viability check already passed, so this only surfaces regressions.
     local stops_next got req skew real_now
     stops_next="$(coder_cli schedule show "$WS" -o json 2>/dev/null \
         | grep -o '"stops_next"[^,]*' | grep -oE '[0-9-]+T[0-9:]+Z' | head -1)"
@@ -153,9 +152,10 @@ do_run() {
 # ---- install (boot, via personalize) --------------------------------------
 provision_binary() {
     local url="${CODER_AGENT_URL:-${DEPLOY_URL:-https://devspaces2.dev.lacework.engineering/}}bin/coder-linux-amd64"
-    # Cached binary still runs: only refresh if the server has a newer build
-    # (conditional GET via -z; 304 => empty file => keep existing). Avoids a 55MB
-    # pull on every boot while still tracking deployment upgrades.
+    # Cached binary still runs: refresh only when the server has a newer build
+    # (conditional GET via -z;
+    # 304 => empty file => keep existing). Avoids a 55MB pull on every boot while
+    # still tracking deployment upgrades.
     if [ -x "$BIN" ] && "$BIN" version >/dev/null 2>&1; then
         if curl -fsSL -z "$BIN" -o "$BIN.new" "$url" 2>/dev/null && [ -s "$BIN.new" ]; then
             chmod +x "$BIN.new"

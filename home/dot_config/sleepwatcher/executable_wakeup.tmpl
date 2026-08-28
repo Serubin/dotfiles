@@ -1,12 +1,11 @@
 #!/bin/bash
 # sleepwatcher wake hook (work-mac). Reap ALL Coder ssh clients (the iTerm2 tmux
 # -CC ssh + the fwd SOCKS ssh) that Coder's roaming tunnel keeps alive across
-# sleep, so iTerm2 releases its gateway and offers a clean reconnect. This is
-# `pkill ssh` scoped to the coder host: unrelated ssh (git, prod, remote-dev) and
-# the `coder … ssh --stdio` proxies are untouched. Remote tmux session survives
-# (tmux new -A reattaches; continuum has state); fwd needs a manual relaunch.
-# Set WAKEUP_DRY_RUN=1 to log targets without killing (for testing).
-# Managed by chezmoi: home/dot_config/sleepwatcher/. coderHost from machine-local data.
+# sleep, so iTerm2 releases its gateway and offers a clean reconnect. Scoped to
+# the coder host: unrelated ssh (git, prod, remote-dev) and the `coder … ssh
+# --stdio` proxies are untouched. The remote tmux session survives (tmux new -A
+# reattaches; continuum has state); fwd needs a manual relaunch.
+# WAKEUP_DRY_RUN=1 logs targets without killing. coderHost is machine-local data.
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 log="$HOME/.config/sleepwatcher/events.log"
 host='{{ .coderHost | replace "." "\\." }}'   # coder ssh host, dots regex-escaped

@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
-# Remove the legacy GNU Stow symlinks created by the pre-chezmoi install.sh.
+# Remove the legacy GNU Stow symlinks created by the pre-chezmoi install.sh, so
+# `chezmoi apply` can write managed files onto clean paths. Only SYMLINKS
+# resolving into .dotfiles are removed — real files and directories are never
+# touched. Idempotent; a no-op on a machine that was never stowed.
 #
-# Use this when migrating a machine from the old Stow setup to chezmoi: it clears
-# the symlinks in $HOME that point into the .dotfiles repo so `chezmoi apply` can
-# write real managed files onto clean paths. Only SYMLINKS resolving into
-# .dotfiles are removed — real files and directories are never touched.
-# Idempotent; a no-op on a machine that was never stowed.
-#
-# (chezmoi also runs this automatically via the run_once_before hook on first
-# apply; this standalone copy is kept for manual/explicit use.)
+# chezmoi also runs this via the run_once_before hook on first apply; this
+# standalone copy is for manual use.
 set -euo pipefail
 
 targets=(.gitconfig .gitignore_global .zshrc .zshenv .zsh .tmux.conf

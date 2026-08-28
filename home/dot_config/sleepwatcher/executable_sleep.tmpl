@@ -1,11 +1,10 @@
 #!/bin/bash
-# sleepwatcher sleep hook (work-mac). Tear down the `fwd` SOCKS tunnel to the Coder
-# workspace so it can't linger as a half-open zombie across sleep. fwd runs in the
-# foreground of a terminal tab with no supervisor, so it will NOT auto-restart —
-# relaunch it yourself after wake. Narrow match: only the fwd supervisor and its
-# `ssh -T -D` SOCKS child; the tmux -CC ssh (ssh -tt) is untouched.
-# Set SLEEP_DRY_RUN=1 to log targets without killing (for testing).
-# Managed by chezmoi: home/dot_config/sleepwatcher/. coderHost from machine-local data.
+# sleepwatcher sleep hook (work-mac). Tear down the `fwd` SOCKS tunnel to the
+# Coder workspace so it can't linger as a half-open zombie across sleep. fwd runs
+# in the foreground of a terminal tab with no supervisor, so it will NOT
+# auto-restart — relaunch it after wake. Narrow match: only the fwd supervisor and
+# its `ssh -T -D` SOCKS child; the tmux -CC ssh (ssh -tt) is untouched.
+# SLEEP_DRY_RUN=1 logs targets without killing. coderHost is machine-local data.
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 log="$HOME/.config/sleepwatcher/events.log"
 host='{{ .coderHost | replace "." "\\." }}'   # coder ssh host, dots regex-escaped

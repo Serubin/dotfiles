@@ -1,12 +1,11 @@
 {{ if eq .chezmoi.os "darwin" -}}
 # ~/.zprofile runs for ALL login shells, interactive or not — unlike ~/.zsh/* (sourced by
 # ~/.zshrc), which dot_zshrc's `[[ $- != *i* ]] && return` guard skips for non-interactive
-# shells (GUI apps resolving PATH, editor shell-integration probes, `ssh host cmd`). Anything
-# that must be on PATH universally belongs here, not in ~/.zsh/*.
+# shells (GUI apps resolving PATH, editor shell-integration probes, `ssh host cmd`).
+# Anything that must be on PATH universally belongs here, not in ~/.zsh/*.
 #
-# chezmoi fully owns this file's content: if something else (pyenv, a future installer, etc.)
-# ever needs to append here, that content will be silently dropped on the next `chezmoi
-# apply` unless folded into this template.
+# chezmoi fully owns this file: content appended by anything else (pyenv, a future
+# installer) is silently dropped on the next apply unless folded into this template.
 #
 # Below is the static expansion of `brew shellenv` plus the GNU-coreutils prepends.
 # `brew shellenv` is deliberately not called — it spawns `brew` (a bash script) which re-evals
@@ -21,11 +20,11 @@ export HOMEBREW_REPOSITORY="/opt/homebrew"
 # gnubin ahead of Homebrew's bin/sbin so the unprefixed GNU names (date, ls, ...) beat macOS's
 # BSD ones on /usr/bin.
 #
-# Entries are *moved* to the front — removed, then prepended — not just added when absent.
-# /etc/zprofile's path_helper rebuilds PATH on every login shell and shunts inherited entries
-# to the back, so in a nested login shell (one per tmux pane) an "already present?" check would
-# leave /usr/bin shadowing Homebrew's git and openssl, which is the bug #90 fixed. Removing
-# first also stops nesting accumulating duplicates.
+# Entries are *moved* to the front — removed, then prepended — not added when absent.
+# /etc/zprofile's path_helper rebuilds PATH on every login shell and shunts inherited
+# entries to the back, so in a nested login shell (one per tmux pane) an "already
+# present?" check would leave /usr/bin shadowing Homebrew's git and openssl (#90).
+# Removing first also stops nesting accumulating duplicates.
 path=(
     /opt/homebrew/opt/coreutils/libexec/gnubin
     /opt/homebrew/bin
@@ -34,9 +33,9 @@ path=(
 )
 export PATH
 
-# Same move-to-front, for colon-separated strings. The `$entry:$rest` shape leaves a trailing
-# colon when $rest is empty — the empty entry that tells man(1)/info(1) to also search their
-# built-in defaults, as `brew shellenv` and the previous coreutils line both did.
+# Same move-to-front, for colon-separated strings. The `$entry:$rest` shape leaves a
+# trailing colon when $rest is empty — the empty entry that tells man(1)/info(1) to
+# also search their built-in defaults, exactly as `brew shellenv` does.
 _zprofile_prepend() {
     local var=$1 entry=$2
     local -a parts=("${(@s.:.)${(P)var}}")

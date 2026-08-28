@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
-# Install base packages for the detected OS. Replaces the old setup/{darwin,debian}
-# scripts. Plugin managers (zinit/tpm/gitstatus) are handled by
-# .chezmoiexternal, not here.
+# Install base packages for the detected OS. Plugin managers (zinit/tpm/gitstatus)
+# are handled by .chezmoiexternal, not here.
 #
-# run_BEFORE_ on purpose: base tooling must exist before any config file/template
-# renders, because chezmoi executes run_before_ scripts before it renders + writes
-# files. In particular ~/.config/git/config gates the gh credential helper on
-# `lookPath "gh"` (dot_config/git/config.tmpl) — installing gh here makes that
-# true on the FIRST apply, so a single `chezmoi apply` converges (no drift needing
-# a second pass). Do not "fix" this back to run_once_after_.
+# run_BEFORE_ on purpose: chezmoi runs these before it renders and writes files,
+# and base tooling must exist by then. ~/.config/git/config gates the gh
+# credential helper on `lookPath "gh"` (dot_config/git/config.tmpl), so installing
+# gh here makes that true on the FIRST apply and a single `chezmoi apply`
+# converges. Do not "fix" this back to run_once_after_.
 #
-# run_once_ semantics: chezmoi re-runs this whenever the *rendered* content hash
-# changes — so editing this script re-triggers installs. On Debian a re-run does
-# NOT rebuild Neovim: the `command -v nvim` guard below short-circuits once nvim
-# exists. Keep it stable regardless.
+# run_once_ re-runs whenever the *rendered* content hash changes, so editing this
+# script re-triggers installs. A Debian re-run does NOT rebuild Neovim — the
+# `command -v nvim` guard below short-circuits once nvim exists.
 set -euo pipefail
 
 {{ if eq .chezmoi.os "darwin" -}}
@@ -24,13 +21,13 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 brew install git gh zsh tmux neovim atool gsed coreutils
 brew install romkatv/gitstatus/gitstatus
-# Window management (all macs). After install, start them once with
+# Window management (all macs). Start them once after install with
 # `yabai --start-service` and `skhd --start-service`; some yabai features also
-# require SIP to be partially disabled (manual, out of scope here).
+# need SIP partially disabled (manual, out of scope).
 brew install asmvik/formulae/yabai asmvik/formulae/skhd
-# deja: predictive shell autosuggestions, as a prebuilt binary. Deliberately not --HEAD:
-# that path pulls in brew's `go` and builds from source. conflicts_with
-# giammarco-ferranti/deja/deja, which must be uninstalled first or this aborts the script.
+# deja: predictive shell autosuggestions, prebuilt. Deliberately not --HEAD, which
+# pulls in brew's `go` and builds from source. conflicts_with
+# giammarco-ferranti/deja/deja — uninstall that first or this aborts the script.
 brew install serubin/tools/deja-canary
 
 {{ else if eq .chezmoi.os "linux" -}}
@@ -61,8 +58,8 @@ elif ! command -v nvim >/dev/null 2>&1; then
     build_neovim
 fi
 
-# Register nvim as the system vi/vim/editor (non-interactive; the old script used
-# the blocking `--config` form, which we drop).
+# Register nvim as the system vi/vim/editor. Non-interactive: the `--config` form
+# blocks, which would hang an unattended apply.
 if command -v nvim >/dev/null 2>&1; then
     nvim_path=$(command -v nvim)
     for alt in vi vim editor; do
@@ -87,17 +84,15 @@ else
     sudo apt-get install -y gh
 fi
 
-# deja: no apt package, so brew when available (see the guard below), else install_deja --
-# upstream's checksum-verified release tarball into ~/.local/bin, which keeps brew-less boxes
-# working. The fallback gets upstream deja, not the canary.
+# deja: no apt package, so brew when available (see the guard below), else
+# install_deja -- upstream's checksum-verified release tarball into ~/.local/bin,
+# which keeps brew-less boxes working. That fallback gets upstream deja, not the
+# canary. Not upstream's install.sh: it appends `eval "$(deja init zsh)"` to
+# ~/.zshrc (chezmoi owns that) and imports from deja's default histfile, not ours.
 #
-# Not upstream's install.sh: it appends `eval "$(deja init zsh)"` to ~/.zshrc (chezmoi owns
-# that) and imports from deja's default histfile rather than ours.
-#
-# Either binary is glibc-linked (CGO sqlite driver), so fine on Debian, not on musl.
-#
-# On work-devbox the brew prefix does not survive a host restart, so ~/personalize reinstalls
-# deja every boot; this script only covers the first apply.
+# Either binary is glibc-linked (CGO sqlite driver): fine on Debian, not on musl.
+# On work-devbox the brew prefix does not survive a host restart, so ~/personalize
+# reinstalls deja every boot; this script only covers the first apply.
 install_deja() {
     local arch tag version archive base tmp
     case "$(uname -m)" in
@@ -112,20 +107,19 @@ install_deja() {
     archive="deja_${version}_linux_${arch}.tar.gz"
     base="https://github.com/Giammarco-Ferranti/deja/releases/download/${tag}"
     tmp=$(mktemp -d) || return 1
-    # Every step below is checked EXPLICITLY rather than leaning on `set -e`: this
+    # Every step is checked EXPLICITLY rather than leaning on `set -e`: this
     # function is called in an `install_deja || ...` list, and bash suspends -e for
-    # the whole body of a function invoked that way. An unchecked failure would fall
-    # through to the next step — e.g. a failed checksum would still reach `install`.
+    # the whole body of a function invoked that way. An unchecked failure falls
+    # through to the next step — a failed checksum would still reach `install`.
     if ! curl -fsSL -o "$tmp/$archive" "$base/$archive" ||
         ! curl -fsSL -o "$tmp/checksums.txt" "$base/checksums.txt"; then
         echo "deja: download failed ($base/$archive)" >&2
         rm -rf "$tmp"; return 1
     fi
     # Same-origin digest: catches a truncated or mangled download, NOT a compromised
-    # release (whoever can rewrite the tarball can rewrite checksums.txt). It fails
-    # closed either way — a mismatch, or a checksums.txt with no line for our
-    # archive (empty grep => "no properly formatted checksum lines"), installs
-    # nothing.
+    # release (whoever can rewrite the tarball can rewrite checksums.txt). Fails
+    # closed either way — a mismatch, or a checksums.txt with no line for our archive
+    # (empty grep => "no properly formatted checksum lines"), installs nothing.
     if ! ( cd "$tmp" && grep " ${archive}\$" checksums.txt | sha256sum -c - >/dev/null ); then
         echo "deja: checksum verification FAILED for $archive — not installing." >&2
         rm -rf "$tmp"; return 1
@@ -147,9 +141,9 @@ install_deja() {
 # dot_zshenv's ~/.local/bin PATH entry only applies to zsh, so add it here for the
 # guard below and for the history import at the end of this script.
 export PATH="$HOME/.local/bin:$PATH"
-# Absolute path, because /etc/profile.d/homebrew.sh puts only <prefix>/Homebrew/bin on
-# PATH and that copy of brew reports its own directory as HOMEBREW_PREFIX -- a bare
-# `brew install` would then split the Cellar in two.
+# Absolute path: /etc/profile.d/homebrew.sh puts only <prefix>/Homebrew/bin on PATH,
+# and that copy of brew reports its own directory as HOMEBREW_PREFIX -- a bare
+# `brew install` would split the Cellar in two.
 if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
     brew_bin=/home/linuxbrew/.linuxbrew/bin/brew
 else
@@ -157,10 +151,9 @@ else
 fi
 
 if ! command -v deja >/dev/null 2>&1; then
-    # Non-fatal on purpose, both paths: this is a run_before_ script, so letting a GitHub
-    # outage or a failed download abort it would abort the whole apply over a nice-to-have.
-    # Explicit `|| echo` rather than relying on set -e, for the same reason install_deja
-    # checks every step itself.
+    # Non-fatal on both paths: in a run_before_ script, letting a GitHub outage abort
+    # would abort the whole apply over a nice-to-have. Explicit `|| echo` rather than
+    # set -e, for the same reason install_deja checks every step itself.
     if [ -n "$brew_bin" ]; then
         "$brew_bin" install serubin/tools/deja-canary ||
             echo "deja: 'brew install serubin/tools/deja-canary' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
@@ -173,10 +166,9 @@ echo "Unsupported Linux distro: '{{ $id }}'. Install git zsh tmux atool neovim d
 {{   end -}}
 {{ end -}}
 
-# One-time seed of deja's DB from our history. `deja import` is NOT idempotent
-# (it inserts rows blindly), so run it only when the DB doesn't exist yet. Our
-# HISTFILE is ~/.config/.histfile (see dot_zsh/env.tmpl) — NOT deja's default — so
-# point it there explicitly. Best-effort; never fail the apply.
+# One-time seed of deja's DB from our history. `deja import` is NOT idempotent (it
+# inserts rows blindly), so run it only when the DB doesn't exist yet. Our HISTFILE
+# is ~/.config/.histfile (see dot_zsh/env.tmpl), NOT deja's default. Best-effort.
 if command -v deja >/dev/null 2>&1 && [ ! -f "$HOME/.local/share/deja/deja.db" ]; then
     deja import --file "$HOME/.config/.histfile" || true
 fi

@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
-# Cache the eager /etc/zsh version-manager init on the work-devbox Coder image, which cost
+# Cache the eager /etc/zsh version-manager init on the work-devbox Coder image:
 # 874ms of a 1018ms tmux pane. The AMI runs `goenv init -`, `pyenv init -` and sources
-# nvm.sh on every shell, and /etc/zsh/zshrc re-sources /etc/zsh/zprofile.d even for login
-# shells that /etc/zprofile already covered.
+# nvm.sh on every shell, and /etc/zsh/zshrc re-sources /etc/zsh/zprofile.d even for
+# login shells that /etc/zprofile already covered.
 #
-# That output is deterministic except for the selected Go/Python/node versions, so it is
-# cached rather than re-derived; those are baked at generation time, so re-run this by hand
-# after switching one. The goenv()/pyenv() functions and the pyenv-virtualenv precmd hook
-# survive; goenv's automatic rehash and nvm's eager load do not.
+# That output is deterministic apart from the selected Go/Python/node versions, which
+# are baked at generation time -- re-run this by hand after switching one. The
+# goenv()/pyenv() functions and the pyenv-virtualenv precmd hook survive; goenv's
+# automatic rehash and nvm's eager load do not.
 #
-# /etc is wiped on a host restart, so ~/personalize re-runs this at startup, like
-# apply-sshd-keepalive.sh.
+# /etc is wiped on a host restart, so ~/personalize re-runs this at startup.
 #
-# Every step is guarded on the image's current content and skips loudly if it changed, and
-# the whole run is reverted unless every command still resolves identically afterward.
+# Every step is guarded on the image's current content and skips loudly if it changed;
+# the whole run reverts unless every command still resolves identically afterward.
 set -uo pipefail
 
 MARK='# managed by apply-etc-zsh-perf (dotfiles) -- regenerated at workspace start'
@@ -35,7 +34,7 @@ export PATH="$GOENV_ROOT/bin:$PYENV_ROOT/bin:$PATH"
 # --- helpers ---------------------------------------------------------------------
 
 # Snapshot $PATH plus the name -> winning-path map for every reachable executable.
-# Resolution is the invariant; the PATH string is not, since dropping the duplicate goenv
+# Resolution is the invariant, not the PATH string: dropping the duplicate goenv
 # snippet legitimately reorders entries.
 snapshot() {  # $1 = zsh flags, $2 = output file (stderr goes to $2.err)
     env -i HOME="$HOME" TERM=dumb USER="$(id -un)" /usr/bin/zsh $1 -c '
@@ -68,7 +67,7 @@ compare() {  # $1 = before file, $2 = after file, $3 = label
         log "$label: \$PATH reordered, same entries, no command resolves differently"
     fi
     # Catches a snippet in the wrong shell dialect, which resolution alone misses.
-    # Compared rather than required-empty: this env -i context has its own benign warnings.
+    # Diffed rather than required-empty: this env -i context has benign warnings of its own.
     if [ -f "$b.err" ] && [ -f "$a.err" ] && ! diff -q "$b.err" "$a.err" >/dev/null 2>&1; then
         warn "$label: new output on stderr --"
         while IFS= read -r line; do warn "    $line"; done < <(diff "$b.err" "$a.err" | grep '^>' | head -10)
@@ -114,7 +113,7 @@ log "baseline: $(grep -c '^cmd ' "$TMP/before.login") commands reachable from a 
 
 # --- 1. drop the duplicate goenv snippet ----------------------------------------
 # goenv.sh and the goenv.zsh symlink both match the loader's *sh* glob, so goenv inits
-# twice. That directory's README documents the .zsh symlinks as intended, so the plain
+# twice. The directory's README documents the .zsh symlinks as intended, so the plain
 # copy is the accident.
 if [ -f "$ZPD/goenv.sh" ] && [ ! -L "$ZPD/goenv.sh" ]; then
     if cmp -s "$ZPD/goenv.sh" /etc/goenv.sh; then
@@ -131,10 +130,10 @@ fi
 # Replaces the goenv.zsh symlink with a regular file. /etc/goenv.sh is left alone:
 # /etc/profile.d/goenv.sh symlinks to it, so editing it would feed zsh text to bash.
 if command -v goenv >/dev/null 2>&1; then
-    # `zsh` is passed explicitly: these snippets are sourced by zsh, but this generator
-    # runs under bash, and both tools sniff their caller. Without the argument they emit
+    # `zsh` is passed explicitly: these snippets are sourced by zsh but this generator
+    # runs under bash, and both tools sniff their caller. Without it they emit
     # `GOENV_SHELL=bash` plus `source .../completions/goenv.bash`, whose `complete`
-    # builtin does not exist in zsh -- every new shell then prints an error.
+    # builtin does not exist in zsh -- every new shell then errors.
     goenv_init="$(goenv init - zsh 2>/dev/null)"
     goenv_paths="$(goenv sh-rehash --only-manage-paths 2>/dev/null)"
     if [ -z "$goenv_init" ] || ! printf '%s\n' "$goenv_paths" | grep -q '^export GOROOT='; then
@@ -191,9 +190,9 @@ if command -v pyenv >/dev/null 2>&1; then
             printf '%s\n' '# removes an existing shims entry so the next line can re-prepend it.'
             printf '%s\n' 'path=(${path:#/opt/pyenv/shims})'
             printf '\n'
-            # `command pyenv rehash` regenerates the shims on every shell: 46ms of a 145ms
-            # pane. Same fork stripped from goenv above; the pyenv() function's own
-            # rehash branch is untouched, so an explicit `pyenv rehash` still works.
+            # `command pyenv rehash` regenerates the shims on every shell: 46ms of a
+            # 145ms pane. The pyenv() function's own rehash branch is untouched, so an
+            # explicit `pyenv rehash` still works.
             printf '%s\n' "$pyenv_init" | tail -n +6 |
                 grep -Ev '^[[:space:]]*(command[[:space:]]+)?pyenv rehash[[:space:]]*$'
             printf '\n'
