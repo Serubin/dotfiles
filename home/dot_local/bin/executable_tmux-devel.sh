@@ -28,4 +28,17 @@ fi
 # (not `-D` soft-detach) so a wedged/paused post-lid-close client actually goes;
 # the client-detached hook still fires a save.
 tmux list-clients -t devel -F '#{client_pid}' 2>/dev/null | xargs -r kill 2>/dev/null
+
+# Rotate iTerm2's session GUID so its double-attach guard cannot false-positive.
+# iTerm2 tags the tmux session with the user option @iterm2_id and, on attach, runs
+# `show -v -q -t $N @iterm2_id`; if that GUID matches a TmuxController still live in
+# THIS iTerm2 process it refuses with "This instance of iTerm2 is already attached to
+# this session". The kill above frees the session remotely, but the local controller
+# only unregisters once the old ssh pipe closes -- a race the new connection usually
+# wins, and one the local side can lose by up to ServerAlive 15x3 = 45s when the old
+# ssh is half-open after a lid close. Unsetting makes iTerm2 mint a fresh GUID instead.
+# We give up its double-attach guard; single-client is already enforced above by the
+# kill and `-D`. No-op on a cold start: `new -A` creates the session below and iTerm2
+# stamps a fresh GUID anyway.
+tmux set-option -t devel -u @iterm2_id 2>/dev/null || true
 exec tmux -CC new -A -D -s devel
