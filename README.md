@@ -158,7 +158,7 @@ chezmoi update               # git pull the source + apply
 | Zsh | `~/.zshrc`, `~/.zshenv`, `~/.zsh/` | Modular config, zinit plugins, custom prompt |
 | tmux | `~/.tmux.conf` | 256-color, TPM plugins, session restore |
 | Neovim | `~/.config/nvim/` | Lua config with lazy.nvim |
-| Claude Code | `~/.claude/` (curated) | CLAUDE.md, settings.json, statusline, skills, plugin config |
+| Claude Code | `~/.claude/` (curated) + `~/.claude-{personal,work}` | CLAUDE.md, settings.json, statusline, skills, plugin config; two logins via `claude --work` / `--personal` |
 | yabai + skhd | `~/.config/{yabai,skhd}` | macOS tiling WM + hotkey daemon (macs only) |
 
 ## Repository layout
@@ -174,6 +174,7 @@ chezmoi update               # git pull the source + apply
 │   │   ├── run_once_before_10-uninstall-stow.sh
 │   │   ├── run_once_before_20-install-packages.sh.tmpl      # base tools (incl. gh) BEFORE configs render
 │   │   ├── run_once_after_15-migrate-git-xdg.sh            # one-time: drop legacy ~/.gitconfig
+│   │   ├── run_once_after_16-split-claude-config.sh        # one-time: seed ~/.claude-personal from ~/.claude
 │   │   └── run_once_after_21-install-env-packages.sh.tmpl  # per-class packages
 │   ├── dot_zshenv  dot_zshrc  dot_zprofile.tmpl
 │   ├── dot_zsh/                      # 00-os executable_02-zinit alias env function promptrc zz-env prompt/
@@ -184,7 +185,9 @@ chezmoi update               # git pull the source + apply
 │   ├── create_dot_gitconfig_local    # ~/.gitconfig_local (created once; machine-local git overrides)
 │   ├── dot_config/git/               # → ~/.config/git/{config.tmpl,ignore} (XDG git config)
 │   ├── dot_config/nvim/
-│   └── dot_claude/                   # CURATED: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
+│   ├── .chezmoitemplates/            # shared template bodies (claude-settings-merge.py)
+│   ├── dot_claude/                   # CURATED shared root: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
+│   └── dot_claude-{personal,work}/   # per-login config dirs; symlink back into dot_claude
 ├── scripts/
 │   ├── uninstall-stow.sh             # remove legacy Stow symlinks (manual)
 │   └── docker-test.sh                # → `dotfiles-test` in the container: apply + login zsh
@@ -326,9 +329,41 @@ full breakdown (options, keymaps, per-plugin notes, autocommands).
 ### Claude Code
 
 Only curated config is managed — `CLAUDE.md`, `settings.json`,
-`statusline-command.sh`, `skills/`, and `plugins/blocklist.json`. Everything else in
-`~/.claude` (sessions, projects, history, caches, `settings.local.json`,
-credentials) is left untouched.
+`statusline-command.sh`, `skills/`, and `plugins/blocklist.json`. Everything else
+(sessions, projects, history, caches, `settings.local.json`, credentials) is left
+untouched.
+
+**Two logins on one machine.** Claude Code keys its entire identity — auth,
+`.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so a second account needs a
+second directory. The split here keeps one copy of the curated config:
+
+```
+~/.claude/            shared assets: CLAUDE.md, skills/, settings.json, statusline
+~/.claude-personal/   personal login  ─┐ CLAUDE.md, skills/, plugins/blocklist.json
+~/.claude-work/       work login      ─┘ are symlinks back into ~/.claude
+```
+
+`settings.json` is the one thing each account gets its own copy of, because Claude Code
+rewrites it in place (a symlink would not survive). All three are generated from the same
+`.chezmoitemplates/claude-settings-merge.py`, so the constants have a single home.
+
+`~/.zsh/zz-env` exports `CLAUDE_CONFIG_DIR=~/.claude-$DOTFILES_ENV`, so the machine's
+`environment` picks the default account and anything launched from the shell agrees with
+it. The `claude` wrapper in `~/.zsh/function` overrides that per invocation:
+
+```zsh
+claude                    # the machine default
+claude --work -c          # work account, --work eaten, -c passed through
+claude --personal --model opus "…"
+```
+
+It also adds `--dangerously-skip-permissions` by default, skipping that for subcommands
+(`claude mcp list`) and whenever you pass your own `--permission-mode`.
+
+> **Caveat:** anything started *without* the shell — a GUI-launched editor, cron — still
+> resolves `~/.claude` and its own `~/.claude.json`, so it keeps working but accumulates a
+> second, separate history. `launchctl setenv CLAUDE_CONFIG_DIR …` would close that gap on
+> macOS if it ever matters.
 
 > **Caveat:** `plugins/blocklist.json` carries an app-maintained `fetchedAt` field
 > that Claude Code rewrites, so `chezmoi status` may show it as drifted and `apply`

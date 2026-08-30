@@ -87,3 +87,35 @@ lazy_load_nvm() {
     add-zsh-hook chpwd load-nvmrc
   fi
 }
+
+# Route `claude` to a per-account config dir, and default to bypassing permissions.
+# `--work` / `--personal` are consumed here so everything after them still reaches the
+# real CLI; the default account comes from CLAUDE_CONFIG_DIR (set in ~/.zsh/zz-env).
+claude() {
+  local arg cfg=${CLAUDE_CONFIG_DIR:-$HOME/.claude-personal} ddash=0
+  local -a args perms
+
+  for arg in "$@"; do
+    # Past a literal `--`, a bare `--work` is the caller's data, not our flag.
+    if (( ddash )); then args+=("$arg"); continue; fi
+    case $arg in
+      --)         ddash=1; args+=("$arg") ;;
+      --work)     cfg=$HOME/.claude-work ;;
+      --personal) cfg=$HOME/.claude-personal ;;
+      *)          args+=("$arg") ;;
+    esac
+  done
+
+  # Subcommands (`claude mcp list`) reject --dangerously-skip-permissions, and a permission
+  # flag the caller passed is them opting out. Subcommands are inferred rather than listed,
+  # since the list grows with each release: one is always a single bare word, where a
+  # session's first argument is absent, a flag, or a multi-word prompt. Misreading a
+  # one-word prompt only loses the default; the reverse would be a hard error.
+  if (( ! ${args[(I)(--dangerously-skip-permissions|--permission-mode|--permission-mode=*)]} )) &&
+     [[ -z ${args[1]} || ${args[1]} == -* || ${args[1]} == *[[:space:]]* ]]
+  then
+    perms=(--dangerously-skip-permissions)
+  fi
+
+  CLAUDE_CONFIG_DIR=$cfg command claude "${perms[@]}" "${args[@]}"
+}

@@ -83,6 +83,29 @@ export NVM_DIR="$HOME/.nvm"
 lazy_load_nvm --auto-use
 ```
 
+#### `claude`
+
+```zsh
+claude [--work|--personal] [claude-args...]
+```
+
+Wrapper around the Claude Code CLI that picks which login to use. Claude Code keys its
+whole identity — auth, `.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so
+`--work` maps to `~/.claude-work` and `--personal` to `~/.claude-personal`. The flag is
+consumed by the wrapper; every other argument reaches the real CLI unchanged, and a flag
+after a literal `--` is treated as data. Without one, the machine default comes from
+`CLAUDE_CONFIG_DIR` (exported by `zz-env` from the chezmoi `environment`).
+
+It also appends `--dangerously-skip-permissions`, except when you already passed
+`--dangerously-skip-permissions` or `--permission-mode`, or when the invocation is a
+subcommand (`claude mcp list`, `claude update`, …), which rejects the flag. Subcommands
+are inferred — a single bare first word — rather than listed, since the list grows with
+each release. The cost is that a one-word prompt (`claude refactor`) reads as a subcommand
+and starts in the settings' default mode instead.
+
+Being a function rather than an alias means it applies to interactive shells only, and
+`command claude` always reaches the real binary.
+
 ### Environment (`env`)
 
 #### `compaudit`
