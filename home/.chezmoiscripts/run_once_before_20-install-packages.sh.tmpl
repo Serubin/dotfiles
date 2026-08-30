@@ -36,7 +36,10 @@ brew install serubin/tools/deja-canary
 # ===== Debian / Ubuntu =====
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
-sudo apt-get install -y git zsh tmux atool curl ca-certificates
+# python3 is not decoration: the Claude settings merge is a chezmoi modify_ script with a
+# python3 shebang, so without it `apply` aborts (exit 127) partway through. Debian minimal
+# images ship without it; macOS always has one.
+sudo apt-get install -y git zsh tmux atool curl ca-certificates python3
 
 build_neovim() {
     sudo apt-get install -y ninja-build gettext cmake curl build-essential git
