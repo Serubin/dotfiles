@@ -91,7 +91,9 @@ claude [--work|--personal] [claude-args...]
 
 Wrapper around the Claude Code CLI that picks which login to use. Claude Code keys its
 whole identity — auth, `.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so
-`--work` maps to `~/.claude-work` and `--personal` to `~/.claude-personal`. The flag is
+`--work` maps to `~/.claude-work` and `--personal` to `~/.claude-personal`. Both dirs
+symlink their session state into `~/.claude`, so conversations, memory and history are
+shared and only the account differs. The flag is
 consumed by the wrapper; every other argument reaches the real CLI unchanged, and a flag
 after a literal `--` is treated as data. Without one, the machine default comes from
 `CLAUDE_CONFIG_DIR` (exported by `zz-env` from the chezmoi `environment`).

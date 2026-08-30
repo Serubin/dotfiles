@@ -19,9 +19,13 @@
 # plugins/blocklist.json) is managed; guard secrets and the cloned marketplace repos.
 #
 # Three dirs, because Claude Code keys its whole identity off CLAUDE_CONFIG_DIR:
-# ~/.claude holds the shared assets, and ~/.claude-{personal,work} hold one login
-# each and symlink back to them. Everything else in all three (sessions, projects,
-# history, .claude.json, caches) is state and stays untracked.
+# ~/.claude is the one store -- assets AND session state -- and
+# ~/.claude-{personal,work} hold one login each, symlinking back to it for
+# everything but .claude.json, credentials and the org-pushed policy files.
+#
+# Only ~/.claude's copies are listed here. The account dirs' settings.json and
+# settings.local.json are chezmoi-managed SYMLINKS into ~/.claude, so ignoring
+# them would suppress the link rather than protect anything.
 #
 # settings.json is merged, not overwritten (Claude Code owns the keys it toggles)
 # -- see .chezmoitemplates/claude-settings-merge.py.
@@ -36,11 +40,9 @@
 .claude/.credentials.json
 .claude/plugins/marketplaces
 .claude/plugins/known_marketplaces.json
-.claude-personal/settings.local.json
 .claude-personal/.credentials.json
 .claude-personal/plugins/marketplaces
 .claude-personal/plugins/known_marketplaces.json
-.claude-work/settings.local.json
 .claude-work/.credentials.json
 .claude-work/plugins/marketplaces
 .claude-work/plugins/known_marketplaces.json

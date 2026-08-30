@@ -174,7 +174,7 @@ chezmoi update               # git pull the source + apply
 │   │   ├── run_once_before_10-uninstall-stow.sh
 │   │   ├── run_once_before_20-install-packages.sh.tmpl      # base tools (incl. gh) BEFORE configs render
 │   │   ├── run_once_after_15-migrate-git-xdg.sh            # one-time: drop legacy ~/.gitconfig
-│   │   ├── run_once_after_16-split-claude-config.sh        # one-time: seed ~/.claude-personal from ~/.claude
+│   │   ├── run_once_before_17-share-claude-session-state.sh # one-time: fold per-account state back into ~/.claude
 │   │   └── run_once_after_21-install-env-packages.sh.tmpl  # per-class packages
 │   ├── dot_zshenv  dot_zshrc  dot_zprofile.tmpl
 │   ├── dot_zsh/                      # 00-os executable_02-zinit alias env function promptrc zz-env prompt/
@@ -187,7 +187,7 @@ chezmoi update               # git pull the source + apply
 │   ├── dot_config/nvim/
 │   ├── .chezmoitemplates/            # shared template bodies (claude-settings-merge.py)
 │   ├── dot_claude/                   # CURATED shared root: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
-│   └── dot_claude-{personal,work}/   # per-login config dirs; symlink back into dot_claude
+│   └── dot_claude-{personal,work}/   # per-login dirs; symlink into dot_claude for everything but auth
 ├── scripts/
 │   ├── uninstall-stow.sh             # remove legacy Stow symlinks (manual)
 │   └── docker-test.sh                # → `dotfiles-test` in the container: apply + login zsh
@@ -335,17 +335,31 @@ untouched.
 
 **Two logins on one machine.** Claude Code keys its entire identity — auth,
 `.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so a second account needs a
-second directory. The split here keeps one copy of the curated config:
+second directory. `~/.claude` stays the one store and each account dir symlinks into it,
+so switching accounts does not fork your conversations:
 
 ```
-~/.claude/            shared assets: CLAUDE.md, skills/, settings.json, statusline
-~/.claude-personal/   personal login  ─┐ CLAUDE.md, skills/, plugins/blocklist.json
-~/.claude-work/       work login      ─┘ are symlinks back into ~/.claude
+~/.claude/            everything: CLAUDE.md, skills/, settings*.json, statusline,
+                      projects/ (incl. per-project memory/), sessions/, history.jsonl,
+                      plans/, tasks/, teams/, file-history/, paste-cache/, …
+~/.claude-personal/   ─┐ all of the above are symlinks back into ~/.claude; only
+~/.claude-work/       ─┘ .claude.json, credentials and the org-pushed
+                         policy-limits.json / remote-settings.json are per-account
 ```
 
-`settings.json` is the one thing each account gets its own copy of, because Claude Code
-rewrites it in place (a symlink would not survive). All three are generated from the same
-`.chezmoitemplates/claude-settings-merge.py`, so the constants have a single home.
+Sharing `projects/` is what makes `-c` and `--resume` reach a conversation from either
+login, and it carries `memory/` with it. `.claude.json` is the one piece that cannot be
+shared: it fuses `oauthAccount` with the project list, so linking it would collapse the
+account distinction.
+
+> **Caveat:** only one account can be signed in at a time. The macOS Keychain entry is
+> shared across config dirs for writes, so a `/login` on one account signs the other out.
+> The split gives you two settings profiles and one shared history, not two concurrent
+> sessions.
+
+> **Caveat:** Claude Code rewrites `settings.json` on `/config`, `/model` and `/theme`. If
+> it ever does so atomically it will replace the symlink with a real file; `chezmoi apply`
+> puts the link back, but a toggle made in between is lost.
 
 `~/.zsh/zz-env` exports `CLAUDE_CONFIG_DIR=~/.claude-$DOTFILES_ENV`, so the machine's
 `environment` picks the default account and anything launched from the shell agrees with
