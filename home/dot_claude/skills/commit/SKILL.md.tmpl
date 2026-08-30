@@ -272,18 +272,30 @@ python3 ~/.claude/skills/commit/lint-commit-msg.py "$msgfile" --tier brief   # o
 ```
 
 It has no dependencies and needs no credentials. It checks only what arithmetic can decide: the
-word and section budgets, subject format and length, {{ if $ticketRequired }}the ticket line, {{ end }}wrapped table rows, unclosed
-fences, AI trailers, PR-template headings pasted into a commit body, and performance claims
-with no openable evidence. Fix every `error` and re-run until it exits 0. Warnings are
-advisory — `S2a` (the subject truncates once a squash merge appends ` (#NNNNN)`) is worth
-fixing, `B8` (prose over 72 chars) matters for terminal readability.
+word and section budgets, subject format and length, {{ if $ticketRequired }}the ticket line, {{ end }}a `## Why` section once the body
+outgrows the brief budget, wrapped table rows, unclosed fences, AI trailers, PR-template
+headings pasted into a commit body, lines that `git commit` is about to delete as comments,
+and performance claims with no openable evidence. Fix every `error` and re-run until it exits
+0. Warnings are advisory — `S2a` (the subject truncates once a squash merge appends
+` (#NNNNN)`) is worth fixing, `B8` (prose over 72 chars) matters for terminal readability.
 
 **The repo still wins.** Where a check contradicts the repo's own convention, bend the linter
-rather than the message, and say which flag you used and why: `--tier`, `--pr-template <path>`,
-{{ if $ticketRequired }}`--no-require-ticket` for a repo that tracks no tickets{{ else }}`--require-ticket` for a repo whose guide or history clearly uses ticket lines{{ end }}.
+rather than the message. Prefer recording the convention in the repo's git config over passing
+a flag every time — a rule that has to be silenced by hand on every run is one that trains its
+reader to ignore the whole linter:
+
+```bash
+git config commitlint.ticket false   # repo tracks no tickets (silences B1)
+git config commitlint.tier medium    # repo's default budget
+```
+
+`--tier`, `--pr-template <path>` and {{ if $ticketRequired }}`--no-require-ticket`{{ else }}`--require-ticket`{{ end }} still override the config for a one-off; say
+which you used and why.
 
 This step exists because the countable failures are the ones a language model is worst at
-policing in its own output.
+policing in its own output. A `commit-msg` hook runs the same linter on every commit, so
+skipping this step does not skip the check — it just moves the failure to `git commit`, after
+the message is written.
 
 **(followup)** Lint and stop there — skip Step 5 and go to Step 6.
 
