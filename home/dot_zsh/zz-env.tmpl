@@ -9,6 +9,12 @@
 export DOTFILES_ENV={{ .environment | quote }}
 export DOTFILES_CLASS={{ .class | quote }}
 
+# Claude Code keys its whole identity -- auth, .claude.json, projects, history -- off this
+# one variable, so two logins mean two dirs. Exported rather than set inside the `claude`
+# wrapper (~/.zsh/function) so scripts and editors launched from this shell resolve the
+# same account; the wrapper's --work/--personal overrides it for a single invocation.
+export CLAUDE_CONFIG_DIR="$HOME/.claude-{{ .environment }}"
+
 {{ if eq .class "work-mac" -}}
 # ===== work-mac =====
 {{ else if eq .class "work-devbox" -}}

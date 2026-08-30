@@ -18,8 +18,17 @@
 # Claude Code: only the curated config (settings.json, CLAUDE.md, skills/,
 # plugins/blocklist.json) is managed; guard secrets and the cloned marketplace repos.
 #
+# Three dirs, because Claude Code keys its whole identity off CLAUDE_CONFIG_DIR:
+# ~/.claude is the one store -- assets AND session state -- and
+# ~/.claude-{personal,work} hold one login each, symlinking back to it for
+# everything but .claude.json, credentials and the org-pushed policy files.
+#
+# Only ~/.claude's copies are listed here. The account dirs' settings.json and
+# settings.local.json are chezmoi-managed SYMLINKS into ~/.claude, so ignoring
+# them would suppress the link rather than protect anything.
+#
 # settings.json is merged, not overwritten (Claude Code owns the keys it toggles)
-# -- see dot_claude/modify_settings.json.tmpl.
+# -- see .chezmoitemplates/claude-settings-merge.py.
 #
 # settings.local.json is listed defensively: Claude Code reads it at PROJECT scope
 # only, so a user-scope copy would never be consumed anyway.
@@ -31,6 +40,12 @@
 .claude/.credentials.json
 .claude/plugins/marketplaces
 .claude/plugins/known_marketplaces.json
+.claude-personal/.credentials.json
+.claude-personal/plugins/marketplaces
+.claude-personal/plugins/known_marketplaces.json
+.claude-work/.credentials.json
+.claude-work/plugins/marketplaces
+.claude-work/plugins/known_marketplaces.json
 
 # Repo docs kept next to the config they document, but NOT deployed to $HOME.
 # (.zsh/README.md would otherwise be sourced by .zshrc's `~/.zsh/*` loop.)

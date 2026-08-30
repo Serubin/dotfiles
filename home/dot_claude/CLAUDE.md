@@ -85,6 +85,14 @@ Comments earn their place by explaining *why*. Keep them terse — a phrase or a
 - When moving a file, use `mv` rather than reading-and-rewriting. It preserves history, permissions, and inode metadata, and avoids accidental content drift between the old and new path.
 - End every file with exactly one trailing newline. No extra blank lines at the end. The last line of content is followed by a single `\n` and nothing more — this matches POSIX expectations and keeps diffs clean.
 
+## Claude Code config directory
+
+`CLAUDE_CONFIG_DIR` may point somewhere other than `~/.claude` — this machine runs a per-account dir (`~/.claude-work`, `~/.claude-personal`) for each login.
+
+- When it does, keep using `~/.claude` for anything shared: skills, memory, plans, transcripts, settings. The per-account dirs are symlinks into it, so both paths reach the same file, and `~/.claude` is the one that stays true if the symlink is ever replaced.
+- Only fall back to `$CLAUDE_CONFIG_DIR` when `~/.claude` does not exist.
+- The per-account dirs hold exactly three things of their own: `.claude.json`, credentials, and the org-pushed `policy-limits.json` / `remote-settings.json`. Never copy those into the shared dir — they are what separates the accounts.
+
 ## Kubernetes and secrets
 
 Treat Kubernetes (and other) secret values as untouchable. They must never enter the conversation transcript.
