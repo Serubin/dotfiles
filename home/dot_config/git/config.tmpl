@@ -6,7 +6,11 @@
 {{- end }}
 [core]
 	editor = nvim
+	# Not '#': cleanup deletes comment lines, so the default eats every '## Why'
+	# heading and every line opening with a '#123' PR reference, silently and
+	# after the commit-msg hook has already approved the message.
 	commentChar = >
+	hooksPath = ~/.config/git/hooks
 {{ if lookPath "gh" -}}
 [credential "https://github.com"]
 	helper = !gh auth git-credential

@@ -12,18 +12,43 @@ linter is opinionated about has a flag to bend it: --tier, --require-ticket /
 
 Exit 0 if clean (warnings allowed), 1 if any error.
 
-    lint-commit-msg.py MSGFILE [--tier brief|medium|detailed] [--mode commit|pr]
+    lint-commit-msg.py MSGFILE [--tier brief|medium|detailed|auto] [--mode commit|pr]
 
 Tier defaults to `brief`. Exceeding it is an error naming the next tier up, so
 growing the budget is an explicit decision that shows up in the transcript
-rather than a default that drifts upward.
+rather than a default that drifts upward. `--tier auto` instead grades against
+the smallest tier the body already fits, for callers with no author to ask --
+the commit-msg hook.
+
+A repo states its own convention in git config, which the flags still override:
+
+    commitlint.ticket   bool, whether a ticket line is required (B1)
+    commitlint.tier     default tier when --tier is not passed
 """
 
 import argparse
 import glob
 import os
 import re
+import subprocess
 import sys
+
+
+def git_config(key):
+    """A repo's own answer for `key`, or None. Machine-wide defaults are a
+    fallback, never an override: the repo's convention wins (see the module
+    docstring), and this is how a repo states it without touching a flag."""
+    try:
+        out = subprocess.run(["git", "config", "--get", key],
+                             capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def git_config_bool(key):
+    val = git_config(key)
+    return None if val is None else val.lower() in ("true", "yes", "on", "1")
 
 # Grounded in the guide's own worked examples (29 / 84 / 197 body words),
 # with headroom. See references/style-commits.md "Examples".
@@ -48,7 +73,10 @@ SUBJECT_MAX = SUBJECT_HARD_MAX - SQUASH_SUFFIX
 TYPES = "feat|fix|refactor|perf|test|docs|chore|build|ci|style|revert"
 FOLLOWUP = "review-response|fixup|cleanup"
 
-SUBJECT_RE = re.compile(rf"^({TYPES})(\([a-z0-9._/-]+\))?: (.+)$")
+# A scope may name more than one component -- `feat(git,claude):` is a change to
+# both, not a malformed subject.
+SCOPE = r"[a-z0-9._/-]+(?:\s*,\s*[a-z0-9._/-]+)*"
+SUBJECT_RE = re.compile(rf"^({TYPES})(\({SCOPE}\))?: (.+)$")
 FOLLOWUP_RE = re.compile(rf"^({FOLLOWUP}): (.+)$")
 
 # Ticket conventions differ per repo, so accept the common ones rather than one
@@ -225,6 +253,18 @@ def count_words(lines):
             continue
         n += len(URL_TOKEN.sub(" ", line).split())
     return n
+
+
+def infer_tier(body):
+    """The smallest tier this body already fits in. A commit-msg hook has no
+    Step 3 in which an author declares a tier, so it grades the message against
+    the one it actually lands in rather than inventing a budget nobody chose --
+    which makes B3 unreachable under `--tier auto`, by design."""
+    words = count_words(classify_lines(body)[0])
+    for name in ("brief", "medium", "detailed"):
+        if words <= TIERS[name]["words"]:
+            return name
+    return "detailed"
 
 
 def normalize_heading(text):
@@ -420,6 +460,20 @@ def check_body(body, tier, rep, mode, followup=False, require_ticket=False,
             "drop any the diff does not require",
         )
 
+    # The guide calls Why "always present, even if implicit in good prose". At
+    # brief tier the prose carries it; past that the body is long enough that an
+    # unnamed Why is one a reader has to go hunting for. Every other heading rule
+    # here is a penalty (B2/B2a/B4), so without this one the cheapest way to
+    # satisfy the linter is to write no headings at all.
+    if mode == "commit" and not followup and tier in ("medium", "detailed"):
+        if not any(h == "why" or h.startswith("why ") for h in headings_in(body)):
+            rep.error(
+                "B9",
+                f"no '## Why' section, required at tier '{tier}'. State what the world "
+                "looked like before this commit and why that was wrong -- or cut the body "
+                "to the brief budget, where the guide lets the why stay implicit in prose",
+            )
+
     for pat, what in AI_FINGERPRINTS:
         if pat.search(body):
             rep.error("B5", f"remove the {what}; the guide forbids AI trailers")
@@ -536,11 +590,46 @@ def check_long_fences(body, rep):
             )
 
 
+def check_comment_stripping(text, rep, mode):
+    """Lines opening with the comment marker are deleted during `git commit`'s
+    cleanup, and the commit-msg hook runs *before* cleanup -- so `## Why` clears
+    every other rule here and is then silently removed, leaving a message that
+    still reads fine and a heading nobody notices is gone. Nothing in the message
+    body can reveal that; only the config can, so that is what this inspects.
+
+    Git's default marker is '#', the character Markdown headings start with. The
+    fix is a marker no line ever opens with -- but that only moves the trap ('>'
+    eats blockquotes), so the check is against whatever is actually configured.
+    """
+    if mode != "commit":
+        return
+    # These cleanup modes never strip, so there is nothing to lose.
+    if (git_config("commit.cleanup") or "default") in ("whitespace", "verbatim"):
+        return
+    marker = git_config("core.commentString") or git_config("core.commentChar") or "#"
+    # 'auto' picks a marker the message does not use; deprecated, but harmless.
+    if marker == "auto":
+        return
+    hits = [i + 1 for i, line in enumerate(text.split("\n")) if line.startswith(marker)]
+    if not hits:
+        return
+    shown = ", ".join(str(n) for n in hits[:8])
+    more = f" (+{len(hits) - 8} more)" if len(hits) > 8 else ""
+    rep.error(
+        "B7c",
+        f"{len(hits)} line(s) open with the comment marker {marker!r} and will be deleted "
+        f"from the committed message: lines {shown}{more}. Set a marker no line starts "
+        "with, e.g. `git config --global core.commentChar '>'`",
+    )
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("msgfile", help="file holding the message ('-' for stdin)")
-    ap.add_argument("--tier", choices=list(TIERS), default="brief")
+    ap.add_argument("--tier", choices=list(TIERS) + ["auto"], default=None,
+                    help="budget to grade against; 'auto' infers the smallest tier "
+                         "the body fits (default: commitlint.tier, else brief)")
     ap.add_argument("--mode", choices=["commit", "pr"], default="commit")
     ap.add_argument("--title", help="PR title to check alongside a --mode pr body")
     ap.add_argument("--require-ticket", dest="require_ticket", action="store_true",
@@ -554,12 +643,27 @@ def main():
     ap.add_argument("--quiet", action="store_true", help="print nothing when clean")
     args = ap.parse_args()
 
-    require_ticket = TICKET_REQUIRED if args.require_ticket is None else args.require_ticket
+    # Flag beats repo config beats machine default. The repo layer is what stops
+    # B1 from erroring on every commit in a repo that tracks no tickets -- run
+    # unattended from a hook, a rule that can only be silenced by remembering a
+    # flag is a rule that trains its reader to ignore the whole linter.
+    if args.require_ticket is not None:
+        require_ticket = args.require_ticket
+    else:
+        repo_ticket = git_config_bool("commitlint.ticket")
+        require_ticket = TICKET_REQUIRED if repo_ticket is None else repo_ticket
 
     text = sys.stdin.read() if args.msgfile == "-" else open(args.msgfile).read()
     text = text.replace("\r\n", "\n").rstrip("\n")
 
     subject, body = split_message(text, args.mode)
+
+    tier = args.tier or git_config("commitlint.tier") or "brief"
+    if tier == "auto":
+        tier = infer_tier(body)
+    if tier not in TIERS:
+        print(f"error: unknown tier {tier!r} (check commitlint.tier)", file=sys.stderr)
+        return 2
     if args.mode == "pr" and args.title:
         subject = args.title.strip()
 
@@ -573,11 +677,12 @@ def main():
     # A follow-up squashes into its lead on merge, so the guide exempts it from
     # the ticket line and lets it go bodyless.
     followup = bool(subject and FOLLOWUP_RE.match(subject)) and args.mode == "commit"
-    check_body(body, args.tier, rep, args.mode, followup=followup,
+    check_body(body, tier, rep, args.mode, followup=followup,
                require_ticket=require_ticket, repo_root=args.repo_root or os.getcwd(),
                template_override=args.pr_template)
     check_evidence(body, subject, rep)
     check_long_fences(body, rep)
+    check_comment_stripping(text, rep, args.mode)
 
     for code, msg in rep.errors:
         print(f"error [{code}] {msg}", file=sys.stderr)
@@ -586,14 +691,29 @@ def main():
 
     if rep.errors:
         print(f"\n{len(rep.errors)} error(s), {len(rep.warnings)} warning(s) "
-              f"against tier '{args.tier}'.", file=sys.stderr)
+              f"against tier '{tier}'.", file=sys.stderr)
+        # The commit-msg hook blocks on this sentinel rather than on the exit
+        # code, because a syntax or import error in this file also exits 1 and
+        # would otherwise be indistinguishable from a message that breaks the
+        # guide -- blocking every commit on the machine over a linter bug.
+        print("lint-commit-msg: FAIL", file=sys.stderr)
         return 1
     if not args.quiet:
         words = count_words(classify_lines(body)[0])
-        print(f"clean: tier '{args.tier}', {words}/{TIERS[args.tier]['words']} words, "
+        print(f"clean: tier '{tier}', {words}/{TIERS[tier]['words']} words, "
               f"{len(rep.warnings)} warning(s).")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except SystemExit:
+        raise
+    except Exception as exc:  # noqa: BLE001 -- see below
+        # Exit 3, distinct from 1, so the commit-msg hook can tell "this message
+        # breaks the guide" from "this script is broken" and let the commit
+        # through on the latter. A linter bug must not hold every commit on the
+        # machine hostage; that is how a hook ends up deleted instead of fixed.
+        print(f"lint-commit-msg: internal error: {exc!r}", file=sys.stderr)
+        sys.exit(3)

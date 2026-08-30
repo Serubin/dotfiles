@@ -1,0 +1,75 @@
+#!/bin/sh
+# Gate every commit on the /commit skill's linter.
+#
+# The linter used to run only because SKILL.md asked it to, which meant it ran
+# only on the paths that went through the skill -- and not always then. Here it
+# runs on every commit on this machine, including the hand-rolled ones.
+#
+# core.hooksPath is global, so this file takes the place of whatever a repo kept
+# in .git/hooks/commit-msg; that hook is chained below rather than dropped.
+# Per-repo strictness lives in git config (commitlint.ticket, commitlint.tier),
+# so a repo with a different convention tunes the rules instead of losing them.
+
+set -eu
+
+msgfile="$1"
+linter="$HOME/.claude/skills/commit/lint-commit-msg.py"
+
+# A repo's own hook still runs, and still gets to veto first -- spr installs one
+# to stamp commit-id, and core.hooksPath would otherwise silently shadow it. (A
+# repo that sets its own core.hooksPath, as husky does, overrides this file
+# outright; that repo's tooling wins and nothing here runs.)
+# Not --git-path: that resolves `hooks/` through core.hooksPath and hands back
+# this very file. --git-common-dir, not --git-dir, so linked worktrees find the
+# shared hooks rather than their own empty gitdir.
+repo_hook="$(git rev-parse --git-common-dir)/hooks/commit-msg"
+if [ -x "$repo_hook" ] && [ "${COMMITLINT_CHAINED:-}" != "1" ]; then
+	COMMITLINT_CHAINED=1 "$repo_hook" "$msgfile" || exit $?
+fi
+
+# Merges, squashes and fixups carry messages git or a later rebase writes, not
+# ones an author chose. Reverts are handled by the linter's own GENERATED_RE.
+[ -f "$(git rev-parse --git-path MERGE_HEAD)" ] && exit 0
+case "$(head -n 1 "$msgfile")" in
+	"squash! "* | "fixup! "* | "amend! "*) exit 0 ;;
+esac
+
+# A missing toolchain warns and allows rather than blocking. Loudly, though: a
+# silent pass is the failure this hook exists to remove.
+if [ ! -f "$linter" ]; then
+	echo "commit-msg: linter missing at $linter; allowing (run 'chezmoi apply')" >&2
+	exit 0
+fi
+if ! command -v python3 >/dev/null 2>&1; then
+	echo "commit-msg: no python3; allowing without lint" >&2
+	exit 0
+fi
+
+out="$(mktemp)"
+trap 'rm -f "$out"' EXIT
+
+set +e  # `set -e` would take the exit code away before it can be read
+python3 "$linter" "$msgfile" --mode commit --tier auto --quiet 2>"$out"
+rc=$?
+set -e
+
+cat "$out" >&2
+
+# Block on the sentinel, not on `$rc`: a syntax or import error in the linter
+# also exits 1, and refusing every commit on the machine over a linter bug is
+# how a hook gets deleted rather than fixed. Only a message that actually
+# reached the rules can stop a commit.
+if grep -q '^lint-commit-msg: FAIL$' "$out"; then
+	cat >&2 <<-'EOF'
+
+		Commit refused by the style linter. Fix the errors above, or:
+		  git config commitlint.ticket false   # repo tracks no tickets
+		  git config commitlint.tier medium    # repo's default budget
+		  git commit --no-verify               # bypass, deliberately
+	EOF
+	exit 1
+fi
+
+if [ "$rc" -ne 0 ]; then
+	echo "commit-msg: linter exited $rc without a verdict; allowing" >&2
+fi
