@@ -97,15 +97,47 @@ When you need to ask the user something, use the AskUserQuestion tool — not fr
 
 ## Code comments
 
-Comments earn their place by explaining *why*. Keep them terse — a phrase or a sentence.
+Comments earn their place by explaining *why*. A comment is one or two lines — that is a
+limit, not an average. If the explanation does not fit, it does not belong in the file: put
+it in the commit message, the PR body, or a doc, and leave at most a pointer behind.
+
+Scope is code. A document is not a comment — memory files, plans, notes, READMEs, skill
+and agent definitions, and Markdown generally run to whatever length their content needs,
+and nothing in this section applies to them.
 
 - Default to no comment. Code that reads clearly needs none, and a comment that restates the line below it is noise.
+- One idea per comment. Constraint, invariant, failure prevented, trade-off, or surprising upstream behavior — pick the single one a reader needs in order to not break this code, and drop the rest. Cite the ticket, RFC, or CVE rather than retelling it.
+- Never argue against alternatives you didn't ship. "X rather than Y, because Y would do Z" is a commit message; the file describes what is true now.
+- No paragraphs. No blank comment line splitting one comment into two, no second sentence elaborating the first.
 - Explain *what* only when the code genuinely cannot be made clear on its own: a gnarly regex, a non-obvious algorithm, a bit-twiddling trick, a workaround for someone else's bug.
-- Prefer the reason the code is shaped this way — the constraint, the invariant, the failure it prevents, the trade-off, the surprising upstream behavior. Cite the ticket, RFC, or CVE when one exists.
 - Never write a changelog. No "changed X to Y", "previously we did Z", "added in v2", no dates, no author names, no `NEW:` / `FIXED:` markers. Git history is the changelog.
 - Don't address me in a comment about the edit you just made. That belongs in your response, not in the file.
 - Match the file's existing comment density and voice. Don't comment code that had none, and don't delete comments that are still true.
+- A file header may run longer, and it has a fixed shape: one line on what the file is, a `usage:` line if it's a script, and nothing else. Provenance — tool versions, why an artifact is committed rather than built — goes in the commit message.
 - Docstrings and public-API doc comments are the exception: stating the contract — params, return, errors, units, thread-safety — is their job. Still terse, still no changelog.
+
+Too long, and real:
+
+```sh
+# The artwork is a full-bleed rounded rect, but the macOS icon grid puts the body in 824 of
+# 1024px with a 100px inset — rendered edge to edge it looks oversized beside every other
+# Dock icon. The inset is rounded and then subtracted from both sides, rather than scaling
+# the body independently: two truncating divisions would leave the body off-centre by 2px
+# at 16px, which is visible in a Finder list.
+#
+# --page-* is load-bearing, not decoration. iconutil checks each PNG's pixel size against
+# its filename, so --width/--height alone would drop a 12px image into the 16px slot.
+```
+
+What it should have been:
+
+```sh
+# macOS grid: the body fills 824 of 1024px, so inset each side before rendering.
+# --page-* is required — iconutil rejects a PNG whose pixels disagree with its filename.
+```
+
+`~/.claude/check-comment-length.py` runs after every edit and flags any run over two
+lines. It knows comment syntax for code files only, so a document never reaches it.
 
 ## File operations
 
