@@ -25,7 +25,7 @@ fi
 # does not apply.
 brew install \
     ejoffe/tap/spr \
-    serubin/tools/deja-canary \
+    serubin/formula/deja \
     claude-code@latest \
     mosh \
     inotify-tools \
