@@ -218,9 +218,10 @@ builds its path with `prompt_pwd` instead, so it always shows the real location.
 Inline suggestions come from **[deja](https://github.com/Giammarco-Ferranti/deja)**
 — predictive ghost-text autosuggestions replacing `zsh-autosuggestions`. It's a
 standalone Go binary + daemon (installed by `run_once_before_20-install-packages`:
-Homebrew on macOS; on Debian/Ubuntu the `serubin/tools/deja-canary` formula when brew is
-available, else upstream's prebuilt release into `~/.local/bin` — both checksum-verified
-prebuilt binaries), `eval`'d in `02-zinit`, so it's not a zinit-managed plugin.
+Homebrew on macOS; on Debian/Ubuntu the `serubin/formula/deja` canary formula when brew
+is available, else upstream's prebuilt release into `~/.local/bin` — both
+checksum-verified prebuilt binaries, and both spelled `deja`), `eval`'d in `02-zinit`,
+so it's not a zinit-managed plugin.
 Right/End accept the full suggestion, Ctrl+Right accepts a word; its Tab-picker and
 `^X` toggle are disabled (via empty `DEJA_CYCLE_KEY`/`DEJA_TOGGLE_KEY`) to preserve
 completion and `^X^E`.
