@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code statusLine
-# Format: cwd (branch) [tsh:cluster] model ctx:X% period:Y% t:Z%|ink/outk
+# Format: cwd (branch) [tsh:cluster] model ctx:X% period:Y% t:Z%|ink/outk session
 input=$(cat)
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 model=$(echo "$input" | jq -r '.model.display_name // ""' | grep -oiE 'sonnet|opus|haiku|claude' | head -1 | tr '[:upper:]' '[:lower:]')
@@ -9,6 +9,7 @@ five_hr=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty
 resets_at=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 total_in=$(echo "$input" | jq -r '.context_window.total_input_tokens // empty')
 total_out=$(echo "$input" | jq -r '.context_window.total_output_tokens // empty')
+session_id=$(echo "$input" | jq -r '.session_id // empty')
 
 # Compute elapsed% of the 5-hour rate-limit window from resets_at (epoch seconds)
 rate_elapsed=""
@@ -59,6 +60,10 @@ if [ -n "$total_in" ] && [ -n "$total_out" ]; then
   else
     ctx_str=$(printf '%s \033[00;36mt:%sk/%sk\033[00m' "$ctx_str" "$in_k" "$out_k")
   fi
+fi
+
+if [ -n "$session_id" ]; then
+  ctx_str=$(printf '%s \033[00;90m%s\033[00m' "$ctx_str" "$session_id")
 fi
 
 # Get active tsh cluster
