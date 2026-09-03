@@ -33,6 +33,21 @@ FORCE = {
         "type": "command",
         "command": "bash $HOME/.claude/statusline-command.sh",
     },
+    # Owned here rather than merged, so a rule cannot be dropped by a live /hooks edit.
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 $HOME/.claude/check-comment-length.py",
+                        "timeout": 10,
+                    },
+                ],
+            },
+        ],
+    },
     "model": "opus",
     "effortLevel": "xhigh",
     "outputStyle": "Concise",

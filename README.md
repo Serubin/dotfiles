@@ -186,7 +186,7 @@ chezmoi update               # git pull the source + apply
 │   ├── dot_config/git/               # → ~/.config/git/{config.tmpl,ignore} (XDG git config)
 │   ├── dot_config/nvim/
 │   ├── .chezmoitemplates/            # shared template bodies (claude-settings-merge.py)
-│   ├── dot_claude/                   # CURATED shared root: CLAUDE.md, settings.json, statusline, skills/, plugins/*.json
+│   ├── dot_claude/                   # CURATED shared root: CLAUDE.md, settings.json, statusline, hooks, skills/, plugins/*.json
 │   └── dot_claude-{personal,work}/   # per-login dirs; symlink into dot_claude for everything but auth
 ├── scripts/
 │   ├── uninstall-stow.sh             # remove legacy Stow symlinks (manual)
@@ -330,9 +330,16 @@ full breakdown (options, keymaps, per-plugin notes, autocommands).
 ### Claude Code
 
 Only curated config is managed — `CLAUDE.md`, `settings.json`,
-`statusline-command.sh`, `skills/`, and `plugins/blocklist.json`. Everything else
-(sessions, projects, history, caches, `settings.local.json`, credentials) is left
-untouched.
+`statusline-command.sh`, `check-comment-length.py`, `skills/`, and
+`plugins/blocklist.json`. Everything else (sessions, projects, history, caches,
+`settings.local.json`, credentials) is left untouched.
+
+`check-comment-length.py` is a `PostToolUse` hook on `Edit`/`Write`: it flags comment
+runs longer than the two lines CLAUDE.md allows, scoped to the lines an edit actually
+added, with file headers and doc comments exempt. It carries comment syntax for code
+files only, so documents — `.md` and the like — are never inspected. `hooks` lives in the
+merge script's `FORCE` block, so the repo owns the hook list and a live `/hooks` edit does
+not survive the next `apply`.
 
 **Two logins on one machine.** Claude Code keys its entire identity — auth,
 `.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so a second account needs a
