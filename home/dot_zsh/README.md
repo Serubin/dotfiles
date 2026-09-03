@@ -204,6 +204,45 @@ builds its path with `prompt_pwd` instead, so it always shows the real location.
 | `~athena-redis` | `~/lwcode/athena/athena-redis-db` | `.environment == "work"` |
 | `~helm3` | `~/lwcode/helm3-platform` | `.environment == "work"` |
 
+### Repo-relative names (`zsh_directory_name`)
+
+The names above are frozen at definition time — `hash -d dotfiles=~/.dotfiles` expands its
+tilde once, so there is no way to say "the worktrees directory of whatever repo I'm in".
+zsh's *dynamic* named directories cover that: a `zsh_directory_name` hook (in the
+`function` file) is called at expansion time and answers by asking git.
+
+| Name | Resolves to |
+|---|---|
+| `~[wt]` | the **main checkout's** `.claude/worktrees` |
+| `~[root]` | the top of the tree you are currently in |
+
+```zsh
+cd ~/.dotfiles/home/dot_zsh
+cd ~[wt]        # → ~/.dotfiles/.claude/worktrees
+cd ~[root]      # → ~/.dotfiles
+```
+
+`~[wt]` reads the first entry of `git worktree list --porcelain`, which is always the main
+checkout, rather than `git rev-parse --show-toplevel`. From inside a worktree the two
+differ, and `--show-toplevel` would point at `<worktree>/.claude/worktrees`, which does not
+exist. `~[root]` deliberately *does* use `--show-toplevel`, so it names the tree you are
+standing in — inside a worktree it gives that worktree, not the main checkout.
+
+Two things to know:
+
+- **The brackets are mandatory.** zsh only consults the hook for the `~[name]` form; a bare
+  `~wt` is a plain static-name lookup and will fail. Both forms tab-complete — `~[<TAB>`
+  offers `wt` and `root`, and `~[wt]/<TAB>` lists the worktrees inside.
+- **Not gated.** These live in `function`, not `alias.tmpl`, and apply on every machine —
+  there is nothing environment-specific to gate on, unlike the `~/lwcode` names above.
+
+The hook implements only the `n` (name → directory) and `c` (completion) calls. The `d`
+call, which zsh uses to turn a directory *back* into a name for `%~` and the directory
+stack, deliberately returns non-zero — contracting paths to `~[wt]/foo` in the prompt is
+the same thing the static names avoid.
+
+Cost is one `git worktree list` fork per expansion and nothing at startup.
+
 > Note: `alias -r` is *not* used anywhere here. When **defining** an alias, `-r` is a
 > no-op — regular is already the default, and `-g` / `-s` are what select the other
 > namespaces. `-r` only does work when **listing** (`alias -r` prints just the regular

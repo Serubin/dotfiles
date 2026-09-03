@@ -119,3 +119,31 @@ claude() {
 
   CLAUDE_CONFIG_DIR=$cfg command claude "${perms[@]}" "${args[@]}"
 }
+
+# Dynamic named directories: computed per expansion, where `hash -d` resolves its tilde
+# once at definition time. The bracket form is required -- a bare `~wt` never reaches here.
+zsh_directory_name() {
+  emulate -L zsh
+  local -a wt
+
+  case $1 in
+    (n)
+      case $2 in
+        # `git worktree list` names the main checkout first; --show-toplevel would name
+        # the current worktree, whose .claude/worktrees does not exist.
+        (wt)   wt=(${(f)"$(git worktree list --porcelain 2>/dev/null)"})
+               [[ -n $wt[1] ]] || return 1
+               reply=(${wt[1]#worktree }/.claude/worktrees) ;;
+        (root) reply=($(git rev-parse --show-toplevel 2>/dev/null))
+               [[ -n $reply[1] ]] || return 1 ;;
+        (*)    return 1 ;;
+      esac
+      ;;
+    (c)
+      local expl
+      _wanted dynamic-dirs expl 'dynamic directory' compadd -S\] wt root
+      return
+      ;;
+    (*) return 1 ;;
+  esac
+}

@@ -285,7 +285,8 @@ switching a Go/Python/node version, since the selected versions are baked in.
 **Notable aliases**: `vim` → `nvim`, `cd` → `cdls` (auto-`ls` after cd), `_` →
 `sudo`, `cm` → `chezmoi`, `extract` → `aunpack`. Named directories (`hash -d`) give
 `cd ~dotfiles` plus work-gated shortcuts to the `~/lwcode` checkouts; the prompt still
-shows real paths.
+shows real paths. Dynamic names resolve against the repo you are standing in — `cd ~[wt]`
+reaches its `.claude/worktrees`, `cd ~[root]` its top level.
 
 **Customization**: Add personal/private overrides to `~/.custom` (sourced at the
 end of `.zshrc`). chezmoi creates it once from a template (`create_dot_custom`)
