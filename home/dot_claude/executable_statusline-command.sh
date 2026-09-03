@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code statusLine
-# Format: cwd (branch) [tsh:cluster] model ctx:X% period:Y% t:Z%|ink/outk session
+# Format: cwd (branch) [tsh:cluster] model effort ctx:X% period:Y% t:Z%|ink/outk session
 input=$(cat)
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 model=$(echo "$input" | jq -r '.model.display_name // ""' | grep -oiE 'sonnet|opus|haiku|claude' | head -1 | tr '[:upper:]' '[:lower:]')
@@ -10,6 +10,7 @@ resets_at=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 total_in=$(echo "$input" | jq -r '.context_window.total_input_tokens // empty')
 total_out=$(echo "$input" | jq -r '.context_window.total_output_tokens // empty')
 session_id=$(echo "$input" | jq -r '.session_id // empty')
+effort=$(echo "$input" | jq -r '.effort.level // empty')
 
 # Compute elapsed% of the 5-hour rate-limit window from resets_at (epoch seconds)
 rate_elapsed=""
@@ -45,10 +46,15 @@ if [ -n "$rate_elapsed" ]; then
   fi
 fi
 
+model_str=$(printf '\033[00;33m%s\033[00m' "$model")
+if [ -n "$effort" ]; then
+  model_str=$(printf '%s \033[00;90m%s\033[00m' "$model_str" "$effort")
+fi
+
 if [ -n "$cyan_parts" ]; then
-  ctx_str=$(printf '\033[00;33m%s\033[00m \033[00;36m%s\033[00m' "$model" "$cyan_parts")
+  ctx_str=$(printf '%s \033[00;36m%s\033[00m' "$model_str" "$cyan_parts")
 else
-  ctx_str=$(printf '\033[00;33m%s\033[00m' "$model")
+  ctx_str="$model_str"
 fi
 
 # cyan token segment: t:[five_hr%|]ink/outk
