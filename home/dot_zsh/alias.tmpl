@@ -50,7 +50,8 @@ alias cd.="cd ."
 # Named directories, for reaching these checkouts quickly. Better than `cdfoo` aliases:
 # the name is a path *prefix*, so `cd ~dotfiles/home` works and `~dot<TAB>` completes.
 # They do not change how the prompt renders -- it shows the real path on purpose (see
-# prompt_pwd). Tildes expand to absolute paths at definition time.
+# prompt_pwd). Tildes expand to absolute paths at definition time; for names that follow
+# the current repo instead, see `zsh_directory_name` in `function`.
 hash -d dotfiles=~/.dotfiles
 {{ if eq .environment "work" -}}
 hash -d services=~/lwcode/services/vulnerability
