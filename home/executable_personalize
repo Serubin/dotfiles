@@ -47,6 +47,12 @@ nohup /home/coder/lwcode/reset-vscode-settings.sh > /tmp/startup-vscode-settings
 # once (it already raced the first shell even when synchronous).
 nohup "$HOME/.local/bin/apply-etc-zsh-perf.sh" > /tmp/startup-apply-etc-zsh-perf.log 2>&1 &
 
+# --- System timezone. Root-owned /etc/localtime, wiped on a host restart, so it is
+# re-applied here rather than by chezmoi.
+if [ "$(timedatectl show -p Timezone --value 2>/dev/null)" != "America/New_York" ]; then
+    sudo timedatectl set-timezone America/New_York
+fi
+
 # --- Periodic tmux-resurrect save cron (every 5 min). The crontab does not survive a
 # host restart, so it is (re)installed here rather than at chezmoi apply; the script
 # itself is chezmoi-managed. Idempotent: de-duped by the marker comment, other entries
