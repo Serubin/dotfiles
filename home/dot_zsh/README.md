@@ -218,7 +218,7 @@ builds its path with `prompt_pwd` instead, so it always shows the real location.
 Inline suggestions come from **[deja](https://github.com/Giammarco-Ferranti/deja)**
 — predictive ghost-text autosuggestions replacing `zsh-autosuggestions`. It's a
 standalone Go binary + daemon (installed by `run_once_before_20-install-packages`:
-Homebrew on macOS; on Debian/Ubuntu the `serubin/formula/deja` canary formula when brew
+Homebrew on macOS; on Debian/Ubuntu the `serubin/tap/deja` canary formula when brew
 is available, else upstream's prebuilt release into `~/.local/bin` — both
 checksum-verified prebuilt binaries, and both spelled `deja`), `eval`'d in `02-zinit`,
 so it's not a zinit-managed plugin.
