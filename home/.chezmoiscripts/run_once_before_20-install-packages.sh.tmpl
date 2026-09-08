@@ -28,7 +28,7 @@ brew install asmvik/formulae/yabai asmvik/formulae/skhd
 # deja: predictive shell autosuggestions, prebuilt. Deliberately not --HEAD, which
 # pulls in brew's `go` and builds from source. conflicts_with
 # giammarco-ferranti/deja/deja — uninstall that first or this aborts the script.
-brew install serubin/formula/deja
+brew install serubin/tap/deja
 
 {{ else if eq .chezmoi.os "linux" -}}
 {{   $id := .chezmoi.osRelease.id -}}
@@ -159,8 +159,8 @@ if ! command -v deja >/dev/null 2>&1; then
     # would abort the whole apply over a nice-to-have. Explicit `|| echo` rather than
     # set -e, for the same reason install_deja checks every step itself.
     if [ -n "$brew_bin" ]; then
-        "$brew_bin" install serubin/formula/deja ||
-            echo "deja: 'brew install serubin/formula/deja' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
+        "$brew_bin" install serubin/tap/deja ||
+            echo "deja: 'brew install serubin/tap/deja' failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
     else
         install_deja || echo "deja: install failed — suggestions stay inert; re-run 'chezmoi apply' to retry." >&2
     fi

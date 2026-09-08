@@ -256,7 +256,7 @@ Inline suggestions come from [deja](https://github.com/Giammarco-Ferranti/deja)
 — predictive ghost-text autosuggestions (replaces `zsh-autosuggestions`).
 It's a standalone Go binary + daemon, initialized in `02-zinit`, not a zinit
 plugin. On Debian/Ubuntu it comes from Homebrew when brew is available
-(`brew install serubin/formula/deja`, the canary build as a checksum-verified prebuilt
+(`brew install serubin/tap/deja`, the canary build as a checksum-verified prebuilt
 binary), falling back to upstream's prebuilt release into `~/.local/bin` on brew-less
 boxes — the difference is which release you get, canary or upstream, not prebuilt versus
 source. Both are spelled `deja`, so the source is the tap, not the name. On work-devbox the
