@@ -80,13 +80,36 @@ if [[ ! -b "$cachedir_dev" ]]; then
   echo
 fi
 
-if [[ $(sudo file -Ls $cachedir_dev) == "$cachedir_dev: data" ]]; then
-  sudo mkfs -t ext4 $cachedir_dev
-  echo "Initialized filesystem on $cachedir_dev"
+# This volume holds only regenerable build caches (mbx, bazel), so reformatting it costs
+# nothing but a repopulate. btrfs is deliberate: mbx restores cached outputs into target
+# directories by cloning, which needs a CoW filesystem, and zstd roughly quarters what
+# build artifacts occupy. On ext4 neither worked -- every restore was a full copy.
+#
+# lsblk rather than blkid: blkid exits 2 on an unformatted device and can exit 0 while
+# printing nothing on a partitioned one, conflating "unformatted" with "unreadable".
+cachedir_fstype=$(lsblk -no FSTYPE "$cachedir_dev" | head -1 | tr -d '[:space:]')
+cachedir_opts="defaults,noatime,compress=zstd:3,nofail"
+if [[ $cachedir_fstype != btrfs ]]; then
+  echo "$cachedir_dev is ${cachedir_fstype:-unformatted}, reformatting as btrfs (discards the build caches)"
+  if mountpoint -q /mnt/cache && ! sudo umount /mnt/cache ; then
+    echo "couldn't unmount /mnt/cache; close anything using it and re-run"
+    exit 1
+  fi
+  # fstab is rewritten only on success: a btrfs line over a failed mkfs wedges every
+  # later `mount -a`, at boot included.
+  if ! sudo mkfs.btrfs -f -L cache "$cachedir_dev" ; then
+    echo "mkfs.btrfs failed on $cachedir_dev; leaving /etc/fstab alone"
+    exit 1
+  fi
+  echo "Initialized btrfs filesystem on $cachedir_dev"
 fi
 
-if ! grep -q /mnt/cache /etc/fstab ; then
-  echo "$cachedir_dev /mnt/cache ext4 defaults 0 0" | sudo tee -a /etc/fstab >/dev/null
+# Rewrite in place when a line exists (an earlier run of this script wrote an ext4 one),
+# append when it does not -- /etc does not survive a host restart.
+if grep -q ' /mnt/cache ' /etc/fstab ; then
+  sudo sed -i "s| /mnt/cache .*$| /mnt/cache btrfs $cachedir_opts 0 0|" /etc/fstab
+else
+  echo "$cachedir_dev /mnt/cache btrfs $cachedir_opts 0 0" | sudo tee -a /etc/fstab >/dev/null
 fi
 
 sudo mkdir -p /mnt/cache
@@ -94,7 +117,10 @@ sudo mount -a
 
 sudo chown coder:coder /mnt/cache
 
-bazel shutdown
+# spark-cli's SPARK_LOCAL_DIRECTORY, wiped by a reformat and created by nothing else.
+mkdir -p /mnt/cache/lhq-spark
+
+"$HOME/.local/bin/clear-bazel-cache.sh"
 
 echo
 df -h | rg 'cache|coder|Use%'
