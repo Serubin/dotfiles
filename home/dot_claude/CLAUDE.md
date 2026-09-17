@@ -27,6 +27,12 @@ Nothing written in my voice reaches another person unless I have approved that e
 
 If something does go out without my approval, tell me immediately and plainly: what was sent, where, under what identity, and how to retract it. Never let it surface only in a summary.
 
+### Write it in my voice
+
+Before drafting any prose that will carry my name, read `~/.claude/style-voice.md`. That covers chat messages, GitHub PR review comments and review bodies, and issue-tracker comments. It is derived from my own published writing and it sets length, register by surface, how I ask for things, refuse, concede, and correct myself, plus the tells that mark a draft as not mine.
+
+Two things it does not do. It does not loosen the approval gate above: it tells you how to write the draft, not whether you may post it. And it does not cover commit messages or source comments, which have their own guides.
+
 ## About the user and the work
 
 Staff-level software engineer working on cybersecurity products. Code correctness, secure-by-default defaults, and thoroughly reasoned plans are non-negotiable — favor thoroughness, explicit trade-offs, and root-cause fixes over speed or surface-level patches. Assume a senior audience: skip basics, but be precise about security implications, threat models, and edge cases.
