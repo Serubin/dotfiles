@@ -19,6 +19,12 @@ and let it win over the bundled guide on any conflict — repo conventions (tick
 scopes, required sections) take precedence. The bundled guide is the default when the repo
 says nothing.
 
+**Voice.** If `~/.claude/style-voice.md` exists, read it: it describes how the user actually
+writes, and it governs the *prose* inside the body and the PR description — sentence shape,
+how they hedge, ask and concede, and the tells that mark a draft as not theirs. It does not
+govern structure. Subject format, sections, budgets and the ticket line stay with the commit
+style guide above. If the file is absent, skip this and change nothing else.
+
 ## Modes
 
 Pick the mode from the user's ask. If ambiguous, ask.
@@ -82,8 +88,9 @@ treat as lead.
 ## Before you draft anything
 
 1. **Read the bundled `references/style-commits.md` in full this turn** (plus the repo's own
-   guide if it has one — see "Defer to the repo"). It's short. Going from memory will get you
-   a draft that fails the lint in Step 4 and the self-review in Step 5.
+   guide if it has one — see "Defer to the repo", and `~/.claude/style-voice.md` if that
+   exists). It's short. Going from memory will get you a draft that fails the lint in Step 4
+   and the self-review in Step 5.
 2. **Detect the VCS.** `.jj/` present → Jujutsu; otherwise → git. See Step 6 for the exact
    apply commands — always pass the message via a file (`git commit -F file`,
    `jj describe --stdin < file`, `gh ... --body-file file`), never via shell-escaped `-m`
@@ -315,6 +322,9 @@ short guide doesn't need a frontier model, and this review runs on every lead co
 - The absolute path to this skill's bundled `references/style-commits.md` (the copy alongside
   this SKILL.md — resolve it relative to this SKILL.md's own directory), **and** the repo's own
   style guide if one exists — tell the agent the repo's guide wins on any conflict.
+- The absolute path to `~/.claude/style-voice.md` if it exists, told plainly: judge voice
+  against it, not structure. The agent should flag prose that doesn't sound like the user, and
+  leave section choices to the style guide.
 - Which artifact is being reviewed: **lead commit message** or **PR description** (if the repo
   squash-merges, say so, so the agent doesn't expect the PR body to recap commits).
 - A one-line summary of the **actual** diff shape (e.g., "docs-only, +12 / -3 in one file" or
