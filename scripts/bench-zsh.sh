@@ -3,7 +3,8 @@
 #
 #   scripts/bench-zsh.sh [startup_runs] [prompt_runs]
 #
-# Startup = `zsh -i -c exit` (sources ~/.zsh/* + loads zinit plugins), warmed.
+# Startup = both shell shapes, warmed: `zsh -i` is a tmux pane, `zsh -li` is ssh or a new
+#           terminal window, and only the latter pays for ~/.zprofile and /etc/zprofile.
 #           Uses hyperfine if installed, otherwise a zsh timing loop.
 # Prompt  = the precmd chain, per component, timed in a git repo under a
 #           pseudo-tty so gitstatus's background daemon is live.
@@ -13,24 +14,26 @@ startup_runs="${1:-30}"
 prompt_runs="${2:-200}"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 
-echo "== zsh startup (zsh -i -c exit, warmed) =="
-if command -v hyperfine >/dev/null 2>&1; then
-    hyperfine --warmup 5 --min-runs "$startup_runs" -N 'zsh -i -c exit'
-else
-    zsh -fc "
-        zmodload zsh/datetime
-        repeat 5 { zsh -i -c exit 2>/dev/null }          # warmup
-        integer n=$startup_runs
-        float sum=0 min=1e9 max=0 d
-        for i in {1..\$n}; do
-            s=\$EPOCHREALTIME; zsh -i -c exit 2>/dev/null; e=\$EPOCHREALTIME
-            d=\$(( (e-s)*1000 )); (( sum+=d )); (( d<min )) && min=d; (( d>max )) && max=d
-        done
-        printf '  min=%.1f  mean=%.1f  max=%.1f ms  (n=%d)\n' \$min \$((sum/n)) \$max \$n
-    "
-fi
+for shape in -i -li; do
+    echo "== zsh startup (zsh $shape -c exit, warmed) =="
+    if command -v hyperfine >/dev/null 2>&1; then
+        hyperfine --warmup 5 --min-runs "$startup_runs" -N "zsh $shape -c exit"
+    else
+        zsh -fc "
+            zmodload zsh/datetime
+            repeat 5 { zsh $shape -c exit 2>/dev/null }      # warmup
+            integer n=$startup_runs
+            float sum=0 min=1e9 max=0 d
+            for i in {1..\$n}; do
+                s=\$EPOCHREALTIME; zsh $shape -c exit 2>/dev/null; e=\$EPOCHREALTIME
+                d=\$(( (e-s)*1000 )); (( sum+=d )); (( d<min )) && min=d; (( d>max )) && max=d
+            done
+            printf '  min=%.1f  mean=%.1f  max=%.1f ms  (n=%d)\n' \$min \$((sum/n)) \$max \$n
+        "
+    fi
+    echo
+done
 
-echo
 echo "== zsh prompt render (pty; gitstatus live; cwd=$repo_root) =="
 # gitstatus's daemon needs job control, so run interactive zsh under a pseudo-tty
 # via `script` (BSD and util-linux arg orders differ).

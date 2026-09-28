@@ -14,7 +14,11 @@ unset _cur_nofile
 # Skip the global compinit in Debian/Ubuntu's /etc/zsh/zshrc. ~/.zsh/env runs its own
 # compinit immediately afterward (with a -C fast path and a 24h dump refresh).
 skip_global_compinit=1
-
+{{ if eq .chezmoi.os "darwin" }}
+# Skip /etc/zprofile and /etc/zshrc — ~14ms, mostly their path_helper and `locale` forks.
+# ~/.zprofile and ~/.zsh/01-system reproduce what they set; later edits to them go unread.
+unsetopt GLOBAL_RCS
+{{ end }}
 # Put ~/.local/bin on PATH for ALL zsh invocations (interactive, scripts, and
 # GUI-launched tools) — chezmoi installs machine-specific executables there.
 # Appended (not prepended) so user scripts can never shadow system binaries.

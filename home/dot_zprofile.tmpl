@@ -6,7 +6,58 @@
 #
 # chezmoi fully owns this file: content appended by anything else (pyenv, a future
 # installer) is silently dropped on the next apply unless folded into this template.
-#
+
+# /etc/zprofile's LANG default, which ~/.zshenv's `unsetopt GLOBAL_RCS` skipped. Fires for
+# launchd-spawned login shells and `ssh mac 'zsh -lc ...'`; iTerm already sets en_US.UTF-8.
+[[ -n $LANG ]] || export LANG=C.UTF-8
+
+# /etc/zprofile's other job, cached: path_helper is a ~5ms fork per login shell (one per
+# tmux pane) for a PATH prefix that only changes when /etc/paths or /etc/paths.d does.
+_zprofile_syspath() {
+    emulate -L zsh
+    local cache=$HOME/.zsh/cache/syspath stamp=$HOME/.zsh/cache/syspath.id
+    local -a key
+    local -A st
+    local f
+
+    zmodload -F zsh/stat b:zstat 2>/dev/null || return
+    # Prefixed builtins only: a bare `zmodload zsh/files` would shadow mv/mkdir on $PATH
+    # for the rest of the shell's life, and $PATH is what we are in the middle of building.
+    zmodload -F zsh/files b:zf_mkdir b:zf_mv 2>/dev/null || return
+
+    # Per-file, not just the directory: a directory mtime moves only on create and unlink,
+    # and app updates rewrite /etc/paths.d entries in place. ctime survives `install -p`.
+    for f in /usr/libexec/path_helper /etc/paths /etc/paths.d /etc/paths.d/*(N); do
+        zstat -H st $f 2>/dev/null && key+=("$f:${st[size]}:${st[mtime]}:${st[ctime]}")
+    done
+    local id="${(j.|.)key}" cached=""
+    [[ -r $stamp ]] && read -r cached < $stamp
+
+    if [[ -z $id || $id != $cached ]]; then
+        # env -i, because path_helper appends the *caller's* PATH to the /etc entries it
+        # emits — without it the cache would bake in whatever this one shell happened to have.
+        local out=${$(env -i /usr/libexec/path_helper -s)#PATH=\"}
+        out=${out%\"; export PATH;*}
+        [[ -n $out ]] || return
+        [[ -d ${cache:h} ]] || zf_mkdir -p ${cache:h}
+        # Written aside and renamed: several login shells can open at once, and a reader
+        # must never see a half-written PATH.
+        print -r -- "$out" > $cache.$$ && zf_mv -f $cache.$$ $cache || return
+        [[ -n $id ]] && print -r -- "$id" > $stamp
+    fi
+
+    local line
+    read -r line < $cache || return
+    local -a sys=("${(@s.:.)line}")
+
+    # path_helper's own semantics: /etc entries first, whatever we inherited after, no
+    # duplicates. `typeset -U` is what drops them — ~/.custom appends on every nesting level.
+    typeset -gU path
+    path=($sys ${path:|sys})
+}
+_zprofile_syspath
+unfunction _zprofile_syspath
+
 # Below is the static expansion of `brew shellenv` plus the GNU-coreutils prepends.
 # `brew shellenv` is deliberately not called — it spawns `brew` (a bash script) which re-evals
 # path_helper, ~55ms on a file that runs for every login shell, one per tmux pane. Valid
@@ -20,11 +71,8 @@ export HOMEBREW_REPOSITORY="/opt/homebrew"
 # gnubin ahead of Homebrew's bin/sbin so the unprefixed GNU names (date, ls, ...) beat macOS's
 # BSD ones on /usr/bin.
 #
-# Entries are *moved* to the front — removed, then prepended — not added when absent.
-# /etc/zprofile's path_helper rebuilds PATH on every login shell and shunts inherited
-# entries to the back, so in a nested login shell (one per tmux pane) an "already
-# present?" check would leave /usr/bin shadowing Homebrew's git and openssl (#90).
-# Removing first also stops nesting accumulating duplicates.
+# Entries are *moved* to the front — removed, then prepended — not added when absent. The
+# block above puts /usr/bin ahead of them, so "already present?" would shadow brew's git (#90).
 path=(
     /opt/homebrew/opt/coreutils/libexec/gnubin
     /opt/homebrew/bin
