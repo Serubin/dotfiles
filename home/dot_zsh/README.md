@@ -4,16 +4,24 @@
 
 | Metric | Time |
 |---|---|
+| Shell startup — `zsh -i`, work-mac | ~75ms |
+| Shell startup — `zsh -li` (login, e.g. ssh), work-mac | ~78ms |
 | Shell startup — `zsh -i`, work-devbox | ~150ms |
-| Shell startup — `zsh -li` (login, e.g. ssh), work-devbox | ~155ms |
-| Prompt render (in git repo) | ~2ms |
+| Shell startup — `zsh -li`, work-devbox | ~155ms |
+| Prompt render (in git repo) | ~4ms |
 
-Startup is dominated by eager zinit plugin loading; prompt render is mostly the
-gitstatus query. Re-measure anytime with `scripts/bench-zsh.sh`, and note which shell
-*shape* you are measuring — a tmux pane is `zsh -i` (`default-command` is
-`/usr/bin/env zsh`, so panes are **non-login**), while ssh gives you `zsh -li`.
+Re-measure anytime with `scripts/bench-zsh.sh`, and note which shell *shape* you are
+measuring — a tmux pane is `zsh -i` (`default-command` is `/usr/bin/env zsh`, so panes are
+**non-login**), while ssh gives you `zsh -li`. On macOS the two now cost nearly the same,
+because skipping `/etc/zprofile` is most of what login used to add.
 
-Of that ~150ms, roughly 20ms is this repo and the rest is the machine's system config.
+What is left on work-mac, roughly: 12ms of bare `zsh -f`, 20ms of zinit, 14ms inside
+deja's generated `init.zsh`, 9ms of zsh-syntax-highlighting. `compinit` is ~0ms thanks to
+`.zcompdump.zwc`, and `zcompile`-ing `~/.zsh/*` was measured and gained nothing. Dropping
+zinit for direct `source` calls measures at a further ~15ms and is the next thing worth
+doing.
+
+On work-devbox, roughly 20ms is this repo and the rest is the machine's system config.
 On work-devbox the base image was responsible for ~874ms of a ~1018ms pane until
 `~/.local/bin/apply-etc-zsh-perf.sh` (run at startup by `~/personalize`) started caching
 its eager `goenv`/`pyenv`/`nvm` initialization — see that script's header for what it
@@ -31,9 +39,20 @@ every login shell whether interactive or not — that's where Homebrew and GNU c
 prepended onto `PATH`, since anything in `~/.zsh/*` would be invisible to non-interactive
 login shells (GUI apps resolving `PATH`, editor shell-integration probes, `ssh host cmd`).
 
+On macOS, `~/.zshenv` sets `unsetopt GLOBAL_RCS`, so zsh never reads `/etc/zprofile` or
+`/etc/zshrc` — together ~14ms per login shell, most of it their `path_helper` and
+`locale LC_CTYPE` forks. What those files set is reproduced here instead: `~/.zprofile`
+handles `LANG` and the `/etc/paths`-derived `PATH` prefix (cached in `~/.zsh/cache/syspath`,
+rebuilt only when `/etc/paths`, `/etc/paths.d/*` or `path_helper` itself changes), and
+`~/.zsh/01-system` handles `combining_chars`, `disable log` and the terminal key bindings.
+The trade-off is that anything appended to those two system files later — by a macOS
+update or by MDM — goes unread; re-check them after a major upgrade. Linux is unaffected,
+and still reads `/etc/zsh/*` for the devbox toolchain init.
+
 | File | Purpose |
 |---|---|
 | `00-os` | Exports `$DISTRO` (resolved by a chezmoi template at apply time — no runtime OS detection) |
+| `01-system` | macOS only: what `/etc/zshrc` would have set, minus its forks (empty elsewhere) |
 | `02-zinit` | Initializes zinit and loads plugins |
 | `alias` | Shell aliases, named directories, and keybindings |
 | `env` | Completion setup, shell options, key bindings, and environment variables |

@@ -1,0 +1,23 @@
+{{ if eq .chezmoi.os "darwin" -}}
+# What /etc/zshrc set, for shells that skip it (see ~/.zshenv). Loads before alias and env.
+
+# Without this, ZLE mangles the decomposed Unicode that macOS apps put on the clipboard.
+[[ $LANG == *(UTF-8|utf8)* || $LC_ALL == *(UTF-8|utf8)* || $LC_CTYPE == *(UTF-8|utf8)* ]] &&
+    setopt combining_chars
+
+# Otherwise the zsh builtin shadows /usr/bin/log.
+disable log
+
+# Literal escapes rather than zsh/terminfo: same result, no module load.
+bindkey "\e[3~" delete-char
+bindkey "\e[H" beginning-of-line
+bindkey "\e[F" end-of-line
+bindkey "\e[A" up-line-or-search
+bindkey "\eOA" up-line-or-search
+bindkey "\e[B" down-line-or-search
+bindkey "\eOB" down-line-or-search
+
+# Terminal.app's shell integration. Nothing to load under iTerm, but a recovery boot or an
+# "Open in Terminal" still gets it.
+[[ -r "/etc/zshrc_$TERM_PROGRAM" ]] && source "/etc/zshrc_$TERM_PROGRAM"
+{{ end -}}
