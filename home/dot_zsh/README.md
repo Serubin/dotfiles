@@ -8,7 +8,9 @@
 | Shell startup — `zsh -li` (login, e.g. ssh), work-mac | ~78ms |
 | Shell startup — `zsh -i`, work-devbox | ~150ms |
 | Shell startup — `zsh -li`, work-devbox | ~155ms |
-| Prompt render (in git repo) | ~4ms |
+| Prompt render — 115-file repo | ~4ms |
+| Prompt render — 5k-file repo | ~11ms |
+| Prompt render — 43k-file repo | ~9ms |
 
 Re-measure anytime with `scripts/bench-zsh.sh`, and note which shell *shape* you are
 measuring — a tmux pane is `zsh -i` (`default-command` is `/usr/bin/env zsh`, so panes are
@@ -20,6 +22,14 @@ deja's generated `init.zsh`, 9ms of zsh-syntax-highlighting. `compinit` is ~0ms 
 `.zcompdump.zwc`, and `zcompile`-ing `~/.zsh/*` was measured and gained nothing. Dropping
 zinit for direct `source` calls measures at a further ~15ms and is the next thing worth
 doing.
+
+Prompt render is gitstatus and nothing else — `prompt_pwd`, the `PROMPT` expansion and the
+syntax-highlighting and deja precmd hooks come to under 0.6ms combined, whatever the repo.
+gitstatus cost scales with repo size, and proving a *clean* repo clean is the worst case,
+since it has to walk every file. `gitstatus_start`'s `-m 10000` caps that: past 10k files
+in the index the dirty scan is skipped (43k files went from 162ms to 9ms) and the prompt
+shows a yellow `?` after the branch instead of a red `*`, meaning "not checked". Staged
+changes still show `*` there, since those come from the index and stay cheap.
 
 On work-devbox, roughly 20ms is this repo and the rest is the machine's system config.
 On work-devbox the base image was responsible for ~874ms of a ~1018ms pane until
