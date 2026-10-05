@@ -10,6 +10,10 @@ git_color_dirty=$Red # Dirty working directory
 git_dirty_prefix=""
 git_dirty_suffix="*"
 
+git_color_unknown=$Yellow # Too many files to check; see prompt-git's -m
+git_unknown_prefix=""
+git_unknown_suffix="?"
+
 
 PromptSymbol="❯"
 

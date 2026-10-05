@@ -23,8 +23,10 @@ fi
 source "$_gitstatus_plugin"
 unset _gitstatus_plugin
 
+# -m caps the dirty scan by index size: a clean 43k-file repo has to be walked in full to
+# prove it is clean, which costs 162ms of every prompt. Past the cap git_stat renders `?`.
 gitstatus_stop PROMPT 2>/dev/null
-gitstatus_start -s 1 -u 1 -c 1 -d 1 PROMPT
+gitstatus_start -s 1 -u 1 -c 1 -d 1 -m 10000 PROMPT
 
 function git_stat() {
     gitstatus_query PROMPT || return
@@ -79,11 +81,22 @@ function git_stat() {
         branch="(${VCS_STATUS_COMMIT[1,7]}...)"
     fi
 
-    local dirty=0
-    (( VCS_STATUS_NUM_STAGED + VCS_STATUS_NUM_UNSTAGED + VCS_STATUS_NUM_UNTRACKED + VCS_STATUS_NUM_CONFLICTED > 0 )) && dirty=1
+    # HAS_*, not NUM_*: past gitstatus_start's -m threshold the counts read 0 whether the
+    # tree is clean or unscanned, and only these three carry the -1 that tells them apart.
+    local dirty=0 unknown=0
+    if (( VCS_STATUS_HAS_STAGED > 0 )); then
+        # Staged comes from the index, which is read either way, so it outranks an unknown.
+        dirty=1
+    elif (( VCS_STATUS_HAS_UNSTAGED < 0 || VCS_STATUS_HAS_UNTRACKED < 0 || VCS_STATUS_HAS_CONFLICTED < 0 )); then
+        unknown=1
+    elif (( VCS_STATUS_HAS_UNSTAGED > 0 || VCS_STATUS_HAS_UNTRACKED > 0 || VCS_STATUS_HAS_CONFLICTED > 0 )); then
+        dirty=1
+    fi
 
     if (( dirty )); then
         echo "${git_color_dirty}${git_dirty_prefix}${branch}${action}${git_dirty_suffix}${Color_Off}"
+    elif (( unknown )); then
+        echo "${git_color_unknown}${git_unknown_prefix}${branch}${action}${git_unknown_suffix}${Color_Off}"
     else
         echo "${git_color_clean}${git_clean_prefix}${branch}${action}${git_clean_suffix}${Color_Off}"
     fi
