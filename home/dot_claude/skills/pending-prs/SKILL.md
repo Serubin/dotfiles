@@ -1,12 +1,14 @@
 ---
 name: pending-prs
-description: List the user's open, non-draft work PRs that still need review, formatted as a paste-ready Slack review-request post (emoji theme line, bold per-service headers, one bullet per PR with the title and a bare URL). Read-only; never posts. Use when the user says "which of my PRs need review", "show my open PRs needing review", "pending PRs", "review request post", "PRs to ask for review", "/pending-prs", or wants a Slack-ready list of their PRs awaiting approval.
+description: List the user's open, non-draft work PRs with their review status, formatted as a paste-ready Slack review-request post (emoji-legend line, bold per-service headers, one bullet per PR with a status emoji, the title, and a bare URL). Read-only; never posts. Use when the user says "which of my PRs need review", "show my open PRs needing review", "pending PRs", "review request post", "PRs to ask for review", "/pending-prs", or wants a Slack-ready list of their PRs awaiting approval.
 argument-hint: "[optional: theme line, or a lookback like '30d']"
 ---
 
 # Pending PRs
 
-Build the Slack post the user pastes into their team channel to ask for approvals.
+Build the Slack post the user pastes into their team channel to ask for approvals. It
+lists every open PR with a status emoji, so the channel can see what's waiting, what has
+comments, and what's done.
 
 **This skill never posts.** The output is text for the user to paste. Do not call any Slack
 send, draft, or schedule tool, and do not request reviewers or comment on the PRs.
@@ -15,7 +17,7 @@ send, draft, or schedule tool, and do not request reviewers or comment on the PR
 
 $ARGUMENTS
 
-- A quoted phrase or sentence is the theme for the opening `:code-review:` line.
+- A quoted phrase or sentence is a theme line placed under the legend line.
 - A lookback like `30d` or `all` widens the age window (default: 14 days).
 
 ## 1. Collect candidates
@@ -47,18 +49,24 @@ Drop everything else without mentioning it: repos under the user's own login
 
 ```bash
 gh pr view <N> -R <owner/repo> \
-  --json number,title,url,isDraft,reviewDecision,baseRefName,headRefName,createdAt,files
+  --json number,title,url,isDraft,author,reviewDecision,latestReviews,reviews,comments,baseRefName,headRefName,createdAt,files
 ```
 
-Run these in parallel (one Bash call with a loop is fine). Then classify:
+Run these in parallel (one Bash call with a loop is fine).
 
-| Condition | Result |
+Drop `isDraft` PRs (the search filter should already have removed them), and drop PRs older
+than the lookback window from the post but list them in the terminal as stale. Every other
+PR goes in the post with one status emoji, checked top to bottom:
+
+| Condition | Emoji |
 |---|---|
-| `isDraft` true | drop (search filter should already have removed it) |
-| `reviewDecision == APPROVED` | drop: it doesn't need review |
-| `reviewDecision == CHANGES_REQUESTED` | drop from the post; list it in the terminal as "changes requested, yours to fix" |
-| `REVIEW_REQUIRED` or empty (repo has no required reviewers) | **include** |
-| older than the lookback window | drop from the post; list it in the terminal as stale |
+| `reviewDecision == APPROVED`, or (repo has no required reviewers, so `reviewDecision` is empty) any `latestReviews` entry is `APPROVED` | `:white_check_mark:` |
+| `reviewDecision == CHANGES_REQUESTED`, or any review or PR comment from a human other than the PR author | `:speech_balloon:` |
+| anything else: no human has touched it yet | `:hourglass_flowing_sand:` |
+
+"Human" excludes the PR author and bots: `github-actions`, any login ending in `[bot]`, and
+review bots such as `copilot-pull-request-reviewer`. CI and Tilt bots comment on most PRs,
+so counting them would mark everything `:speech_balloon:`.
 
 ## 4. Assign each PR to a service header
 
@@ -89,31 +97,36 @@ session or PR body shows the link. Never guess one.
 Put the post in a single fenced code block so it copies cleanly:
 
 ```
-:code-review: <theme line>
+:code-review:  emoji legend :white_check_mark: = reviewed, :speech_balloon: = comments and no approval, :hourglass_flowing_sand: = waiting
+<theme line, only if one was given>
 
 *<service>:*
-• <full PR title verbatim> <bare PR URL>
-• <title> <url> (stacked on <N>)
+• :white_check_mark: <full PR title verbatim> <bare PR URL>
+• :hourglass_flowing_sand: <title> <url> (stacked on <N>)
 
 *<other service>:*
-• <title> <url>
+• :speech_balloon: <title> <url>
 ```
 
 Rules:
 
-- Theme line: use the argument if one was given. Otherwise write `a few review requests`
-  (or `a review request` for exactly one PR). Don't invent a theme.
-- Bold header is `*<service>:*`, with a blank line between groups.
+- The legend line is fixed text, copied exactly as above (two spaces after
+  `:code-review:`), even if some emoji don't appear in this post.
+- Theme line: use the argument if one was given, on its own line right under the legend.
+  Otherwise leave the line out. Don't invent a theme.
+- Bold header is `*<service>:*`, with a blank line between groups. The user has Slack's
+  "Format messages with markup" preference on, so pasted `*bold*` and `:emoji:` codes render
+  when sent.
 - Use the `•` bullet character, not `*` or `-`.
-- Copy the title verbatim, then one space and the **bare** URL. No colon, and no
-  `<url|text>` mrkdwn: that shows up as literal text when pasted into the Slack composer,
-  and Slack shortens bare URLs by itself.
+- After the bullet, the status emoji, one space, the title verbatim, then one space and the
+  **bare** URL. No colon, and no `<url|text>` mrkdwn: that shows up as literal text when
+  pasted into the Slack composer, and Slack shortens bare URLs by itself.
 - Leave out sizes, CI status, ticket keys, ages, and reviewer names.
 - Order groups by their newest PR, newest first. Inside a group, put a stack in order from
   bottom to top, and otherwise newest first.
 - No em-dashes.
 
-After the code block, add a short terminal-only note (not part of the post) that lists
-what was left out and why: approved, changes requested, stale beyond the window. Give the
-number and repo for each so the user can widen the window if they want. If nothing needs
-review, say so and skip the code block.
+After the code block, add a short terminal-only note (not part of the post): a count per
+status, and the PRs left out as stale beyond the window, with number and repo for each so
+the user can widen the window if they want. If there are no open PRs in the window, say so
+and skip the code block.
