@@ -91,7 +91,7 @@ lazy_load_nvm() {
 # Route `claude` to a per-account config dir, and default to bypassing permissions.
 # `--work` / `--personal` are consumed here so everything after them still reaches the
 # real CLI; the default account comes from CLAUDE_CONFIG_DIR (set in ~/.zsh/zz-env).
-claude() {
+_claude_routed() {
   local arg cfg=${CLAUDE_CONFIG_DIR:-$HOME/.claude-personal} ddash=0
   local -a args perms
 
@@ -117,5 +117,22 @@ claude() {
     perms=(--dangerously-skip-permissions)
   fi
 
-  CLAUDE_CONFIG_DIR=$cfg command claude "${perms[@]}" "${args[@]}"
+  # cmux's wrapper adds the session hooks behind its sidebar status, notifications and resume.
+  if (( $+functions[_cmux_claude_wrapper_command] )); then
+    CLAUDE_CONFIG_DIR=$cfg _cmux_claude_wrapper_command "${perms[@]}" "${args[@]}"
+  else
+    CLAUDE_CONFIG_DIR=$cfg command claude "${perms[@]}" "${args[@]}"
+  fi
 }
+claude() { _claude_routed "$@"; }
+
+# cmux redefines `claude` on the first prompt from a hook registered before ~/.zshrc,
+# so this one-shot hook runs right after it and takes the name back.
+if [[ -n $CMUX_SHELL_INTEGRATION_DIR ]]; then
+  _claude_reclaim() {
+    claude() { _claude_routed "$@"; }
+    add-zsh-hook -d precmd _claude_reclaim
+  }
+  autoload -U add-zsh-hook
+  add-zsh-hook precmd _claude_reclaim
+fi
