@@ -50,6 +50,7 @@ FORCE = {
     },
     "model": "opus",
     "effortLevel": "xhigh",
+    "subagentPromptCacheTtl": "1h",
     "outputStyle": "Concise",
     "tui": "fullscreen",
     "skipAutoPermissionPrompt": True,
