@@ -1,6 +1,6 @@
 ---
 name: pending-prs
-description: List the user's open, non-draft work PRs with their review status, formatted as a paste-ready Slack review-request post (emoji-legend line, bold per-service headers, one bullet per PR with a status emoji, the title, and a bare URL). Read-only; never posts. Use when the user says "which of my PRs need review", "show my open PRs needing review", "pending PRs", "review request post", "PRs to ask for review", "/pending-prs", or wants a Slack-ready list of their PRs awaiting approval.
+description: List the user's open, non-draft work PRs with their review status, formatted as a paste-ready Slack review-request post (emoji-legend line, plain per-service headers, one bullet per PR with a status emoji, the title, and a bare URL). Read-only; never posts. Use when the user says "which of my PRs need review", "show my open PRs needing review", "pending PRs", "review request post", "PRs to ask for review", "/pending-prs", or wants a Slack-ready list of their PRs awaiting approval.
 argument-hint: "[optional: theme line, or a lookback like '30d']"
 ---
 
@@ -100,11 +100,11 @@ Put the post in a single fenced code block so it copies cleanly:
 :code-review:  emoji legend :white_check_mark: = reviewed, :speech_balloon: = comments and no approval, :hourglass_flowing_sand: = waiting
 <theme line, only if one was given>
 
-*<service>:*
+<service>:
 • :white_check_mark: <full PR title verbatim> <bare PR URL>
 • :hourglass_flowing_sand: <title> <url> (stacked on <N>)
 
-*<other service>:*
+<other service>:
 • :speech_balloon: <title> <url>
 ```
 
@@ -114,9 +114,8 @@ Rules:
   `:code-review:`), even if some emoji don't appear in this post.
 - Theme line: use the argument if one was given, on its own line right under the legend.
   Otherwise leave the line out. Don't invent a theme.
-- Bold header is `*<service>:*`, with a blank line between groups. The user has Slack's
-  "Format messages with markup" preference on, so pasted `*bold*` and `:emoji:` codes render
-  when sent.
+- Header is a plain `<service>:` line, with a blank line between groups. No `*bold*`:
+  Slack's composer doesn't convert pasted markup, so the asterisks would show literally.
 - Use the `•` bullet character, not `*` or `-`.
 - After the bullet, the status emoji, one space, the title verbatim, then one space and the
   **bare** URL. No colon, and no `<url|text>` mrkdwn: that shows up as literal text when
