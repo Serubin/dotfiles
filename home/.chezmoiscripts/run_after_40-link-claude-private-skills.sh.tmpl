@@ -1,0 +1,11 @@
+#!/bin/bash
+# Link the private Claude skills repo into ~/.claude/skills; runs every apply to pick up manual pulls.
+{{- $repo := dig "claudeSkillsRepo" "" . }}
+{{- if contains "'" $repo }}
+echo "claude-skills-sync: claudeSkillsRepo contains a single quote; skipping" >&2
+exit 0
+{{- else }}
+sync="$HOME/.local/bin/claude-skills-sync"
+[ -x "$sync" ] || exit 0
+exec "$sync" --repo {{ $repo | squote }}
+{{- end }}

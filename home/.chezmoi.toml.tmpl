@@ -48,6 +48,14 @@
 {{-   $coderHost = promptStringOnce . "coderHost" "coder ssh host for sleep/wake hooks (blank if none)" "" -}}
 {{- end -}}
 
+{{- /* claudeSkillsRepo: SSH URL of a private Claude skills repo, linked into
+       ~/.claude/skills by claude-skills-sync; blank disables. Prompted so the
+       public repo never names it. */ -}}
+{{- $claudeSkillsRepo := env "DOTFILES_CLAUDE_SKILLS_REPO" -}}
+{{- if not $claudeSkillsRepo -}}
+{{-   $claudeSkillsRepo = promptStringOnce . "claudeSkillsRepo" "private Claude skills repo (SSH URL; blank to disable)" "" -}}
+{{- end -}}
+
 {{- /* cacheVolumeID / awsAccountID: the /mnt/cache EBS build cache on a work-devbox.
        Prompted rather than hardcoded for the same reason as the git identity above --
        this repo is public, and an EBS volume id plus an AWS account id are work
@@ -76,6 +84,7 @@ sourceDir = {{ (joinPath .chezmoi.homeDir ".dotfiles") | quote }}
     coderHost = {{ $coderHost | quote }}
     cacheVolumeID = {{ $cacheVolumeID | quote }}
     awsAccountID = {{ $awsAccountID | quote }}
+    claudeSkillsRepo = {{ $claudeSkillsRepo | quote }}
 
 [data.git]
     name = {{ $name | quote }}
