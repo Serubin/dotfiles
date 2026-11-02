@@ -8,8 +8,8 @@
 # state too and each account dir symlinks into it -- those symlinks are chezmoi entries
 # written right after this script.
 #
-# run_BEFORE_ on purpose: chezmoi cannot write a symlink over a 58M real directory, so the
-# merge and the move-aside have to happen before it writes files. Do not "fix" this to
+# run_BEFORE_ on purpose: chezmoi replaces a real directory with a symlink by deleting it, so
+# the merge and the move-aside have to happen before it writes files. Do not "fix" this to
 # run_once_after_.
 #
 # Nothing is deleted. Drained copies move to ~/.claude-split-backup-<stamp>/ for the user

@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# Clone a private Claude repo and link its skills/ and agents/ into ~/.claude.
+# usage: claude-skills-sync [--pull] [--repo URL]   (no --repo: read it from chezmoi data; "" disables)
+set -uo pipefail
+
+CLONE="$HOME/.local/share/claude-skills-private"
+SKILLS="$HOME/.claude/skills"
+AGENTS="$HOME/.claude/agents"
+
+log()  { echo "[claude-skills-sync] $*"; }
+warn() { echo "[claude-skills-sync] $*" >&2; }
+
+pull=0
+repo_set=0
+repo=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --pull)   pull=1; shift ;;
+        --repo)   [ $# -ge 2 ] || { warn "--repo needs a value"; exit 2; }; repo="$2"; repo_set=1; shift 2 ;;
+        --repo=*) repo="${1#*=}"; repo_set=1; shift ;;
+        -h|--help) sed -n 3p "$0" | sed 's/^# //'; exit 0 ;;
+        *) warn "unknown argument: $1"; exit 2 ;;
+    esac
+done
+
+if [ "$repo_set" -eq 0 ]; then
+    repo="$(chezmoi execute-template '{{ dig "claudeSkillsRepo" "" . }}' 2>/dev/null)" || repo=""
+fi
+
+# Never fails the caller: a missing key or offline host must not block `chezmoi apply`.
+[ -t 0 ] || export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh -o BatchMode=yes}"
+linkable=0
+if [ -n "$repo" ]; then
+    if [ ! -e "$CLONE" ]; then
+        log "cloning private skills into $CLONE"
+        mkdir -p "$(dirname "$CLONE")"
+        if GIT_TERMINAL_PROMPT=0 git clone --quiet -- "$repo" "$CLONE"; then
+            linkable=1
+        else
+            warn "clone failed; skipping"
+        fi
+    elif [ ! -d "$CLONE/.git" ]; then
+        warn "$CLONE exists but is not a git checkout; unlinking its skills"
+    elif origin="$(git -C "$CLONE" remote get-url origin 2>/dev/null)"; [ "$origin" != "$repo" ]; then
+        warn "$CLONE tracks '$origin', not the configured '$repo'; unlinking its skills"
+    else
+        linkable=1
+        if [ "$pull" -eq 1 ]; then
+            GIT_TERMINAL_PROMPT=0 git -C "$CLONE" pull --quiet --ff-only \
+                || warn "pull failed (dirty tree or diverged history); linking what is checked out"
+        fi
+    fi
+elif [ "$pull" -eq 1 ]; then
+    warn "no private skills repo configured; nothing to pull"
+fi
+
+# A skill is a dir holding SKILL.md; an agent is a single .md file.
+valid() {
+    case "$1" in
+        skill) [ -f "$2/SKILL.md" ] ;;
+        agent) [ -f "$2" ] ;;
+    esac
+}
+
+# Prune links into the clone that are dangling, or all of them when it can't be trusted.
+prune_dir() {
+    local kind="$1" dir="$2" dest target
+    for dest in "$dir"/*; do
+        [ -L "$dest" ] || continue
+        target="$(readlink "$dest")"
+        case "$target" in "$CLONE"/*) ;; *) continue ;; esac
+        if [ "$linkable" -eq 0 ] || ! valid "$kind" "$target"; then
+            rm -f -- "$dest" && log "unlinked $kind $(basename "$dest")"
+        fi
+    done
+}
+
+link_one() {
+    local kind="$1" src="$2" name="$3" dest="$4"
+    if [ -L "$src" ] || [[ ! "$name" =~ ^[A-Za-z0-9_][A-Za-z0-9._-]*$ ]]; then
+        warn "skipping $kind '$name': a symlink or not a safe name"
+        return
+    fi
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+        return
+    fi
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        case "$(readlink "$dest" 2>/dev/null)" in
+            "$CLONE"/*) ;;
+            *) warn "skipping $kind '$name': $dest already exists and is not ours"; return ;;
+        esac
+    fi
+    # -n: replace an existing directory link instead of creating a link inside it.
+    if ln -sfn -- "$src" "$dest"; then log "linked $kind $name"; else warn "could not link $kind $name"; fi
+}
+
+mkdir -p "$SKILLS" "$AGENTS"
+prune_dir skill "$SKILLS"
+prune_dir agent "$AGENTS"
+
+[ "$linkable" -eq 1 ] || exit 0
+
+for manifest in "$CLONE"/skills/*/SKILL.md; do
+    [ -f "$manifest" ] || continue
+    src="$(dirname "$manifest")"
+    name="$(basename "$src")"
+    link_one skill "$src" "$name" "$SKILLS/$name"
+done
+for src in "$CLONE"/agents/*.md; do
+    [ -f "$src" ] || continue
+    name="$(basename "$src")"
+    link_one agent "$src" "${name%.md}" "$AGENTS/$name"
+done
+exit 0

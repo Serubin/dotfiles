@@ -341,13 +341,49 @@ files only, so documents — `.md` and the like — are never inspected. `hooks`
 merge script's `FORCE` block, so the repo owns the hook list and a live `/hooks` edit does
 not survive the next `apply`.
 
+**Private skills and agents.** Skills and subagents that shouldn't be public live in a
+separate private repo laid out as `skills/<name>/SKILL.md` and `agents/<name>.md`. Each
+machine opts in on its own:
+`chezmoi init` asks for the repo's SSH URL (or set `DOTFILES_CLAUDE_SKILLS_REPO`), and
+leaving it blank turns the feature off. On a machine set up before this existed, re-run
+`chezmoi init` to get the prompt. The URL is stored only in that machine's
+`~/.config/chezmoi/chezmoi.toml`, never in this repo.
+
+On every `apply`, `run_after_40-link-claude-private-skills.sh` calls
+`~/.local/bin/claude-skills-sync`, which:
+
+- clones the repo to `~/.local/share/claude-skills-private` if it isn't there yet;
+- symlinks each skill into `~/.claude/skills/<name>` and each agent into
+  `~/.claude/agents/<name>.md` (both logins see them through the shared dirs);
+- refuses to replace anything that isn't already one of its own links, so a private
+  skill can't shadow a public one like `commit`;
+- removes links whose skill or agent was deleted. It removes all of its links when the URL is
+  blank, or when the clone no longer tracks the configured URL (repointing the URL
+  unloads the old repo).
+
+A failed clone or pull only prints a warning, so a machine without the SSH key still
+applies everything else.
+
+Updates are deliberate: `apply` never pulls. Run `claude-skills-sync --pull` to
+fast-forward and relink. The clone is a normal checkout, so author skills there,
+then commit and push.
+
+> **Trust:** the `claude` wrapper runs with `--dangerously-skip-permissions`, so anything
+> pulled from that repo becomes instructions, and possibly scripts, that run without a
+> prompt. Treat the repo, and the GitHub account behind it, as code execution on every
+> opted-in machine: keep 2FA and branch protection on.
+
+> **Don't leak names:** never `chezmoi add` a linked private skill. That commits a
+> `symlink_` entry naming it in this public repo. Use placeholders, not real repo or skill
+> names, in anything committed here.
+
 **Two logins on one machine.** Claude Code keys its entire identity — auth,
 `.claude.json`, projects, history — off `CLAUDE_CONFIG_DIR`, so a second account needs a
 second directory. `~/.claude` stays the one store and each account dir symlinks into it,
 so switching accounts does not fork your conversations:
 
 ```
-~/.claude/            everything: CLAUDE.md, skills/, settings*.json, statusline,
+~/.claude/            everything: CLAUDE.md, skills/, agents/, settings*.json, statusline,
                       projects/ (incl. per-project memory/), sessions/, history.jsonl,
                       plans/, tasks/, teams/, file-history/, paste-cache/, …
 ~/.claude-personal/   ─┐ all of the above are symlinks back into ~/.claude; only
