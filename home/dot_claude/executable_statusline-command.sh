@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code statusLine
-# Format: cwd (branch) [tsh:cluster] model effort ctx:X% period:Y% t:Z%|ink/outk session
+# Format: cwd (branch) [tsh:cluster] [agent:name] model effort ctx:X% period:Y% t:Z%|ink/outk session
 input=$(cat)
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 model=$(echo "$input" | jq -r '.model.display_name // ""' | grep -oiE 'sonnet|opus|haiku|claude' | head -1 | tr '[:upper:]' '[:lower:]')
@@ -80,6 +80,53 @@ else
   tsh_str=""
 fi
 
+# This session's SendMessage address. Refreshed detached: Claude Code cancels a slow status line.
+agent_name=""
+if [[ "$session_id" =~ ^[0-9a-fA-F-]+$ ]]; then
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/claude-statusline"
+  cache_file="$cache_dir/addr-$session_id"
+  mkdir -p -m 700 "$cache_dir" 2>/dev/null
+  if [ -O "$cache_dir" ]; then
+    write_addr() {
+      local tmp
+      tmp=$(mktemp "$cache_dir/.addr.XXXXXX" 2>/dev/null) || return
+      { printf '%s\n%s\n' "$1" "$2" > "$tmp" && mv -f "$tmp" "$cache_file"; } || rm -f "$tmp"
+    }
+    now=$(date +%s)
+    cached_at=""
+    if [ -r "$cache_file" ]; then
+      { read -r cached_at; read -r agent_name; } < "$cache_file"
+    fi
+    age=-1
+    [[ "$cached_at" =~ ^[0-9]+$ ]] && age=$(( now - cached_at ))
+    if [ "$age" -lt 0 ] || [ "$age" -ge 30 ]; then
+      # Claim the refresh so concurrent runs within 30s don't spawn their own.
+      write_addr "$now" "$agent_name"
+      if command -v claude >/dev/null 2>&1; then
+        to=()
+        command -v timeout >/dev/null 2>&1 && to=(timeout 5)
+        set -m 2>/dev/null
+        (
+          name=$("${to[@]}" claude agents --json 2>/dev/null \
+            | jq -r --arg id "$session_id" 'first(.[] | select(.sessionId == $id) | .name) // empty' 2>/dev/null \
+            | LC_ALL=C tr -cd '[:print:]')
+          [ -n "$name" ] && write_addr "$(date +%s)" "$name"
+          find "$cache_dir" \( -name 'addr-*' -mtime +7 -o -name '.addr.*' -mtime +1 \) -delete 2>/dev/null
+        ) </dev/null >/dev/null 2>&1 &
+        disown
+        set +m 2>/dev/null
+      fi
+    fi
+  fi
+fi
+agent_name=$(printf '%s' "$agent_name" | LC_ALL=C tr -cd '[:print:]')
+
+if [ -n "$agent_name" ]; then
+  agent_str=$(printf ' \033[00;95m[agent:%s]\033[00m' "$agent_name")
+else
+  agent_str=""
+fi
+
 home_dir="$HOME"
 short_cwd="${cwd/#$home_dir/\~}"
-printf '\033[01;34m%s\033[00m%s%s\n%s' "$short_cwd" "$branch_str" "$tsh_str" "$ctx_str"
+printf '\033[01;34m%s\033[00m%s%s%s\n%s' "$short_cwd" "$branch_str" "$tsh_str" "$agent_str" "$ctx_str"
