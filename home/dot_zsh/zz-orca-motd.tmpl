@@ -1,0 +1,5 @@
+{{ if eq .class "work-devbox" -}}
+# Orca opens each pane as a fresh `zsh -l` with SHLVL=0, so /etc/zsh/zlogin's lw-doctor banner
+# passes its own guards. Unset here, after /etc/zsh/zshrc, it skips only /etc/zsh/zlogin{,out}.
+[[ $TERM_PROGRAM == Orca ]] && unsetopt GLOBAL_RCS
+{{- end }}
