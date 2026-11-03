@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Coder workspace keep-alive. Holds the autostop deadline out until STOP_HOUR
-# (evaluated in TZ_NAME) on weekdays, then lets the workspace autostop normally.
+# Coder workspace keep-alive. Holds the autostop deadline out through a weekly window
+# (START to STOP, evaluated in TZ_NAME), then lets the workspace autostop normally.
 #
 # WHY: the team's 2h autostop reclaims the workspace during long meetings or lunch
 # (no activity -> deadline lapses). The Mac-side `fwd` SOCKS tunnel kept it alive by
@@ -17,16 +17,18 @@
 #
 # Subcommands:
 #   install   provision stable binary + state env + install cron + one run (boot)
-#   run       cron target: extend the deadline if before STOP_HOUR on a weekday
+#   run       cron target: extend the deadline while inside the weekly window
 #   --check   print the decision WITHOUT calling coder (dry-run; honors
 #             KEEPALIVE_FAKE_EPOCH=<unix-seconds> to simulate the clock)
 set -uo pipefail
 
 # ---- tunables -------------------------------------------------------------
-STOP_HOUR=18                     # local hour after which we stop bumping (0-23)
-TZ_NAME="America/New_York"       # timezone STOP_HOUR is evaluated in
-WEEKDAYS_ONLY=1                  # 1 = Mon-Fri only
-CAP_MIN=115                      # max minutes to extend per tick (< the 2h TTL)
+START_DOW=1                      # window opens: weekday (1=Mon..7=Sun) ...
+START_HOUR=7                     # ... and local hour (0-23)
+STOP_DOW=5                       # window closes; must follow START in the same Mon-Sun week
+STOP_HOUR=20
+TZ_NAME="America/New_York"       # timezone the window is evaluated in
+CAP_MIN=600                      # max minutes per extend; also the grace if ticks stop
 MIN_FUTURE_MIN=30                # coder rejects extends < 30 min in the future
 CRON_SPEC="*/15 * * * *"         # cadence; CAP_MIN tolerates several missed ticks
 
@@ -63,32 +65,41 @@ load_env() {
 }
 
 # ---- decision -------------------------------------------------------------
-# Echo "dow mins": ET weekday (1=Mon..7=Sun) and whole minutes until today's
-# STOP_HOUR:00 in TZ_NAME, both from now_epoch() so --check can simulate. Epoch
-# subtraction, not HH:MM arithmetic, so it stays correct across the hour and DST.
+
+# Epoch of <hour>:00 in TZ_NAME on weekday <target_dow> of the Mon-Sun week holding <ymd>
+# (weekday <dow>). Day arithmetic runs at UTC noon so a DST change can't skip a day.
+week_epoch() {
+    local day
+    day="$(TZ=UTC date -d "$1 12:00 UTC $(( $3 - $2 )) days" +%Y-%m-%d)"
+    TZ="$TZ_NAME" date -d "$day $4:00:00" +%s
+}
+
+# Echo "dow to_open to_close": ET weekday and whole minutes until this week's window
+# edges, by epoch subtraction so DST is handled; now_epoch() lets --check simulate.
 compute() {
-    local now dow ymd target
+    local now dow ymd open close
     now="$(now_epoch)"
     dow="$(TZ="$TZ_NAME" date -d "@$now" +%u)"
     ymd="$(TZ="$TZ_NAME" date -d "@$now" +%Y-%m-%d)"
-    target="$(TZ="$TZ_NAME" date -d "$ymd ${STOP_HOUR}:00:00" +%s)"
-    echo "$dow $(( (target - now) / 60 ))"
+    open="$(week_epoch "$ymd" "$dow" "$START_DOW" "$START_HOUR")"
+    close="$(week_epoch "$ymd" "$dow" "$STOP_DOW" "$STOP_HOUR")"
+    echo "$dow $(( (open - now) / 60 )) $(( (close - now) / 60 ))"
 }
 
 # Echo "SKIP <reason>" or "EXTEND <minutes>".
 decide() {
-    local dow mins dur
-    read -r dow mins < <(compute)
-    if [ "$WEEKDAYS_ONLY" = "1" ] && [ "$dow" -gt 5 ]; then
-        echo "SKIP weekend (dow=$dow)"; return 0
+    local dow to_open to_close dur
+    read -r dow to_open to_close < <(compute)
+    if [ "$to_open" -gt 0 ]; then
+        echo "SKIP before window opens (dow=$dow, mins=$to_open)"; return 0
     fi
-    if [ "$mins" -le 0 ]; then
-        echo "SKIP past ${STOP_HOUR}:00 ${TZ_NAME} (mins=$mins)"; return 0
+    if [ "$to_close" -le 0 ]; then
+        echo "SKIP past window close (dow=$dow, mins=$to_close)"; return 0
     fi
-    if [ "$mins" -lt "$MIN_FUTURE_MIN" ]; then
-        echo "SKIP within ${MIN_FUTURE_MIN}m of ${STOP_HOUR}:00 (mins=$mins); prior tick governs"; return 0
+    if [ "$to_close" -lt "$MIN_FUTURE_MIN" ]; then
+        echo "SKIP within ${MIN_FUTURE_MIN}m of window close (mins=$to_close); prior tick governs"; return 0
     fi
-    dur="$mins"; [ "$dur" -gt "$CAP_MIN" ] && dur="$CAP_MIN"
+    dur="$to_close"; [ "$dur" -gt "$CAP_MIN" ] && dur="$CAP_MIN"
     echo "EXTEND $dur"
 }
 
@@ -130,7 +141,7 @@ do_run() {
     # the soft-TTL viability check already passed, so this only surfaces regressions.
     local stops_next got req skew real_now
     stops_next="$(coder_cli schedule show "$WS" -o json 2>/dev/null \
-        | grep -o '"stops_next"[^,]*' | grep -oE '[0-9-]+T[0-9:]+Z' | head -1)"
+        | grep -o '"stops_next"[^,]*' | grep -oE '[0-9-]+T[0-9:.]+(Z|[+-][0-9]{2}:[0-9]{2})' | head -1)"
     if [ -n "$stops_next" ]; then
         real_now="$(date +%s)"                       # real clock: server extends from real now
         got="$(date -d "$stops_next" +%s 2>/dev/null || echo 0)"
@@ -208,11 +219,11 @@ do_install() {
 # ---- check (dry-run) ------------------------------------------------------
 do_check() {
     load_env
-    local dow mins decision now
-    read -r dow mins < <(compute)
+    local dow to_open to_close decision now
+    read -r dow to_open to_close < <(compute)
     now="$(now_epoch)"
     decision="$(decide)"
-    echo "now (${TZ_NAME}): $(TZ="$TZ_NAME" date -d "@$now" '+%Y-%m-%d %H:%M:%S %Z')  (dow=$dow, mins_to_${STOP_HOUR}:00=$mins)"
+    echo "now (${TZ_NAME}): $(TZ="$TZ_NAME" date -d "@$now" '+%Y-%m-%d %H:%M:%S %Z')  (dow=$dow, mins_to_open=$to_open, mins_to_close=$to_close)"
     echo "workspace:       $WS"
     echo "stable binary:   $([ -x "$BIN" ] && echo "$BIN" || echo 'MISSING')"
     echo "decision:        $decision"
