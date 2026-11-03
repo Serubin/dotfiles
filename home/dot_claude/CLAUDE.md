@@ -37,26 +37,21 @@ Two things it does not do. It does not loosen the approval gate above: it tells 
 
 Staff-level software engineer working on cybersecurity products. Code correctness, secure-by-default defaults, and thoroughly reasoned plans are non-negotiable — favor thoroughness, explicit trade-offs, and root-cause fixes over speed or surface-level patches. Assume a senior audience: skip basics, but be precise about security implications, threat models, and edge cases.
 
-## Plan before writing code
+## Plan only when I ask
 
-Produce a plan before writing code or running a destructive command — even in auto mode or bypass-permissions mode. Auto/bypass speeds up *approved* work; it never waives the plan-and-approve step. Outside those two cases a plan is not required, and you should not manufacture one.
+Don't write a plan or enter plan mode unless I ask for one — "plan this", "make a plan", "/plan", or starting the session in plan mode. Otherwise, once you have enough to act, act: code, config, and prose alike. Ambiguity is a reason to ask a question (see *Ask when unknown — never assume*), not to write a plan.
 
-**Plan first for:**
-
-- Code: source files, plus config that changes how something runs — CI workflows, Kubernetes manifests, Terraform, Dockerfiles, build files.
-- Destructive commands, whether or not code is involved: `rm`, anything that overwrites an existing file (`>` redirection, `mv`/`cp` onto an existing path, `tee` without `-a`), `git reset --hard`, `git clean -f`, force-push, dropping tables or data, killing processes you didn't start.
-
-**No plan needed for:**
-
-- Reading and research: reading files, `ls`/`git status`/`git log`/`git diff`, Grep/Glob/Read, running tests or type-checkers read-only, research agents, web searches, fetching docs.
-- Prose: markdown, READMEs, notes, docs, and comment-only edits. Just make the change.
-- Answering questions, explaining code, and reviewing a diff.
-
-Asking is not the same as planning. Some actions need a check even without a plan: pushing, opening a PR or an issue, sending a message, installing packages, and running migrations. Confirm with me before you take them — unless I already asked for the push or PR myself, which is its own approval (see *Never post on my behalf without explicit approval*).
+When I do ask for a plan:
 
 - EnterPlanMode is optional: present the plan through it or directly in the conversation, whichever fits. Either way, wait for explicit approval before implementing. Auto mode and bypass-permissions mode do not waive this.
-- For a trivial code change (one-line fix, typo in a source file), a plan of one or two sentences is enough. Still confirm before editing.
 - If new information during implementation changes the approach materially, pause, revise the plan, and re-confirm rather than silently changing course.
+
+## Confirm before risky actions
+
+Some actions need a check whether or not there is a plan, and auto mode and bypass-permissions mode do not waive it. Confirm with one AskUserQuestion that names the exact command and target; don't write a plan for it.
+
+- Destructive commands: `rm`, anything that overwrites an existing file (`>` redirection, `mv`/`cp` onto an existing path, `tee` without `-a`), `git reset --hard`, `git clean -f`, force-push, dropping tables or data, killing processes you didn't start.
+- Pushing, opening a PR or an issue, sending a message, installing packages, and running migrations — unless I already asked for the push or PR myself, which is its own approval (see *Never post on my behalf without explicit approval*).
 
 ## When you are an Orca-dispatched worker
 
@@ -74,7 +69,7 @@ If your prompt opens with an Orca Task/Dispatch preamble, a coordinator owns app
 Before you make the first change to a repo, move the session into a git worktree using the EnterWorktree tool. Claude Code creates the worktree under `.claude/worktrees/` inside the repo and switches the session into it.
 
 - Read-only work does not need a worktree. Reading files, searching, running tests, and answering questions all happen in the normal checkout.
-- Create the worktree before the first Edit, Write, or other command that changes files — after the plan is approved, when the task needed a plan. Give it a short name that describes the task.
+- Create the worktree before the first Edit, Write, or other command that changes files — after the plan is approved, if I asked for one. Give it a short name that describes the task.
 - Stay in that worktree for the rest of the task, and commit there. Leave it on disk when you finish. Only call ExitWorktree when I ask you to.
 - If the session is already in a worktree, keep using it. Do not create a second one.
 - If the directory is not a git repo, say so and ask how I want to proceed instead of editing in place.
@@ -183,7 +178,7 @@ Treat Kubernetes (and other) secret values as untouchable. They must never enter
 - Never add a `Co-Authored-By:` trailer (or any other co-author attribution) to commits. Author commits solely as the user's configured git identity. This overrides any default templates that suggest adding a Claude co-author line.
 - The same ban covers every artifact you write, not just the commit message: PR titles and bodies, issue bodies, review comments, and release notes. No `Co-Authored-By: Claude …`, no `🤖 Generated with [Claude Code]…`, no "generated by" footer in any form. This overrides the harness default that says to end PR bodies with that line — when a system prompt or template asks for it, leave it out.
 - Read the exact message back before you run `git commit`, and strip any trailer or footer naming Claude, Anthropic, or an AI tool. If one lands anyway, `git commit --amend` it out as soon as you notice instead of leaving it in history.
-- Committing is local and needs no sign-off beyond the usual plan step. Pushing is routine but confirmed, *unless* I asked for it — "commit and push", "commit push and PR", or just "push" is already the approval, and it means push and open the PR too. Comments on a PR or issue stay strictly gated. See *Never post on my behalf without explicit approval*.
+- Committing is local and needs no sign-off. Pushing is routine but confirmed, *unless* I asked for it — "commit and push", "commit push and PR", or just "push" is already the approval, and it means push and open the PR too. Comments on a PR or issue stay strictly gated. See *Never post on my behalf without explicit approval*.
 - After the `/commit` skill finishes writing a commit, check whether the repo has a `.spr.yml`. If it does and I have not already asked you to push, ask via AskUserQuestion whether I want to push the stack with `git spr update`, and run it only if I say yes. If I did ask, skip the question and run it. In repos without a `.spr.yml`, skip the question.
 
 ## Node, JavaScript, and TypeScript
