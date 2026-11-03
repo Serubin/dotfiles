@@ -62,8 +62,8 @@ if command -v crontab >/dev/null 2>&1; then
     ( crontab -l 2>/dev/null | grep -vF '# tmux-periodic-save'; echo "$line" ) | crontab -
 fi
 
-# --- Coder keep-alive. Holds the workspace autostop deadline out until 6pm ET on
-# weekdays so a long meeting or lunch can't reclaim the box mid-day. The helper
+# --- Coder keep-alive. Holds the workspace autostop deadline out from Mon 7am to
+# Fri 8pm ET so idle time can't reclaim the box mid-week. The helper
 # (re)provisions a stable coder binary under ~/.local/state (the PATH one lives in a
 # per-SSH-session /tmp dir) and installs its own */15 cron -- both wiped on a host
 # restart, so like the tmux cron they are re-established here. It reuses the ambient
