@@ -13,9 +13,9 @@ the app reorders keys and writes machine-local preferences back on its own.
 chezmoi runs a modify_ script with the current target file on stdin and writes
 our stdout back to it, which lets the file have two writers. We own the keys in
 FORCE (re-injected on every apply) and the ones in SEED (written only when
-absent, so a fresh machine gets a default and later toggles survive). Everything
-else -- permissions.allow, enabledPlugins, and any key a future release adds --
-passes through untouched.
+absent, so a fresh machine gets a default and later toggles survive), plus our own
+entries in FORCE_HOOKS. Everything else -- permissions.allow, enabledPlugins, hooks
+other tools install, and any key a future release adds -- passes through untouched.
 
 Note: `chezmoi add`/`re-add` cannot round-trip this file. Edit the constants here.
 """
@@ -33,21 +33,6 @@ FORCE = {
         "type": "command",
         "command": "bash $HOME/.claude/statusline-command.sh",
     },
-    # Owned here rather than merged, so a rule cannot be dropped by a live /hooks edit.
-    "hooks": {
-        "PostToolUse": [
-            {
-                "matcher": "Edit|Write",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "python3 $HOME/.claude/check-comment-length.py",
-                        "timeout": 10,
-                    },
-                ],
-            },
-        ],
-    },
     "model": "opus",
     "effortLevel": "xhigh",
     "subagentPromptCacheTtl": "1h",
@@ -61,6 +46,22 @@ FORCE = {
 # `claude --permission-mode auto` falls back to.
 FORCE_PERMISSIONS = {
     "defaultMode": "auto",
+}
+
+# Re-injected per event on every apply; entries other tools install (Orca's agent hooks) survive.
+FORCE_HOOKS = {
+    "PostToolUse": [
+        {
+            "matcher": "Edit|Write",
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "python3 $HOME/.claude/check-comment-length.py",
+                    "timeout": 10,
+                },
+            ],
+        },
+    ],
 }
 
 # Written only when the key is missing.
@@ -78,6 +79,32 @@ SEED_PERMISSIONS = {
     ],
 {{- end }}
 }
+
+
+def _commands(entry):
+    hooks = entry.get("hooks") if isinstance(entry, dict) else None
+    return {h.get("command") for h in hooks or [] if isinstance(h, dict)}
+
+
+def merge_hooks(live):
+    """Swap our entries in at the position of any live copy, leaving foreign entries as-is."""
+    if not isinstance(live, dict):
+        live = {}
+    for event, ours in FORCE_HOOKS.items():
+        owned = set().union(*(_commands(e) for e in ours))
+        entries = live.get(event)
+        merged, placed = [], False
+        for entry in entries if isinstance(entries, list) else []:
+            if _commands(entry) & owned:
+                if not placed:
+                    merged.extend(ours)
+                    placed = True
+                continue
+            merged.append(entry)
+        if not placed:
+            merged.extend(ours)
+        live[event] = merged
+    return live
 
 
 def main() -> int:
@@ -100,6 +127,7 @@ def main() -> int:
 
     # Live key order first, so a no-op apply produces a no-op diff.
     settings.update(FORCE)
+    settings["hooks"] = merge_hooks(settings.get("hooks"))
     for key, value in SEED.items():
         settings.setdefault(key, value)
 
