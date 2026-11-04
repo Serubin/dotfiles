@@ -54,7 +54,7 @@ Produce a plan before writing code or running a destructive command — even in 
 
 Asking is not the same as planning. Some actions need a check even without a plan: pushing, opening a PR or an issue, sending a message, installing packages, and running migrations. Confirm with me before you take them — unless I already asked for the push or PR myself, which is its own approval (see *Never post on my behalf without explicit approval*).
 
-- Use EnterPlanMode to present the plan. Wait for explicit approval before exiting plan mode and implementing. Auto mode and bypass-permissions mode do not waive this.
+- EnterPlanMode is optional: present the plan through it or directly in the conversation, whichever fits. Either way, wait for explicit approval before implementing. Auto mode and bypass-permissions mode do not waive this.
 - For a trivial code change (one-line fix, typo in a source file), a plan of one or two sentences is enough. Still confirm before editing.
 - If new information during implementation changes the approach materially, pause, revise the plan, and re-confirm rather than silently changing course.
 
@@ -99,7 +99,7 @@ If a requirement, constraint, or path forward is unclear, ask. Do not guess and 
 When you need to ask the user something, use the AskUserQuestion tool — not free-text prose buried in a response.
 
 - Structured questions are easier for the user to answer and harder to miss.
-- Exception: plan approval goes through ExitPlanMode, which already requests approval. Don't double-ask via AskUserQuestion for plan sign-off.
+- Exception: a plan presented with EnterPlanMode is approved through ExitPlanMode, which already requests approval. Don't double-ask via AskUserQuestion for that sign-off. A plan presented in the conversation is approved through AskUserQuestion.
 
 ## Code comments
 
