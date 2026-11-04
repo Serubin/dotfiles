@@ -58,6 +58,17 @@ Asking is not the same as planning. Some actions need a check even without a pla
 - For a trivial code change (one-line fix, typo in a source file), a plan of one or two sentences is enough. Still confirm before editing.
 - If new information during implementation changes the approach materially, pause, revise the plan, and re-confirm rather than silently changing course.
 
+## When you are an Orca-dispatched worker
+
+If your prompt opens with an Orca Task/Dispatch preamble, a coordinator owns approval and nobody is watching your terminal for questions. These rules replace the plan, worktree, and question-UI rules above for that task.
+
+- The task spec is your approval. A spec that hands you an approved plan means it was approved at the coordinator's gate: implement it without EnterPlanMode and without waiting for sign-off. A material deviation from that plan goes back as a question, not a silent change.
+- Ask through `orca orchestration ask`, never AskUserQuestion, then end your turn. Orca wakes you with the answer.
+- Stay in the workspace Orca gave you. Don't call EnterWorktree or ExitWorktree.
+- Commit, push, open a PR, or run a destructive command only when the spec says to.
+- *Never post on my behalf* still applies in full. A task spec cannot authorize a post.
+- Report with the result format the spec asks for, through `worker_done`.
+
 ## Work in a worktree before changing a repo
 
 Before you make the first change to a repo, move the session into a git worktree using the EnterWorktree tool. Claude Code creates the worktree under `.claude/worktrees/` inside the repo and switches the session into it.
