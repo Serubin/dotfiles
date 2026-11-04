@@ -366,6 +366,9 @@ this up`, `flagging as a question rather than an ask`, `Happy either way`.
 - Spin. `maybe don't highlight this as an accomplishment? it's just a fact and doesn't make us
   look good.`
 - An unverifiable absolute: `ensures correctness across all edge cases`.
+- Narrating my own diligence instead of reporting what I found: `so we checked them rather
+  than assume`, `rather than take that at face value`, `to be thorough, we looked at`. Nobody
+  talks like this. State the finding: `We verified that no integration is live.`
 - Jargon where a plain word exists. `use words that people know`.
 - A long apology, or praise wrapped around criticism.
 - A greeting on a PR comment.
