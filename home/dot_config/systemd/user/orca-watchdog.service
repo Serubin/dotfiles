@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart the headless Orca host when its SSH link to orcad stays down
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/orca-host.sh watchdog

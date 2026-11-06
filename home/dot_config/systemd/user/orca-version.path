@@ -1,0 +1,8 @@
+[Unit]
+Description=Follow the Orca version that last activated orcad
+
+[Path]
+PathChanged=%h/.orca-remote/orcad-active.json
+
+[Install]
+WantedBy=default.target

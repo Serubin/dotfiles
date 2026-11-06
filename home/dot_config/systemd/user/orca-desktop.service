@@ -1,0 +1,19 @@
+[Unit]
+Description=Headless Orca desktop app, the Relay host for Orca Mobile
+Requires=orca-xvfb.service
+After=orca-xvfb.service orca-sync.service
+Wants=orca-sync.service
+StartLimitIntervalSec=0
+
+[Service]
+Environment=DISPLAY=:98
+Environment=XAUTHORITY=%h/.local/state/orca-host/Xauthority
+Environment=PATH=%h/.config/orca-host/shim:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStartPre=%h/.local/bin/orca-host.sh trust-localhost
+ExecStart=%h/.local/opt/orca/current/squashfs-root/orca-ide
+ExecStopPost=%h/.local/bin/orca-host.sh reap
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

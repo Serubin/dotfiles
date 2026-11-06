@@ -1,0 +1,8 @@
+[Unit]
+Description=Fetch the Orca build matching the version that last ran orcad
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=%h/.local/bin/orca-host.sh sync
+TimeoutStartSec=15min

@@ -1,0 +1,12 @@
+[Unit]
+Description=Virtual X display for the headless Orca host
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+UMask=0077
+ExecStartPre=%h/.local/bin/orca-host.sh xauth
+ExecStart=/usr/bin/Xvfb :98 -screen 0 1600x1000x24 -nolisten tcp -auth %h/.local/state/orca-host/Xauthority
+ExecStartPost=%h/.local/bin/orca-host.sh wait-display
+Restart=always
+RestartSec=10
