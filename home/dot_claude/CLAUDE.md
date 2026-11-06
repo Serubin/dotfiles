@@ -80,8 +80,23 @@ Reach for subagents whenever they meaningfully improve quality or save context, 
 
 - Research and exploration: spawn an Explore (or general-purpose) subagent for any open-ended search across the codebase, anything likely to take more than a few greps, or anything that would dump a lot of output into the main context.
 - Review: after producing a non-trivial plan or code change, spawn a subagent to critique it before presenting to the user. A second pair of eyes catches assumptions that the author can't see.
-- Parallelism: when subtasks are independent, launch multiple subagents in a single message so they run concurrently.
+- Parallelism: when subtasks are independent, launch multiple subagents in a single message so they run concurrently. Parallel code changes go to Orca workers instead (below).
 - Don't duplicate work: if a subagent is investigating something, don't run the same searches yourself in parallel.
+
+### Orca workers for implementation
+
+Hand implementation work to an Orca worker through the `orchestration` skill, instead of a subagent, when it edits a repo and any of these hold:
+
+- it will run long;
+- it runs alongside other code changes;
+- I may want to watch it or answer it from Orca Mobile;
+- it needs a different agent, such as Codex.
+
+Workers get their own worktree and terminal, show up in Orca and on my phone, and keep going if this session compacts or ends.
+
+Keep subagents for research, exploration, reviews (including the critique pass above and the `/commit` self-review), and anything short. A worker is a full session with its own startup and context, so it is the wrong tool for read-only or few-minute work.
+
+Give a worker a spec it can finish without anyone at its terminal: the approved plan if there is one, whether it may commit or push, and the result format. *When you are an Orca-dispatched worker* is what it follows on the other side.
 
 ## Challenge assumptions and self-correct
 
