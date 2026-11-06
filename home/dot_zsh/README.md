@@ -125,7 +125,14 @@ each release. The cost is that a one-word prompt (`claude refactor`) reads as a 
 and starts in the settings' default mode instead.
 
 Being a function rather than an alias means it applies to interactive shells only, and
-`command claude` always reaches the real binary.
+`command claude` skips the routing.
+
+Inside cmux, the routed call goes through cmux's `_cmux_claude_wrapper_command`, so cmux's
+session hooks (sidebar status, notifications, resume) still apply on top of the account and
+permission defaults. cmux redefines `claude` on the first prompt from a hook registered
+before `~/.zshrc` runs, so a one-shot `_claude_reclaim` precmd hook takes the name back
+immediately after. This depends on cmux internals; if cmux renames its wrapper function, the
+call falls back to `command claude`.
 
 ### Environment (`env`)
 
