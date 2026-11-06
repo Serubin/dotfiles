@@ -71,3 +71,9 @@ fi
 if [ -x "$HOME/.local/bin/coder-keepalive.sh" ]; then
     "$HOME/.local/bin/coder-keepalive.sh" install || true
 fi
+
+# --- Headless Orca host (Relay to the phone with the laptop off). Its apt/AppArmor bits
+# live in /, so they are re-applied here; backgrounded so a slow apt can't delay startup.
+if [ -x "$HOME/.local/bin/orca-host.sh" ]; then
+    nohup "$HOME/.local/bin/orca-host.sh" install > /tmp/startup-orca-host.log 2>&1 &
+fi

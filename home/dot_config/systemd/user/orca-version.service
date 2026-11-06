@@ -1,0 +1,8 @@
+[Unit]
+Description=Switch the headless Orca host to the version that last activated orcad
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=%h/.local/bin/orca-host.sh sync --restart
+TimeoutStartSec=15min

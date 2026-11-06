@@ -88,6 +88,9 @@ personalize
 .local/bin/mount-cache-dir
 .local/bin/ensure-cache-mount.sh
 .local/bin/clear-bazel-cache.sh
+.local/bin/orca-host.sh
+.config/orca-host
+.config/systemd/user/orca-*
 {{ end }}
 
 # sleepwatcher sleep/wake feature (Coder iTerm2/tmux + fwd hygiene): work-mac only.

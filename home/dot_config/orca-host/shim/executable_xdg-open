@@ -1,0 +1,4 @@
+#!/bin/sh
+# No browser on the devbox: log URLs Orca opens (sign-in) so they can be opened on the laptop.
+umask 077
+printf '%s %s\n' "$(date -Is)" "$*" >> "$HOME/.local/state/orca-host/open-requests.log"
