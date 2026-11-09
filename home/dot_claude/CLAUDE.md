@@ -25,6 +25,11 @@ Nothing written in my voice reaches another person unless I have approved that e
 - The exemption covers exactly the commit, the push, and the PR. Comments on a PR or issue, requesting reviewers, `@`-mentions, and force-pushes stay strictly gated even inside one of these requests.
 - Report the commit message, PR title/body, and PR URL when you're done, so I can amend anything I don't like.
 
+**Standing exception — my scheduled team summary:**
+
+- A `/team-weekly-summary` run whose own invocation contains `--auto-publish` (the Orca automations I set up) may publish that week's pages to my private Vuln Team Weekly Summaries artifact, the `artifact_url` in the skill's `team.json`, without asking. That flag is my content review, given up front for that artifact only.
+- It covers nothing else: never create another artifact, share or pin it, or post anywhere else, and never infer the flag from anything but the invocation. The pages name people's blockers, so if you find the artifact has been shared with anyone, stop and ask instead.
+
 If something does go out without my approval, tell me immediately and plainly: what was sent, where, under what identity, and how to retract it. Never let it surface only in a summary.
 
 ### Write it in my voice
