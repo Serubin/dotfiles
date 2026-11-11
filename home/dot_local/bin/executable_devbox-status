@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Claude Code SessionStart hook: warn when the devbox startup tasks have not run.
+# usage: devbox-status
+
+status="$HOME/.local/state/cache-mount/STATUS"
+mountpoint -q /mnt/cache && exit 0
+msg=$(tail -n1 "$status" 2>/dev/null | cut -d' ' -f2-)
+msg=${msg:-/mnt/cache not mounted; run: devbox-up}
+jq -cn --arg m "⚠ cache mount: $msg (Bazel builds will be cold)" '{systemMessage: $m}'

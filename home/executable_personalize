@@ -62,6 +62,13 @@ if command -v crontab >/dev/null 2>&1; then
     ( crontab -l 2>/dev/null | grep -vF '# tmux-periodic-save'; echo "$line" ) | crontab -
 fi
 
+# --- /mnt/cache retry cron (every 5 min), re-installed per boot like the tmux one. It
+# mounts with cached SSO credentials only; when those have expired, run `devbox-up`.
+if command -v crontab >/dev/null 2>&1; then
+    line="*/5 * * * * $HOME/.local/bin/ensure-cache-mount.sh --cron >/dev/null 2>&1 # cache-mount"
+    ( crontab -l 2>/dev/null | grep -vF '# cache-mount'; echo "$line" ) | crontab -
+fi
+
 # --- Coder keep-alive. Holds the workspace autostop deadline out from Mon 7am to
 # Fri 8pm ET so idle time can't reclaim the box mid-week. The helper
 # (re)provisions a stable coder binary under ~/.local/state (the PATH one lives in a

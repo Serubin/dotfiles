@@ -87,6 +87,8 @@ personalize
 .local/bin/coder-keepalive.sh
 .local/bin/mount-cache-dir
 .local/bin/ensure-cache-mount.sh
+.local/bin/devbox-up
+.local/bin/devbox-status
 .local/bin/clear-bazel-cache.sh
 .local/bin/orca-host.sh
 .config/orca-host
