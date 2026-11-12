@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Run the work-devbox startup tasks that need a human (SSO in the Mac browser).
+# usage: devbox-up
+
+"$HOME/.local/bin/ensure-cache-mount.sh"
+
+if ! mountpoint -q /mnt/cache; then
+    msg=$(tail -n1 "$HOME/.local/state/cache-mount/STATUS" 2>/dev/null | cut -d' ' -f2-)
+    printf '\n!! cache mount: %s\n' "${msg:-/mnt/cache not mounted}"
+    exit 1
+fi
+printf '\nok: /mnt/cache mounted\n'

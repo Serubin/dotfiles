@@ -62,6 +62,19 @@ FORCE_HOOKS = {
             ],
         },
     ],
+{{- if eq .class "work-devbox" }}
+    "SessionStart": [
+        {
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "$HOME/.local/bin/devbox-status",
+                    "timeout": 5,
+                },
+            ],
+        },
+    ],
+{{- end }}
 }
 
 # Written only when the key is missing.

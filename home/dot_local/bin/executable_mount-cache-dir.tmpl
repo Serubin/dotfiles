@@ -2,7 +2,8 @@
 # Attach + mount the EBS build-cache volume at /mnt/cache. Nothing outside
 # /home/coder survives a workspace host restart, so it must be re-attached and
 # re-mounted after every one. Run by hand any time, or let
-# ~/.local/bin/ensure-cache-mount.sh call it once per SSH connection.
+# ~/.local/bin/ensure-cache-mount.sh call it (devbox-up, tmux-devel.sh, cron).
+# CACHE_MOUNT_NO_LOGIN=1 fails instead of running `aws sso login`.
 #
 # The volume id and AWS account id come from chezmoi [data] rather than being
 # hardcoded: this repo is public and both are work infrastructure identifiers.
@@ -68,6 +69,11 @@ if [[ ! -b "$cachedir_dev" ]]; then
   echo "attaching ebs volume to $cachedir_dev"
 
   if ! aws_mount_volume ; then
+    # Unattended callers (the cron retry) must never start a browser login.
+    if [[ -n "$CACHE_MOUNT_NO_LOGIN" ]]; then
+      echo "attach failed and CACHE_MOUNT_NO_LOGIN is set; run devbox-up to log in"
+      exit 1
+    fi
     aws_login || exit 1
     aws_mount_volume
   fi

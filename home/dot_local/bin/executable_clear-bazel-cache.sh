@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Delete every Bazel output base on the /mnt/cache EBS build cache, keeping the
 # repository caches and install bases. Called by ~/.local/bin/mount-cache-dir once the
-# volume is mounted, which is the only moment the cache is provably live and no build
-# can be running; safe to run by hand any time.
+# volume is mounted; a server started against the bare mountpoint before then is stopped
+# below. Safe to run by hand any time.
 #
 # Two roots because lwcode/services/.bazelrc.user sets
 # `startup --output_user_root=/mnt/cache/bazel` while worktrees without that file use the
@@ -84,7 +84,7 @@ for root in "${ROOTS[@]}"; do
     done <<< "$bases"
 
     # Bazel leaves read-only directories through external/, which rm cannot unlink
-    # through. Backgrounded: this runs on the SSH pty that is waiting to attach tmux.
+    # through. Backgrounded: callers (tmux-devel.sh, devbox-up) are waiting on it.
     if [[ -n $trash ]]; then
         log "removing $trash in the background (log: $LOG)"
         nohup bash -c "chmod -R u+w '$trash' 2>/dev/null; \
