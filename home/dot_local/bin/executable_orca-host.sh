@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the Orca desktop app headless on this devbox so the phone reaches orcad over Orca Relay.
-# usage: orca-host.sh install|sync [--restart]|trust-localhost|watchdog|reap|xauth|wait-display|vnc [stop]|status
+# usage: orca-host.sh install|sync [--restart]|trust-localhost|reclaim-lock|revive|watchdog|reap|xauth|wait-display|vnc [stop]|status
 set -euo pipefail
 
 OPT="$HOME/.local/opt/orca"
@@ -159,6 +159,38 @@ print("[orca-host] refreshed 127.0.0.1 host keys in known_hosts", file=sys.stder
 PY
 }
 
+# A lock from an earlier boot of this host can't have a live owner; Orca treats it as another machine's.
+do_reclaim_lock() {
+    python3 -I - "$HOME/.config/orca/orcad.lock" <<'PY'
+import json, os, socket, sys
+path = sys.argv[1]
+try:
+    lock = json.load(open(path))
+except FileNotFoundError:
+    sys.exit(0)
+except ValueError:
+    print("[orca-host] %s is not JSON; leaving it" % path, file=sys.stderr)
+    sys.exit(0)
+boot = open("/proc/sys/kernel/random/boot_id").read().strip()
+if not isinstance(lock, dict) or lock.get("host") != socket.gethostname() or not lock.get("bootId"):
+    sys.exit(0)
+if lock["bootId"] != boot:
+    os.remove(path)
+    print("[orca-host] removed orcad.lock from earlier boot %s (pid %s)" % (lock["bootId"], lock.get("pid")),
+          file=sys.stderr)
+PY
+}
+
+# Run from cron: nothing restarts a lingering user manager that earlyoom SIGKILLed.
+do_revive() {
+    local uid
+    uid="$(id -u)"
+    [ -e "/var/lib/systemd/linger/$(id -un)" ] || return 0
+    systemctl -q is-active "user@$uid.service" && return 0
+    log "user@$uid.service is $(systemctl is-active "user@$uid.service" || true); starting it"
+    sudo -n systemctl start "user@$uid.service"
+}
+
 ensure_ssh_key() {
     local ak="$HOME/.ssh/authorized_keys" pub
     [ -f "$KEY" ] || ssh-keygen -q -t ed25519 -N '' -C orca-host-localhost -f "$KEY"
@@ -246,6 +278,20 @@ profile orca-host @{HOME}/.local/opt/orca/*/squashfs-root/orca-ide flags=(unconf
 }
 AA
     sudo apparmor_parser -r /etc/apparmor.d/orca-host
+    if [ -f /usr/lib/systemd/system/earlyoom.service ]; then
+        sudo mkdir -p /etc/systemd/system/earlyoom.service.d
+        sudo tee /etc/systemd/system/earlyoom.service.d/orca-host.conf >/dev/null <<'EOF'
+[Service]
+ExecStart=
+ExecStart=/usr/bin/earlyoom $EARLYOOM_ARGS --avoid "^(systemd|Xvfb|orca-ide|dbus-daemon)$$"
+EOF
+        sudo systemctl daemon-reload
+        sudo systemctl try-restart earlyoom.service
+    fi
+    if command -v crontab >/dev/null; then
+        ( { crontab -l 2>/dev/null || true; } | grep -vF '# orca-host-revive' || true
+          echo "*/5 * * * * $HOME/.local/bin/orca-host.sh revive >>$STATE/revive.log 2>&1 # orca-host-revive" ) | crontab -
+    fi
     sudo loginctl enable-linger "$(id -un)"
     # Enabling linger starts the user manager asynchronously; its bus must exist before systemctl --user.
     for _ in $(seq 1 60); do
@@ -286,6 +332,8 @@ case "${1:-}" in
     install) do_install ;;
     sync) do_sync "${2:-}" ;;
     trust-localhost) do_trust_localhost ;;
+    reclaim-lock) do_reclaim_lock ;;
+    revive) do_revive ;;
     watchdog) do_watchdog ;;
     reap) do_reap ;;
     xauth) do_xauth ;;
