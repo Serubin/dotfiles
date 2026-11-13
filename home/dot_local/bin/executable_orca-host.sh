@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the Orca desktop app headless on this devbox so the phone reaches orcad over Orca Relay.
-# usage: orca-host.sh install|sync [--restart]|trust-localhost|reclaim-lock|revive|watchdog|reap|xauth|wait-display|vnc [stop]|status
+# usage: orca-host.sh install|sync [--restart]|claim-machine|trust-localhost|reclaim-lock|revive|watchdog|reap|xauth|wait-display|vnc [stop]|status
 set -euo pipefail
 
 OPT="$HOME/.local/opt/orca"
@@ -191,6 +191,20 @@ do_revive() {
     sudo -n systemctl start "user@$uid.service"
 }
 
+# Orca picks orcad's data dir by a hash of /etc/machine-id, which a rebuild regenerates; only one machine uses this home.
+do_claim_machine() {
+    local claim="$HOME/.orca-remote/orcad-machine.json" id key
+    id="$(cat /etc/machine-id 2>/dev/null || true)"
+    [[ "$id" =~ ^[a-f0-9]{32}$ ]] || die "unusable /etc/machine-id"
+    key="$(printf 'linux:%s' "$id" | sha256sum | cut -c1-16)"
+    grep -qF "\"machineKey\":\"$key\"" "$claim" 2>/dev/null && return 0
+    mkdir -p "$HOME/.orca-remote"
+    [ -f "$claim" ] && cp -p "$claim" "$claim.bak"
+    printf '{"schemaVersion":1,"machineKey":"%s"}' "$key" > "$claim.tmp"
+    mv "$claim.tmp" "$claim"
+    log "claimed ~/.orca for machine key $key"
+}
+
 ensure_ssh_key() {
     local ak="$HOME/.ssh/authorized_keys" pub
     [ -f "$KEY" ] || ssh-keygen -q -t ed25519 -N '' -C orca-host-localhost -f "$KEY"
@@ -259,6 +273,7 @@ PY
 
 do_install() {
     local pkgs=()
+    do_claim_machine
     command -v Xvfb >/dev/null || pkgs+=(xvfb)
     command -v xauth >/dev/null || pkgs+=(xauth)
     if [ "${#pkgs[@]}" -gt 0 ]; then
@@ -331,6 +346,7 @@ do_status() {
 case "${1:-}" in
     install) do_install ;;
     sync) do_sync "${2:-}" ;;
+    claim-machine) do_claim_machine ;;
     trust-localhost) do_trust_localhost ;;
     reclaim-lock) do_reclaim_lock ;;
     revive) do_revive ;;
