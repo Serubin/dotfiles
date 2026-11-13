@@ -10,6 +10,7 @@ Environment=DISPLAY=:98
 Environment=XAUTHORITY=%h/.local/state/orca-host/Xauthority
 Environment=PATH=%h/.config/orca-host/shim:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStartPre=%h/.local/bin/orca-host.sh trust-localhost
+ExecStartPre=%h/.local/bin/orca-host.sh reclaim-lock
 ExecStart=%h/.local/opt/orca/current/squashfs-root/orca-ide
 ExecStopPost=%h/.local/bin/orca-host.sh reap
 Restart=always
