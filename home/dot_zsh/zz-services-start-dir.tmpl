@@ -1,0 +1,17 @@
+{{ if eq .class "work-devbox" -}}
+# New shells at the root of any services checkout or worktree start in its vulnerability/ subtree.
+# Read .git directly rather than running git, which would cost a fork on every shell start.
+() {
+    [[ -d $PWD/vulnerability ]] || return
+    local main=$HOME/lwcode/services/.git link
+    if [[ -f $PWD/.git ]]; then
+        read -r link < $PWD/.git
+        [[ $link == "gitdir: $main/worktrees/"* ]] || return
+    elif [[ $PWD/.git -ef $main ]]; then
+        :
+    else
+        return
+    fi
+    builtin cd -q vulnerability
+}
+{{- end }}
