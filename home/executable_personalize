@@ -53,6 +53,10 @@ if [ "$(timedatectl show -p Timezone --value 2>/dev/null)" != "America/New_York"
     sudo timedatectl set-timezone America/New_York
 fi
 
+# --- Helix sandbox: bwrap plus a bwrap-only AppArmor userns grant, both wiped on restart.
+# Backgrounded like the zsh step: apt must never gate workspace startup.
+nohup "$HOME/.local/bin/apply-helix-sandbox.sh" > /tmp/startup-apply-helix-sandbox.log 2>&1 &
+
 # --- Periodic tmux-resurrect save cron (every 5 min). The crontab does not survive a
 # host restart, so it is (re)installed here rather than at chezmoi apply; the script
 # itself is chezmoi-managed. Idempotent: de-duped by the marker comment, other entries
