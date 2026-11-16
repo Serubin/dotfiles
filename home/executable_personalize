@@ -9,10 +9,16 @@
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # --- Dotfiles: install chezmoi if missing + apply, by running this repo's install.sh
-# from the persisted local checkout, so there is no network or branch dependency.
+# from the persisted local checkout, fast-forwarded to origin/main when that is safe.
 # install.sh also runs the base-package chezmoiscript and deploys the helper scripts
 # this bootstrap calls below.
 DOTFILES_SRC="${DOTFILES_SRC:-$HOME/.dotfiles}"
+# Only a clean main: a feature branch or local edits are work in progress, not to be moved.
+if [ "$(git -C "$DOTFILES_SRC" symbolic-ref -q --short HEAD 2>/dev/null)" = main ] &&
+   [ -z "$(git -C "$DOTFILES_SRC" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+    GIT_TERMINAL_PROMPT=0 timeout 60 git -C "$DOTFILES_SRC" pull -q --ff-only origin main ||
+        echo "[personalize] could not fast-forward $DOTFILES_SRC; applying it as is" >&2
+fi
 if [ -x "$DOTFILES_SRC/install.sh" ]; then
     "$DOTFILES_SRC/install.sh" --env work --class work-devbox
 else
