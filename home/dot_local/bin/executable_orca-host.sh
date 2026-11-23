@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 # Run the Orca desktop app headless on this devbox so the phone reaches orcad over Orca Relay.
-# usage: orca-host.sh install|sync [--restart]|claim-machine|trust-localhost|reclaim-lock|revive|watchdog|reap|xauth|wait-display|vnc [stop]|status
+# usage: orca-host.sh install|sync [--restart]|trust-localhost|reclaim-lock|revive|watchdog|reap|xauth|wait-display|vnc [stop]|status
 set -euo pipefail
 
 OPT="$HOME/.local/opt/orca"
 STATE="$HOME/.local/state/orca-host"
-ACTIVE_JSON="$HOME/.orca-remote/orcad-active.json"
+# Must match ~/.zshenv: Orca keys orcad's data dir to this name instead of /etc/machine-id.
+MACHINE_NAME="${ORCA_MACHINE_NAME:-$(hostname -s)}"
+[[ "$MACHINE_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]] || { echo "[orca-host] bad machine name '$MACHINE_NAME'" >&2; exit 1; }
+MACHINE_KEY="$(printf 'linux:name:%s' "$MACHINE_NAME" | sha256sum | cut -c1-16)"
+ORCAD_ROOT="$HOME/.orca-remote/hosts/$MACHINE_KEY/.orca-remote"
+ACTIVE_JSON="$ORCAD_ROOT/orcad-active.json"
 KEY="$HOME/.ssh/orca_localhost_ed25519"
 XAUTH="$STATE/Xauthority"
 DISPLAY_NUM=98
@@ -161,23 +166,23 @@ PY
 
 # A lock from an earlier boot of this host can't have a live owner; Orca treats it as another machine's.
 do_reclaim_lock() {
-    python3 -I - "$HOME/.config/orca/orcad.lock" <<'PY'
+    python3 -I - "$HOME/.config/orca/orcad.lock" "$HOME/.orca-${MACHINE_KEY:0:8}/orcad.lock" <<'PY'
 import json, os, socket, sys
-path = sys.argv[1]
-try:
-    lock = json.load(open(path))
-except FileNotFoundError:
-    sys.exit(0)
-except ValueError:
-    print("[orca-host] %s is not JSON; leaving it" % path, file=sys.stderr)
-    sys.exit(0)
 boot = open("/proc/sys/kernel/random/boot_id").read().strip()
-if not isinstance(lock, dict) or lock.get("host") != socket.gethostname() or not lock.get("bootId"):
-    sys.exit(0)
-if lock["bootId"] != boot:
-    os.remove(path)
-    print("[orca-host] removed orcad.lock from earlier boot %s (pid %s)" % (lock["bootId"], lock.get("pid")),
-          file=sys.stderr)
+for path in sys.argv[1:]:
+    try:
+        lock = json.load(open(path))
+    except FileNotFoundError:
+        continue
+    except ValueError:
+        print("[orca-host] %s is not JSON; leaving it" % path, file=sys.stderr)
+        continue
+    if not isinstance(lock, dict) or lock.get("host") != socket.gethostname() or not lock.get("bootId"):
+        continue
+    if lock["bootId"] != boot:
+        os.remove(path)
+        print("[orca-host] removed %s from earlier boot %s (pid %s)" % (path, lock["bootId"], lock.get("pid")),
+              file=sys.stderr)
 PY
 }
 
@@ -189,20 +194,6 @@ do_revive() {
     systemctl -q is-active "user@$uid.service" && return 0
     log "user@$uid.service is $(systemctl is-active "user@$uid.service" || true); starting it"
     sudo -n systemctl start "user@$uid.service"
-}
-
-# Orca picks orcad's data dir by a hash of /etc/machine-id, which a rebuild regenerates; only one machine uses this home.
-do_claim_machine() {
-    local claim="$HOME/.orca-remote/orcad-machine.json" id key
-    id="$(cat /etc/machine-id 2>/dev/null || true)"
-    [[ "$id" =~ ^[a-f0-9]{32}$ ]] || die "unusable /etc/machine-id"
-    key="$(printf 'linux:%s' "$id" | sha256sum | cut -c1-16)"
-    grep -qF "\"machineKey\":\"$key\"" "$claim" 2>/dev/null && return 0
-    mkdir -p "$HOME/.orca-remote"
-    [ -f "$claim" ] && cp -p "$claim" "$claim.bak"
-    printf '{"schemaVersion":1,"machineKey":"%s"}' "$key" > "$claim.tmp"
-    mv "$claim.tmp" "$claim"
-    log "claimed ~/.orca for machine key $key"
 }
 
 ensure_ssh_key() {
@@ -273,7 +264,6 @@ PY
 
 do_install() {
     local pkgs=()
-    do_claim_machine
     command -v Xvfb >/dev/null || pkgs+=(xvfb)
     command -v xauth >/dev/null || pkgs+=(xauth)
     if [ "${#pkgs[@]}" -gt 0 ]; then
@@ -346,7 +336,6 @@ do_status() {
 case "${1:-}" in
     install) do_install ;;
     sync) do_sync "${2:-}" ;;
-    claim-machine) do_claim_machine ;;
     trust-localhost) do_trust_localhost ;;
     reclaim-lock) do_reclaim_lock ;;
     revive) do_revive ;;

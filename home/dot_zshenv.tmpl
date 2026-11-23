@@ -26,6 +26,10 @@ case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;
     *) export PATH="$PATH:$HOME/.local/bin" ;;
 esac
+{{ if eq .class "work-devbox" -}}
+# Orca otherwise keys orcad's state to /etc/machine-id, which every rebuild regenerates.
+export ORCA_MACHINE_NAME={{ .chezmoi.hostname | quote }}
+{{ end -}}
 {{ if and (eq .chezmoi.os "linux") (stat "/home/linuxbrew/.linuxbrew/bin") }}
 # Homebrew (linuxbrew) for EVERY zsh invocation, not just ~/.zprofile: a tmux pane is a
 # non-login shell (tmux.conf's `default-command "/usr/bin/env zsh"`) that never sources it,
