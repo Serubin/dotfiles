@@ -35,7 +35,8 @@ aws_mount_volume() {
   fi
   export AWS_REGION
 
-  aws ec2 attach-volume \
+  # --no-cli-pager: the JSON reply otherwise opens `less`, which suspends the run when backgrounded.
+  aws ec2 attach-volume --no-cli-pager \
       --volume-id "$VOLUME_ID" \
       --instance-id "$INSTANCE_ID" \
       --device "$cachedir_dev"
